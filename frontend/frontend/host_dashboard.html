@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Anfitrión - ViviGo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-house-chimney logo-house"></i>
+                </div>
+                <span class="logo-text">ViviGo</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="user-menu">
+                        <img src="https://placehold.co/50x50/cccccc/333333?text=DA" alt="Foto del anfitrión">
+                        <span>Daniela Arboleda Trejos</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container dashboard-container">
+        <div class="dashboard-layout">
+            <aside class="dashboard-nav">
+                <div class="user-profile-summary">
+                    <img src="https://placehold.co/80x80/cccccc/333333?text=DA" alt="Foto del anfitrión">
+                    <h3>Daniela Arboleda Trejos</h3>
+                    <p>Anfitrión desde 2023</p>
+                </div>
+                <ul>
+                    <li class="active"><a href="#"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fa-solid fa-house-user"></i> Mis Alojamientos</a></li>
+                    <li><a href="#"><i class="fa-solid fa-calendar-check"></i> Reservas</a></li>
+                    <li><a href="#"><i class="fa-solid fa-comments"></i> Comentarios</a></li>
+                    <li><a href="#"><i class="fa-solid fa-user"></i> Mi Perfil</a></li>
+                    <li><a href="#"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
+                </ul>
+            </aside>
+
+            <section class="dashboard-content">
+                <h1>Dashboard de Anfitrión</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+                        <div class="stat-info">
+                            <h4>Ingresos (Últ. 30 días)</h4>
+                            <p>$4,850,000 COP</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+                        <div class="stat-info">
+                            <h4>Nuevas Reservas (Últ. 7 días)</h4>
+                            <p>5</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                        <div class="stat-info">
+                            <h4>Tasa de Ocupación (Mes)</h4>
+                            <p>75%</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+                        <div class="stat-info">
+                            <h4>Calificación Promedio</h4>
+                            <p>4.95</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-section">
+                    <h2>Actividad Reciente</h2>
+                    <ul class="activity-list">
+                        <li>
+                            <i class="fa-solid fa-circle-check activity-icon new-booking"></i>
+                            <div><strong>Nueva reserva</strong> en "Villa con Piscina" de <strong>Carlos Rodriguez</strong> por 3 noches.</div>
+                            <span class="activity-time">hace 2 horas</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-comment-dots activity-icon new-review"></i>
+                            <div><strong>Nuevo comentario</strong> de <strong>Maria</strong> en "Cabaña Rústica". Calificación: 5 estrellas.</div>
+                            <span class="activity-time">hace 1 día</span>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-circle-xmark activity-icon cancellation"></i>
+                            <div><strong>Cancelación</strong> de reserva en "Apartamento Moderno" por <strong>Ana Gómez</strong>.</div>
+                            <span class="activity-time">hace 2 días</span>
+                        </li>
+                    </ul>
+                </div>
+
+                 <div class="dashboard-section">
+                    <h2>Mis Alojamientos</h2>
+                    <div class="property-quick-view">
+                        <div class="property-item">
+                            <h4>Villa con Piscina en la Montaña</h4>
+                            <span class="status published">Publicado</span>
+                            <a href="#" class="btn btn-secondary">Gestionar</a>
+                        </div>
+                        <div class="property-item">
+                            <h4>Apartamento Moderno en el Centro</h4>
+                            <span class="status published">Publicado</span>
+                            <a href="#" class="btn btn-secondary">Gestionar</a>
+                        </div>
+                         <div class="property-item">
+                            <h4>Cabaña Rústica junto al Lago</h4>
+                            <span class="status paused">Pausado</span>
+                            <a href="#" class="btn btn-secondary">Gestionar</a>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-primary add-property-btn"><i class="fa-solid fa-plus"></i> Añadir Alojamiento</a>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom"><p>&copy; 2025 ViviGo. Todos los derechos reservados.</p></div>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Alojamiento - ViviGo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-house-chimney logo-house"></i>
+                </div>
+                <span class="logo-text">ViviGo</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="user-menu">
+                        <img src="https://placehold.co/50x50/cccccc/333333?text=DA" alt="Foto del anfitrión">
+                        <span>Daniela Arboleda</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container dashboard-container">
+        <div class="dashboard-layout">
+            <aside class="dashboard-nav">
+                <div class="user-profile-summary">
+                    <img src="https://placehold.co/80x80/cccccc/333333?text=DA" alt="Foto del anfitrión">
+                    <h3>Daniela Arboleda</h3>
+                    <p>Anfitrión desde 2023</p>
+                </div>
+                <ul>
+                    <li><a href="host_dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                    <li class="active"><a href="host_accommodations.html"><i class="fa-solid fa-house-user"></i> Mis Alojamientos</a></li>
+                    <li><a href="#"><i class="fa-solid fa-calendar-check"></i> Reservas</a></li>
+                    <li><a href="#"><i class="fa-solid fa-comments"></i> Comentarios</a></li>
+                    <li><a href="#"><i class="fa-solid fa-user"></i> Mi Perfil</a></li>
+                    <li><a href="#"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
+                </ul>
+            </aside>
+
+            <section class="dashboard-content">
+                <div class="content-header">
+                    <h1>Añadir Nuevo Alojamiento</h1>
+                </div>
+                
+                <div class="form-container multi-step-form">
+                    <div class="form-progress-bar">
+                        <div class="step active" data-step="1"><span>Descripción</span></div>
+                        <div class="step" data-step="2"><span>Ubicación</span></div>
+                        <div class="step" data-step="3"><span>Servicios y Precio</span></div>
+                        <div class="step" data-step="4"><span>Imágenes</span></div>
+                    </div>
+
+                    <form>
+                        <!-- Step 1: Description -->
+                        <div class="form-step-content active" data-step="1">
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label for="title">Título del Alojamiento</label>
+                                    <input type="text" id="title" placeholder="Ej: Villa moderna con vistas al mar">
+                                </div>
+                                <div class="form-group">
+                                    <label for="type">Tipo de Propiedad</label>
+                                    <select id="type">
+                                        <option>Apartamento</option>
+                                        <option>Casa</option>
+                                        <option>Cabaña</option>
+                                        <option>Finca</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="capacity">Capacidad Máxima</label>
+                                    <input type="number" id="capacity" placeholder="Número de huéspedes">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="description">Descripción</label>
+                                    <textarea id="description" rows="6" placeholder="Describe tu alojamiento..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Location -->
+                        <div class="form-step-content" data-step="2">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="city">Ciudad</label>
+                                    <input type="text" id="city" placeholder="Ej: Bogotá D.C.">
+                                </div>
+                                <div class="form-group">
+                                    <label for="address">Dirección</label>
+                                    <input type="text" id="address" placeholder="Ej: Carrera 10 #20-30">
+                                </div>
+                                <div class="form-group full-width">
+                                    <label>Marcar en el mapa</label>
+                                    <div class="map-placeholder">Mapa interactivo para seleccionar ubicación</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Amenities & Price -->
+                        <div class="form-step-content" data-step="3">
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label>Servicios</label>
+                                    <div class="checkbox-grid">
+                                        <div class="checkbox-group"><div><input type="checkbox" id="serv1"><label for="serv1">Wi-Fi</label></div></div>
+                                        <div class="checkbox-group"><div><input type="checkbox" id="serv2"><label for="serv2">Piscina</label></div></div>
+                                        <div class="checkbox-group"><div><input type="checkbox" id="serv3"><label for="serv3">Cocina</label></div></div>
+                                        <div class="checkbox-group"><div><input type="checkbox" id="serv4"><label for="serv4">Parking</label></div></div>
+                                        <div class="checkbox-group"><div><input type="checkbox" id="serv5"><label for="serv5">Admite Mascotas</label></div></div>
+                                        <div class="checkbox-group"><div><input type="checkbox" id="serv6"><label for="serv6">TV</label></div></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Precio por Noche (COP)</label>
+                                    <input type="number" id="price" placeholder="Ej: 250000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Images -->
+                        <div class="form-step-content" data-step="4">
+                            <div class="form-group">
+                                <label>Imágenes del Alojamiento</label>
+                                <div class="image-uploader">
+                                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    <p>Arrastra y suelta tus imágenes aquí, o haz clic para seleccionar</p>
+                                    <input type="file" multiple>
+                                </div>
+                                <div class="image-preview-grid">
+                                    <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=300&auto=format&fit=crop" alt="Imagen principal">
+                                    <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=300&auto=format&fit=crop" alt="Vista interior">
+                                    <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=300&auto=format&fit=crop" alt="Vista exterior">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn btn-secondary btn-prev" disabled>Anterior</button>
+                            <button type="button" class="btn btn-primary btn-next">Siguiente</button>
+                            <button type="submit" class="btn btn-primary btn-submit" style="display: none;">Guardar Alojamiento</button>
+                        </div>
+                    </form>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom"><p>&copy; 2025 ViviGo. Todos los derechos reservados.</p></div>
+        </div>
+    </footer>
+
+    <!-- Simple JS for multi-step form functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const prevBtn = document.querySelector('.btn-prev');
+            const nextBtn = document.querySelector('.btn-next');
+            const submitBtn = document.querySelector('.btn-submit');
+            const steps = document.querySelectorAll('.form-step-content');
+            const progressSteps = document.querySelectorAll('.form-progress-bar .step');
+            let currentStep = 1;
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < steps.length) {
+                    currentStep++;
+                    updateFormSteps();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateFormSteps();
+                }
+            });
+
+            function updateFormSteps() {
+                steps.forEach(step => {
+                    step.classList.remove('active');
+                    if (parseInt(step.dataset.step) === currentStep) {
+                        step.classList.add('active');
+                    }
+                });
+
+                progressSteps.forEach((step, idx) => {
+                    if (idx < currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+
+                prevBtn.disabled = currentStep === 1;
+                nextBtn.style.display = currentStep === steps.length ? 'none' : 'inline-flex';
+                submitBtn.style.display = currentStep === steps.length ? 'inline-flex' : 'none';
+            }
+        });
+    </script>
+
+</body>
+</html>

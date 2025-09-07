@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Búsqueda - ViviGo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-house-chimney logo-house"></i>
+                </div>
+                <span class="logo-text">ViviGo</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#">Conviértete en Anfitrión</a></li>
+                    <li><a href="#" class="btn btn-secondary">Iniciar Sesión</a></li>
+                    <li><a href="#" class="btn btn-primary">Regístrate</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container search-page-container">
+        <aside class="filters-sidebar">
+            <h3>Filtros</h3>
+            <div class="filter-group">
+                <h4>Rango de Precios</h4>
+                <div class="price-range">
+                    <input type="text" placeholder="Mín">
+                    <span>-</span>
+                    <input type="text" placeholder="Máx">
+                </div>
+            </div>
+            <div class="filter-group">
+                <h4>Tipo de Alojamiento</h4>
+                <div class="checkbox-group">
+                    <div><input type="checkbox" id="tipo1"><label for="tipo1">Apartamento</label></div>
+                    <div><input type="checkbox" id="tipo2"><label for="tipo2">Casa</label></div>
+                    <div><input type="checkbox" id="tipo3"><label for="tipo3">Cabaña</label></div>
+                    <div><input type="checkbox" id="tipo4"><label for="tipo4">Finca</label></div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <h4>Servicios</h4>
+                <div class="checkbox-group">
+                    <div><input type="checkbox" id="serv1"><label for="serv1">Wi-Fi</label></div>
+                    <div><input type="checkbox" id="serv2"><label for="serv2">Piscina</label></div>
+                    <div><input type="checkbox" id="serv3"><label for="serv3">Cocina</label></div>
+                    <div><input type="checkbox" id="serv4"><label for="serv4">Parking</label></div>
+                    <div><input type="checkbox" id="serv5"><label for="serv5">Admite Mascotas</label></div>
+                </div>
+            </div>
+            <button class="btn btn-primary filter-btn">Aplicar Filtros</button>
+        </aside>
+
+        <section class="results-section">
+            <div class="results-header">
+                <h2>Resultados para "Bogotá D.C."</h2>
+                <p>Más de 300 alojamientos encontrados</p>
+            </div>
+            <div class="accommodations-grid">
+                <!-- Card 1 -->
+                <div class="accommodation-card">
+                    <div class="card-image"><img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop" alt="Apartamento Moderno en el Centro"><div class="favorite-icon"><i class="fa-regular fa-heart"></i></div></div>
+                    <div class="card-info">
+                        <h3>Apartamento Moderno en el Centro</h3>
+                        <p class="location">Bogotá D.C., Chapinero</p>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.85 (250)</div>
+                        <p class="price"><strong>$280,000 COP</strong> / noche</p>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="accommodation-card">
+                    <div class="card-image"><img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=800&auto=format&fit=crop" alt="Villa con Piscina en la Montaña"><div class="favorite-icon"><i class="fa-regular fa-heart"></i></div></div>
+                    <div class="card-info">
+                        <h3>Villa con Piscina en la Montaña</h3>
+                        <p class="location">La Calera, Cundinamarca</p>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.92 (120)</div>
+                        <p class="price"><strong>$450,000 COP</strong> / noche</p>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="accommodation-card">
+                    <div class="card-image"><img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop" alt="Loft Industrial con Vistas"><div class="favorite-icon"><i class="fa-regular fa-heart"></i></div></div>
+                    <div class="card-info">
+                        <h3>Loft Industrial con Vistas</h3>
+                        <p class="location">Medellín, El Poblado</p>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.90 (180)</div>
+                        <p class="price"><strong>$320,000 COP</strong> / noche</p>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="accommodation-card">
+                    <div class="card-image"><img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=800&auto=format&fit=crop" alt="Cabaña Rústica junto al Lago"><div class="favorite-icon"><i class="fa-regular fa-heart"></i></div></div>
+                    <div class="card-info">
+                        <h3>Cabaña Rústica junto al Lago</h3>
+                        <p class="location">Guatavita, Cundinamarca</p>
+                        <div class="rating"><i class="fa-solid fa-star"></i> 4.98 (95)</div>
+                        <p class="price"><strong>$350,000 COP</strong> / noche</p>
+                    </div>
+                </div>
+                <!-- Add more cards as needed -->
+            </div>
+            <nav class="pagination">
+                <ul>
+                    <li><a href="#" class="active">1</a></li>
+                    <li><a href="#">2</a></li>
+                    <li><a href="#">3</a></li>
+                    <li><a href="#">...</a></li>
+                    <li><a href="#">15</a></li>
+                    <li><a href="#">&raquo;</a></li>
+                </ul>
+            </nav>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><h4>ViviGo</h4><ul><li><a href="#">Sobre Nosotros</a></li><li><a href="#">Prensa</a></li><li><a href="#">Carreras</a></li><li><a href="#">Políticas</a></li></ul></div>
+                <div class="footer-section"><h4>Descubre</h4><ul><li><a href="#">Confianza y Seguridad</a></li><li><a href="#">Créditos de Viaje</a></li><li><a href="#">Ideas para Viajes</a></li></ul></div>
+                <div class="footer-section"><h4>Anfitriones</h4><ul><li><a href="#">¿Por qué ser anfitrión?</a></li><li><a href="#">Hospitalidad</a></li><li><a href="#">Centro de la Comunidad</a></li></ul></div>
+                <div class="footer-section social-media"><h4>Síguenos</h4><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-twitter"></i></a><a href="#"><i class="fa-brands fa-instagram"></i></a></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2025 ViviGo. Todos los derechos reservados.</p></div>
+        </div>
+    </footer>
+
+</body>
+</html>

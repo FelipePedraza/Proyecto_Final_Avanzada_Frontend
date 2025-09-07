@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViviGo - Tu próximo destino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-house-chimney logo-house"></i>
+                </div>
+                <span class="logo-text">ViviGo</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#">Conviértete en Anfitrión</a></li>
+                    <li><a href="#" class="btn btn-secondary">Iniciar Sesión</a></li>
+                    <li><a href="#" class="btn btn-primary">Regístrate</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-slideshow">
+                <div class="slide-bg slide-1 active"></div>
+                <div class="slide-bg slide-2"></div>
+                <div class="slide-bg slide-3"></div>
+                <div class="slide-bg slide-4"></div>
+                <div class="slide-bg slide-5"></div>
+            </div>
+            <div class="hero-background"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Tu próximo destino te espera</h1>
+                    <p>Encuentra alojamientos únicos para tu próxima aventura.</p>
+                    <div class="search-bar">
+                        <div class="search-field">
+                            <label for="city">Ciudad</label>
+                            <input type="text" id="city" placeholder="¿A dónde viajas?">
+                        </div>
+                        <div class="search-field">
+                            <label for="checkin">Check-in</label>
+                            <input type="date" id="checkin">
+                        </div>
+                        <div class="search-field">
+                            <label for="checkout">Check-out</label>
+                            <input type="date" id="checkout">
+                        </div>
+                        <div class="search-field">
+                            <label for="guests">Huéspedes</label>
+                            <input type="number" id="guests" placeholder="¿Cuántos?">
+                        </div>
+                        <button class="btn-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="popular-accommodations">
+            <div class="container">
+                <h2>Alojamientos Populares</h2>
+                <div class="accommodations-grid">
+                    <div class="accommodation-card">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=800&auto=format&fit=crop" alt="Villa con Piscina en la Montaña">
+                            <div class="favorite-icon"><i class="fa-regular fa-heart"></i></div>
+                        </div>
+                        <div class="card-info">
+                            <h3>Villa con Piscina en la Montaña</h3>
+                            <p class="location">La Calera, Cundinamarca</p>
+                            <div class="rating">
+                                <i class="fa-solid fa-star"></i> 4.92 (120)
+                            </div>
+                            <p class="price"><strong>$450,000 COP</strong> / noche</p>
+                        </div>
+                    </div>
+                    <div class="accommodation-card">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop" alt="Apartamento Moderno en el Centro">
+                            <div class="favorite-icon"><i class="fa-regular fa-heart"></i></div>
+                        </div>
+                        <div class="card-info">
+                            <h3>Apartamento Moderno en el Centro</h3>
+                            <p class="location">Bogotá D.C., Chapinero</p>
+                            <div class="rating">
+                                <i class="fa-solid fa-star"></i> 4.85 (250)
+                            </div>
+                            <p class="price"><strong>$280,000 COP</strong> / noche</p>
+                        </div>
+                    </div>
+                    <div class="accommodation-card">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=800&auto=format&fit=crop" alt="Cabaña Rústica junto al Lago">
+                            <div class="favorite-icon"><i class="fa-regular fa-heart"></i></div>
+                        </div>
+                        <div class="card-info">
+                            <h3>Cabaña Rústica junto al Lago</h3>
+                            <p class="location">Guatavita, Cundinamarca</p>
+                            <div class="rating">
+                                <i class="fa-solid fa-star"></i> 4.98 (95)
+                            </div>
+                            <p class="price"><strong>$350,000 COP</strong> / noche</p>
+                        </div>
+                    </div>
+                     <div class="accommodation-card">
+                        <div class="card-image">
+                            <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop" alt="Loft Industrial con Vistas">
+                            <div class="favorite-icon"><i class="fa-regular fa-heart"></i></div>
+                        </div>
+                        <div class="card-info">
+                            <h3>Loft Industrial con Vistas</h3>
+                            <p class="location">Medellín, El Poblado</p>
+                            <div class="rating">
+                                <i class="fa-solid fa-star"></i> 4.90 (180)
+                            </div>
+                            <p class="price"><strong>$320,000 COP</strong> / noche</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>ViviGo</h4>
+                    <ul>
+                        <li><a href="#">Sobre Nosotros</a></li>
+                        <li><a href="#">Prensa</a></li>
+                        <li><a href="#">Carreras</a></li>
+                        <li><a href="#">Políticas</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Descubre</h4>
+                    <ul>
+                        <li><a href="#">Confianza y Seguridad</a></li>
+                        <li><a href="#">Créditos de Viaje</a></li>
+                        <li><a href="#">Ideas para Viajes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Anfitriones</h4>
+                    <ul>
+                        <li><a href="#">¿Por qué ser anfitrión?</a></li>
+                        <li><a href="#">Hospitalidad</a></li>
+                        <li><a href="#">Centro de la Comunidad</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section social-media">
+                    <h4>Síguenos</h4>
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ViviGo. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // SLIDESHOW SÚPER SIMPLE - FUNCIONARÁ 100%
+        console.log('Iniciando slideshow...');
+        
+        let currentSlide = 0;
+        const totalSlides = 5;
+        
+        function showSlide(index) {
+            // Remover active de todos
+            for (let i = 1; i <= totalSlides; i++) {
+                const slide = document.querySelector('.slide-' + i);
+                if (slide) {
+                    slide.classList.remove('active');
+                }
+            }
+            
+            // Agregar active al slide actual
+            const activeSlide = document.querySelector('.slide-' + (index + 1));
+            if (activeSlide) {
+                activeSlide.classList.add('active');
+                console.log('Mostrando slide:', index + 1);
+            }
+        }
+        
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            showSlide(currentSlide);
+        }
+        
+        // Esperar a que cargue la página
+        window.addEventListener('load', function() {
+            console.log('Página cargada, iniciando slideshow');
+            
+            // Mostrar primer slide
+            showSlide(0);
+            
+            // Cambiar cada 4 segundos
+            setInterval(nextSlide, 4000);
+            
+            console.log('Slideshow configurado - cambio cada 4 segundos');
+        });
+    </script>
+
+</body>
+</html>

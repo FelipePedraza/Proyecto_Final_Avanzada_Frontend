@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - ViviGo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-house-chimney logo-house"></i>
+                </div>
+                <span class="logo-text">ViviGo</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#">Conviértete en Anfitrión</a></li>
+                    <li><a href="#" class="user-menu">
+                        <img src="https://placehold.co/40x40/3f51b5/fff?text=DP" alt="Avatar de usuario">
+                        <span>David Alfonso Posso Cano</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container dashboard-container">
+        <div class="dashboard-layout">
+            <aside class="dashboard-nav">
+                <div class="user-profile-summary">
+                    <img src="https://placehold.co/80x80/3f51b5/fff?text=DP" alt="Avatar de usuario">
+                    <h3>David Alfonso Posso Cano</h3>
+                    <p>Miembro desde 2024</p>
+                </div>
+                <ul>
+                    <li class="active"><a href="#"><i class="fa-solid fa-briefcase"></i> Mis Reservas</a></li>
+                    <li><a href="#"><i class="fa-solid fa-user"></i> Mi Perfil</a></li>
+                    <li><a href="#"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+                    <li><a href="#"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
+                </ul>
+            </aside>
+
+            <section class="dashboard-content">
+                <h1>Mis Reservas</h1>
+                
+                <div class="tabs">
+                    <button class="tab-link active" data-tab="activas">Activas</button>
+                    <button class="tab-link" data-tab="pasadas">Pasadas</button>
+                    <button class="tab-link" data-tab="canceladas">Canceladas</button>
+                </div>
+
+                <div id="activas" class="tab-content active">
+                    <div class="reservation-card">
+                        <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=400&auto=format&fit=crop" alt="Villa con Piscina en la Montaña">
+                        <div class="reservation-details">
+                            <h4>Villa con Piscina en la Montaña</h4>
+                            <p><i class="fa-solid fa-location-dot"></i> Salento, Quindío</p>
+                            <p><i class="fa-solid fa-calendar-days"></i> 04 Sep, 2025 - 05 Sep, 2025</p>
+                            <p><i class="fa-solid fa-money-bill-wave"></i> $1,500,000 COP</p>
+                        </div>
+                        <div class="reservation-actions">
+                            <span class="status confirmed">Confirmada</span>
+                            <a href="#" class="btn btn-secondary">Ver Detalles</a>
+                            <a href="#" class="btn btn-danger">Cancelar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pasadas" class="tab-content">
+                    <div class="reservation-card">
+                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=400&auto=format&fit=crop" alt="Apartamento Moderno en el Centro">
+                        <div class="reservation-details">
+                            <h4>Apartamento Moderno en el Centro</h4>
+                            <p><i class="fa-solid fa-location-dot"></i> Armenia, Limonar</p>
+                            <p><i class="fa-solid fa-calendar-days"></i> 10 Oct, 2025 - 12 Oct, 2025</p>
+                            <p><i class="fa-solid fa-money-bill-wave"></i> $610,000 COP</p>
+                        </div>
+                        <div class="reservation-actions">
+                            <span class="status completed">Completada</span>
+                            <a href="#" class="btn btn-primary">Dejar Reseña</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="canceladas" class="tab-content">
+                     <div class="reservation-card">
+                        <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=400&auto=format&fit=crop" alt="Cabaña Rústica junto al Lago">
+                        <div class="reservation-details">
+                            <h4>Cabaña Rústica junto al Lago</h4>
+                            <p><i class="fa-solid fa-location-dot"></i> Guatavita, Cundinamarca</p>
+                            <p><i class="fa-solid fa-calendar-days"></i> 01 May, 2025 - 02 May, 2025</p>
+                            <p><i class="fa-solid fa-money-bill-wave"></i> $385,000 COP</p>
+                        </div>
+                        <div class="reservation-actions">
+                            <span class="status cancelled">Cancelada</span>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                 <div class="footer-section"><h4>ViviGo</h4><ul><li><a href="#">Sobre Nosotros</a></li><li><a href="#">Prensa</a></li><li><a href="#">Carreras</a></li><li><a href="#">Políticas</a></li></ul></div>
+                <div class="footer-section"><h4>Descubre</h4><ul><li><a href="#">Confianza y Seguridad</a></li><li><a href="#">Créditos de Viaje</a></li><li><a href="#">Ideas para Viajes</a></li></ul></div>
+                <div class="footer-section"><h4>Anfitriones</h4><ul><li><a href="#">¿Por qué ser anfitrión?</a></li><li><a href="#">Hospitalidad</a></li><li><a href="#">Centro de la Comunidad</a></li></ul></div>
+                <div class="footer-section social-media"><h4>Síguenos</h4><a href="#"><i class="fa-brands fa-facebook"></i></a><a href="#"><i class="fa-brands fa-twitter"></i></a><a href="#"><i class="fa-brands fa-instagram"></i></a></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2025 ViviGo. Todos los derechos reservados.</p></div>
+        </div>
+    </footer>
+
+</body>
+</html>
