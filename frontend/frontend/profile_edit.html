@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - ViviGo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-house-chimney logo-house"></i>
+                </div>
+                <span class="logo-text">ViviGo</span>
+            </a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="user-menu">
+                        <img src="https://placehold.co/50x50/cccccc/333333?text=DA" alt="Foto del usuario">
+                        <span>Daniela Arboleda</span>
+                    </a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container dashboard-container">
+        <div class="dashboard-layout">
+            <aside class="dashboard-nav">
+                <div class="user-profile-summary">
+                    <img src="https://placehold.co/80x80/cccccc/333333?text=DA" alt="Foto del usuario" id="currentProfileImage">
+                    <h3>Daniela Arboleda</h3>
+                    <p id="userRole">Usuaria desde 2023</p>
+                </div>
+                <ul>
+                    <li><a href="dashboard.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fa-solid fa-calendar-check"></i> Mis Reservas</a></li>
+                    <li><a href="#"><i class="fa-solid fa-heart"></i> Favoritos</a></li>
+                    <li class="active"><a href="profile_edit.html"><i class="fa-solid fa-user-pen"></i> Editar Perfil</a></li>
+                    <li><a href="#"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
+                </ul>
+            </aside>
+
+            <section class="dashboard-content">
+                <div class="content-header">
+                    <h1>Editar Mi Perfil</h1>
+                    <p>Actualiza tu información personal y preferencias</p>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-link active" data-tab="personal">
+                        <i class="fa-solid fa-user"></i> Información Personal
+                    </button>
+                    <button class="tab-link" data-tab="host" id="hostTab" style="display: none;">
+                        <i class="fa-solid fa-house-user"></i> Información de Anfitrión
+                    </button>
+                    <button class="tab-link" data-tab="security">
+                        <i class="fa-solid fa-shield-halved"></i> Seguridad
+                    </button>
+                </div>
+                
+                <!-- Personal Information Tab -->
+                <div class="tab-content active" id="personal">
+                    <form id="personalForm">
+                        <div class="form-grid">
+                            <div class="form-group full-width" style="text-align: center; margin-bottom: 2rem;">
+                                <label>Foto de Perfil</label>
+                                <div class="profile-image-container" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                                    <div class="current-image" style="position: relative;">
+                                        <img src="https://placehold.co/150x150/cccccc/333333?text=DA" alt="Foto actual" 
+                                             style="width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--primary-color); object-fit: cover;" 
+                                             id="profilePreview">
+                                        <button type="button" class="btn btn-icon" style="position: absolute; bottom: 0; right: 0; background: var(--primary-color); color: white; border-radius: 50%; width: 40px; height: 40px;">
+                                            <i class="fa-solid fa-camera"></i>
+                                        </button>
+                                    </div>
+                                    <input type="file" id="profileImage" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('profileImage').click()">
+                                        <i class="fa-solid fa-upload"></i> Cambiar Foto
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="firstName">Nombre *</label>
+                                <input type="text" id="firstName" name="firstName" value="Daniela" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="lastName">Apellido *</label>
+                                <input type="text" id="lastName" name="lastName" value="Arboleda" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="email">Correo Electrónico</label>
+                                <input type="email" id="email" name="email" value="daniela.arboleda@email.com" disabled>
+                                <small style="color: #7F8C8D; font-size: 0.85rem;">El email no se puede cambiar. Contacta soporte si necesitas modificarlo.</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Teléfono *</label>
+                                <input type="tel" id="phone" name="phone" value="+57 310 456 7890" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="birthDate">Fecha de Nacimiento</label>
+                                <input type="date" id="birthDate" name="birthDate" value="2004-09-11" disabled>
+                                <small style="color: #7F8C8D; font-size: 0.85rem;">La fecha de nacimiento no se puede modificar.</small>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="bio">Acerca de ti</label>
+                                <textarea id="bio" name="bio" rows="4" placeholder="Cuéntanos algo sobre ti...">Anfitriona experimentada con pasión por la hospitalidad. Me encanta compartir mi conocimiento local y crear experiencias únicas para mis huéspedes.</textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="language">Idioma Preferido</label>
+                                <select id="language" name="language">
+                                    <option value="es" selected>Español</option>
+                                    <option value="en">English</option>
+                                    <option value="pt">Português</option>
+                                    <option value="fr">Français</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="userType">Tipo de Usuario</label>
+                                <select id="userType" name="userType">
+                                    <option value="guest" selected>Solo Huésped</option>
+                                    <option value="host">Solo Anfitrión</option>
+                                    <option value="both">Huésped y Anfitrión</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-navigation" style="justify-content: flex-end; border-top: 2px solid var(--light-green); padding-top: 2rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Host Information Tab -->
+                <div class="tab-content" id="host">
+                    <form id="hostForm">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="hostDescription">Descripción como Anfitrión</label>
+                                <textarea id="hostDescription" name="hostDescription" rows="5" placeholder="Describe tu experiencia como anfitrión, tu estilo de hospitalidad y qué hace especial tu alojamiento...">Soy un anfitrión experimentado con más de 3 años ofreciendo alojamientos únicos. Me encanta compartir mi conocimiento local y asegurarme de que mis huéspedes tengan la mejor experiencia posible.</textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="hostExperience">Años de Experiencia</label>
+                                <select id="hostExperience" name="hostExperience">
+                                    <option value="">Selecciona...</option>
+                                    <option value="nuevo">Nuevo anfitrión</option>
+                                    <option value="1">1 año</option>
+                                    <option value="2">2 años</option>
+                                    <option value="3" selected>3 años</option>
+                                    <option value="4">4 años</option>
+                                    <option value="5+">5+ años</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="responseTime">Tiempo de Respuesta</label>
+                                <select id="responseTime" name="responseTime">
+                                    <option value="1h" selected>Dentro de 1 hora</option>
+                                    <option value="2h">Dentro de 2 horas</option>
+                                    <option value="24h">Dentro de 24 horas</option>
+                                    <option value="48h">Dentro de 48 horas</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label>Servicios Especiales que Ofreces</label>
+                                <div class="checkbox-grid">
+                                    <div class="checkbox-group"><div><input type="checkbox" id="pickup" checked><label for="pickup">Recogida en aeropuerto</label></div></div>
+                                    <div class="checkbox-group"><div><input type="checkbox" id="breakfast"><label for="breakfast">Desayuno incluido</label></div></div>
+                                    <div class="checkbox-group"><div><input type="checkbox" id="tours" checked><label for="tours">Tours locales</label></div></div>
+                                    <div class="checkbox-group"><div><input type="checkbox" id="cleaning"><label for="cleaning">Servicio de limpieza</label></div></div>
+                                    <div class="checkbox-group"><div><input type="checkbox" id="laundry"><label for="laundry">Servicio de lavandería</label></div></div>
+                                    <div class="checkbox-group"><div><input type="checkbox" id="concierge"><label for="concierge">Servicio de conserjería</label></div></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label>Documentos Legales (Opcional)</label>
+                                <div class="document-upload-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                                    <div class="document-item">
+                                        <label for="cedula">Cédula de Ciudadanía</label>
+                                        <input type="file" id="cedula" accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-status" style="font-size: 0.85rem; color: var(--success-color); margin-top: 0.5rem;">
+                                            <i class="fa-solid fa-check-circle"></i> Documento verificado
+                                        </div>
+                                    </div>
+                                    <div class="document-item">
+                                        <label for="rut">RUT (Registro Único Tributario)</label>
+                                        <input type="file" id="rut" accept=".pdf,.jpg,.jpeg,.png">
+                                        <div class="file-status" style="font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
+                                            <i class="fa-solid fa-upload"></i> Subir documento
+                                        </div>
+                                    </div>
+                                </div>
+                                <small style="color: #7F8C8D; font-size: 0.85rem; display: block; margin-top: 1rem;">
+                                    Los documentos legales ayudan a generar más confianza con los huéspedes y pueden mejorar tu posicionamiento.
+                                </small>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="bankAccount">Información Bancaria</label>
+                                <input type="text" id="bankAccount" name="bankAccount" placeholder="Número de cuenta para pagos (opcional)">
+                                <small style="color: #7F8C8D; font-size: 0.85rem;">Esta información será encriptada y solo se usará para procesar pagos.</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-navigation" style="justify-content: flex-end; border-top: 2px solid var(--light-green); padding-top: 2rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-floppy-disk"></i> Guardar Información de Anfitrión
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Security Tab -->
+                <div class="tab-content" id="security">
+                    <form id="securityForm">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <h3 style="color: var(--dark-green); margin-bottom: 1.5rem;">
+                                    <i class="fa-solid fa-key"></i> Cambiar Contraseña
+                                </h3>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label for="currentPassword">Contraseña Actual *</label>
+                                <input type="password" id="currentPassword" name="currentPassword" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="newPassword">Nueva Contraseña *</label>
+                                <input type="password" id="newPassword" name="newPassword" required>
+                                <div class="password-requirements">
+                                    <p><i class="fa-solid fa-info-circle"></i> Debe contener al menos:</p>
+                                    <ul>
+                                        <li id="newLength">8 caracteres</li>
+                                        <li id="newUppercase">1 letra mayúscula</li>
+                                        <li id="newNumber">1 número</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="confirmNewPassword">Confirmar Nueva Contraseña *</label>
+                                <input type="password" id="confirmNewPassword" name="confirmNewPassword" required>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <hr style="margin: 2rem 0;">
+                                <h3 style="color: var(--dark-green); margin-bottom: 1.5rem;">
+                                    <i class="fa-solid fa-shield-halved"></i> Configuración de Privacidad
+                                </h3>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <div class="checkbox-group">
+                                    <div style="display: flex; align-items: flex-start; gap: 12px; background: none; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                                        <input type="checkbox" id="profileVisible" checked>
+                                        <label for="profileVisible" style="margin: 0; font-weight: 400; line-height: 1.5;">
+                                            <strong>Perfil público</strong><br>
+                                            <small style="color: #7F8C8D;">Permite que otros usuarios vean tu perfil y reseñas</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <div class="checkbox-group">
+                                    <div style="display: flex; align-items: flex-start; gap: 12px; background: none; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                                        <input type="checkbox" id="emailNotifications" checked>
+                                        <label for="emailNotifications" style="margin: 0; font-weight: 400; line-height: 1.5;">
+                                            <strong>Notificaciones por email</strong><br>
+                                            <small style="color: #7F8C8D;">Recibir emails sobre reservas, mensajes y actualizaciones importantes</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <div class="checkbox-group">
+                                    <div style="display: flex; align-items: flex-start; gap: 12px; background: none; padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                                        <input type="checkbox" id="smsNotifications">
+                                        <label for="smsNotifications" style="margin: 0; font-weight: 400; line-height: 1.5;">
+                                            <strong>Notificaciones por SMS</strong><br>
+                                            <small style="color: #7F8C8D;">Recibir mensajes de texto para confirmaciones urgentes</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <div class="danger-zone" style="border: 2px solid var(--danger-color); border-radius: 12px; padding: 1.5rem; margin-top: 2rem;">
+                                    <h3 style="color: var(--danger-color); margin-bottom: 1rem;">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro
+                                    </h3>
+                                    <p style="margin-bottom: 1rem; color: var(--text-color);">
+                                        Una vez que elimines tu cuenta, no hay vuelta atrás. Por favor asegúrate.
+                                    </p>
+                                    <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
+                                        <i class="fa-solid fa-trash"></i> Eliminar mi cuenta
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-navigation" style="justify-content: flex-end; border-top: 2px solid var(--light-green); padding-top: 2rem; margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa-solid fa-floppy-disk"></i> Actualizar Seguridad
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom"><p>&copy; 2025 ViviGo. Todos los derechos reservados.</p></div>
+        </div>
+    </footer>
+
+    <style>
+        .password-requirements {
+            background-color: var(--light-green);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .password-requirements p {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .password-requirements ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        
+        .password-requirements li {
+            margin-bottom: 0.3rem;
+            color: var(--text-color);
+        }
+        
+        .password-requirements li.valid {
+            color: var(--success-color);
+        }
+        
+        .password-requirements li.valid::before {
+            content: "✓ ";
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const userTypeSelect = document.getElementById('userType');
+            const hostTab = document.getElementById('hostTab');
+            
+            // Tab functionality
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabLinks.forEach(tab => tab.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+            
+            // Show/hide host tab based on user type
+            function toggleHostTab() {
+                const userType = userTypeSelect.value;
+                if (userType === 'host' || userType === 'both') {
+                    hostTab.style.display = 'block';
+                } else {
+                    hostTab.style.display = 'none';
+                    // If currently on host tab, switch to personal tab
+                    if (document.querySelector('.tab-link[data-tab="host"]').classList.contains('active')) {
+                        document.querySelector('.tab-link[data-tab="personal"]').click();
+                    }
+                }
+            }
+            
+            userTypeSelect.addEventListener('change', toggleHostTab);
+            toggleHostTab(); // Initial check
+            
+            // Profile image preview
+            document.getElementById('profileImage').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('profilePreview').src = e.target.result;
+                        document.getElementById('currentProfileImage').src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Password strength validation for new password
+            const newPasswordInput = document.getElementById('newPassword');
+            if (newPasswordInput) {
+                newPasswordInput.addEventListener('input', function() {
+                    const password = this.value;
+                    const lengthReq = document.getElementById('newLength');
+                    const uppercaseReq = document.getElementById('newUppercase');
+                    const numberReq = document.getElementById('newNumber');
+                    
+                    // Check length
+                    if (password.length >= 8) {
+                        lengthReq.classList.add('valid');
+                    } else {
+                        lengthReq.classList.remove('valid');
+                    }
+                    
+                    // Check uppercase
+                    if (/[A-Z]/.test(password)) {
+                        uppercaseReq.classList.add('valid');
+                    } else {
+                        uppercaseReq.classList.remove('valid');
+                    }
+                    
+                    // Check number
+                    if (/\d/.test(password)) {
+                        numberReq.classList.add('valid');
+                    } else {
+                        numberReq.classList.remove('valid');
+                    }
+                });
+            }
+            
+            // Form submissions
+            document.getElementById('personalForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Información personal actualizada correctamente');
+            });
+            
+            document.getElementById('hostForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Información de anfitrión actualizada correctamente');
+            });
+            
+            document.getElementById('securityForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+                
+                if (newPassword !== confirmNewPassword) {
+                    alert('Las contraseñas no coinciden');
+                    return;
+                }
+                
+                if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+                    alert('La nueva contraseña no cumple con los requisitos');
+                    return;
+                }
+                
+                alert('Configuración de seguridad actualizada correctamente');
+            });
+        });
+        
+        function confirmDeleteAccount() {
+            if (confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+                if (confirm('¿Realmente quieres eliminar tu cuenta? Perderás todos tus datos, reservas e historial.')) {
+                    alert('Cuenta eliminada. Serás redirigido a la página principal.');
+                    // window.location.href = 'index.html';
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
