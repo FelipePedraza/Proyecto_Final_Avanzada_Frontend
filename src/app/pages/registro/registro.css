@@ -1,0 +1,49 @@
+.password-requirements {
+  background-color: var(--light-green);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.password-requirements p {
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.password-requirements li {
+  margin-bottom: 0.3rem;
+  color: var(--text-color);
+}
+
+.password-requirements li.valid {
+  color: var(--success-color);
+}
+
+.password-requirements li.valid::before {
+  content: "✓ ";
+  font-weight: bold;
+}
+
+.error-message {
+  color: var(--danger-color);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
+.form-group input.error,
+.form-group select.error {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
