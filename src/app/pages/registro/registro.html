@@ -8,104 +8,234 @@
       </div>
 
       <div class="form-container">
-        <form [formGroup]="registroForm" (ngSubmit)="crearUsuario()" novalidate="">
+        <form [formGroup]="registroForm" (ngSubmit)="crearUsuario()" novalidate>
           <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 700px; margin: 0 auto;">
+
+            <!-- Nombre -->
             <div class="form-group">
               <label for="nombre">Nombre *</label>
-              <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" formControlName="nombre" [class.error]="registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched">
-              @if (registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched) {
-                <div class="error-message show">Este campo es obligatorio</div>
+              <input
+                type="text"
+                id="nombre"
+                formControlName="nombre"
+                placeholder="Tu nombre"
+                autocomplete="given-name"
+                [class.error]="campoInvalido('nombre')">
+
+              @if (campoInvalido('nombre')) {
+                <div class="error-message show">
+                  {{ obtenerErrorCampo('nombre') }}
+                </div>
               }
             </div>
 
+            <!-- Apellido -->
             <div class="form-group">
               <label for="apellido">Apellido *</label>
-              <input type="text" id="apellido" name="apellido" required placeholder="Tu apellido" formControlName="apellido" [class.error]="registroForm.get('apellido')?.invalid && registroForm.get('apellido')?.touched">
-              @if (registroForm.get('apellido')?.invalid && registroForm.get('apellido')?.touched) {
-                <div class="error-message show">Este campo es obligatorio</div>
+              <input
+                type="text"
+                id="apellido"
+                formControlName="apellido"
+                placeholder="Tu apellido"
+                autocomplete="family-name"
+                [class.error]="campoInvalido('apellido')">
+
+              @if (campoInvalido('apellido')) {
+                <div class="error-message show">
+                  {{ obtenerErrorCampo('apellido') }}
+                </div>
               }
             </div>
 
+            <!-- Email -->
             <div class="form-group full-width">
               <label for="email">Correo Electrónico *</label>
-              <input type="email" id="email" name="email" required placeholder="tu@email.com" formControlName="email" [class.error]="registroForm.get('email')?.invalid && registroForm.get('email')?.touched">
-              @if (registroForm.get('email')?.hasError('email') && registroForm.get('email')?.touched || registroForm.get('email')?.invalid && registroForm.get('email')?.touched) {
-                <div class="error-message show">Por favor ingresa un email válido</div>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="tu@email.com"
+                autocomplete="email"
+                [class.error]="campoInvalido('email')">
+
+              @if (campoInvalido('email')) {
+                <div class="error-message show">
+                  {{ obtenerErrorCampo('email') }}
+                </div>
               }
             </div>
 
+            <!-- Contraseña -->
             <div class="form-group full-width">
               <label for="contrasena">Contraseña *</label>
-              <input type="password" id="contrasena" name="contrasena" required placeholder="Mínimo 8 caracteres" formControlName="contrasena" [class.error]="registroForm.get('contrasena')?.invalid && registroForm.get('contrasena')?.touched">
+              <div class="password-input-container" style="position: relative;">
+                <input
+                  [type]="mostrarContrasena ? 'text' : 'password'"
+                  id="contrasena"
+                  formControlName="contrasena"
+                  placeholder="Mínimo 8 caracteres"
+                  autocomplete="new-password"
+                  [class.error]="campoInvalido('contrasena')">
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="toggleContrasena()"
+                  [attr.aria-label]="mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #7F8C8D; cursor: pointer;">
+                  <i [class]="mostrarContrasena ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                </button>
+              </div>
+
+              <!-- Requisitos de contraseña -->
               <div class="password-requirements">
                 <p><i class="fa-solid fa-info-circle"></i> Debe contener al menos:</p>
                 <ul>
-                  <li id="tamano">8 caracteres</li>
-                  <li id="mayuscula">1 letra mayúscula</li>
-                  <li id="numero">1 número</li>
+                  <li [class.valid]="validacionContrasena.tieneLongitud">
+                    @if (validacionContrasena.tieneLongitud) {
+                      <i class="fa-solid fa-check"></i>
+                    }
+                    8 caracteres
+                  </li>
+                  <li [class.valid]="validacionContrasena.tieneMayuscula">
+                    @if (validacionContrasena.tieneMayuscula) {
+                      <i class="fa-solid fa-check"></i>
+                    }
+                    1 letra mayúscula
+                  </li>
+                  <li [class.valid]="validacionContrasena.tieneNumero">
+                    @if (validacionContrasena.tieneNumero) {
+                      <i class="fa-solid fa-check"></i>
+                    }
+                    1 número
+                  </li>
                 </ul>
               </div>
-              @if (registroForm.get('contrasena')?.hasError('contrasenaSegura') && registroForm.get('contrasena')?.touched) {
-                <div class="error-message show">Debe contener al menos una mayúscula y un número</div>
-              }
-              @if (registroForm.get('contrasena')?.hasError('minlength') && registroForm.get('contrasena')?.touched) {
-                <div class="error-message show">Debe tener mínimo 8 caracteres</div>
-              }
-              @if (registroForm.get('contrasena')?.invalid && registroForm.get('contrasena')?.touched) {
-                <div class="error-message show">Ingrese una contrasena</div>
+
+              @if (campoInvalido('contrasena')) {
+                <div class="error-message show">
+                  {{ obtenerErrorCampo('contrasena') }}
+                </div>
               }
             </div>
 
+            <!-- Confirmar Contraseña -->
             <div class="form-group full-width">
               <label for="confirmarContrasena">Confirmar Contraseña *</label>
-              <input type="password" id="confirmarContrasena" name="confirmarContrasena" required placeholder="Repite tu contraseña" formControlName="confirmarContrasena" [class.error]="registroForm.hasError('contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched">
-              @if (registroForm.hasError('contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched) {
-                <div class="error-message show">Las contraseñas no coinciden</div>
+              <div class="password-input-container" style="position: relative;">
+                <input
+                  [type]="mostrarConfirmarContrasena ? 'text' : 'password'"
+                  id="confirmarContrasena"
+                  formControlName="confirmarContrasena"
+                  placeholder="Repite tu contraseña"
+                  autocomplete="new-password"
+                  [class.error]="formularioTieneError('contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched">
+
+                <button
+                  type="button"
+                  class="password-toggle"
+                  (click)="toggleConfirmarContrasena()"
+                  [attr.aria-label]="mostrarConfirmarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #7F8C8D; cursor: pointer;">
+                  <i [class]="mostrarConfirmarContrasena ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                </button>
+              </div>
+
+              @if (formularioTieneError('contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched) {
+                <div class="error-message show">
+                  Las contraseñas no coinciden
+                </div>
               }
             </div>
 
+            <!-- Teléfono -->
             <div class="form-group">
               <label for="telefono">Teléfono *</label>
-              <input type="tel" id="telefono" name="telefono" required placeholder="300 123 4567" formControlName="telefono" [class.error]="registroForm.get('telefono')?.invalid && registroForm.get('telefono')?.touched">
-              @if (registroForm.get('telefono')?.hasError('pattern') && registroForm.get('telefono')?.touched || registroForm.get('telefono')?.invalid && registroForm.get('telefono')?.touched) {
-                <div class="error-message show">Por favor ingresa un teléfono válido</div>
+              <input
+                type="tel"
+                id="telefono"
+                formControlName="telefono"
+                placeholder="300 123 4567"
+                autocomplete="tel"
+                [class.error]="campoInvalido('telefono')">
+
+              @if (campoInvalido('telefono')) {
+                <div class="error-message show">
+                  {{ obtenerErrorCampo('telefono') }}
+                </div>
               }
             </div>
 
+            <!-- Fecha de Nacimiento -->
             <div class="form-group">
               <label for="fechaNacimiento">Fecha de Nacimiento *</label>
-              <input type="date" id="fechaNacimiento" name="fechaNacimiento" required formControlName="fechaNacimiento" [class.error]="registroForm.get('fechaNacimiento')?.invalid && registroForm.get('fechaNacimiento')?.touched">
-              @if (registroForm.get('fechaNacimiento')?.hasError('edadMinima') && registroForm.get('fechaNacimiento')?.touched) {
-                <div class="error-message show">Debes ser mayor de 18 años</div>
+              <input
+                type="date"
+                id="fechaNacimiento"
+                formControlName="fechaNacimiento"
+                autocomplete="bday"
+                [max]="obtenerFechaMaxima()"
+                [min]="obtenerFechaMinima()"
+                [class.error]="campoInvalido('fechaNacimiento')">
+
+              @if (campoInvalido('fechaNacimiento')) {
+                <div class="error-message show">
+                  {{ obtenerErrorCampo('fechaNacimiento') }}
+                </div>
               }
             </div>
+
+            <!-- Términos y condiciones -->
             <div class="form-group full-width" style="display: block !important; flex-direction: initial !important;">
               <div style="display: table; width: 100%;">
                 <div style="display: table-cell; width: 20px; vertical-align: top; padding-top: 3px;">
-                  <input type="checkbox" id="terminos" name="terminos" required style="margin: 0; padding: 0;" formControlName="terminos">
+                  <input
+                    type="checkbox"
+                    id="terminos"
+                    formControlName="terminos"
+                    style="margin: 0; padding: 0; cursor: pointer;">
                 </div>
                 <div style="display: table-cell; vertical-align: top; padding-left: 8px;">
                   <label for="terminos" style="font-weight: 400; line-height: 1.5; cursor: pointer; margin: 0; display: block;">
-                    Acepto los <a href="#" style="color: var(--primary-color); font-weight: 600;">Términos y Condiciones</a> y la <a href="#" style="color: var(--primary-color); font-weight: 600;">Política de Privacidad</a> de ViviGo *
+                    Acepto los <a href="#" style="color: var(--primary-color); font-weight: 600;" (click)="$event.preventDefault()">Términos y Condiciones</a> y la <a href="#" style="color: var(--primary-color); font-weight: 600;" (click)="$event.preventDefault()">Política de Privacidad</a> de ViviGo *
                   </label>
                 </div>
               </div>
-              @if (registroForm.get('terminos')?.invalid && registroForm.get('terminos')?.touched) {
-                <div class="error-message show">Debes aceptar los términos y condiciones</div>
+
+              @if (campoInvalido('terminos')) {
+                <div class="error-message show">
+                  Debes aceptar los términos y condiciones
+                </div>
               }
             </div>
 
           </div>
+
+          <!-- Botón de envío -->
           <div class="form-navigation" style="justify-content: center; border-top: none; padding-top: 2rem; max-width: 700px; margin: 0 auto;">
-            <button type="submit" [disabled]="registroForm.invalid" class="btn btn-primary" style="width: 300px; padding: 16px 24px; font-size: 1.1rem;" >
-              <i class="fa-solid fa-user-plus"></i>
-              Crear mi cuenta
+            <button
+              type="submit"
+              [disabled]="cargando || registroForm.invalid"
+              class="btn btn-primary"
+              style="width: 300px; padding: 16px 24px; font-size: 1.1rem;">
+
+              @if (cargando) {
+                <span class="loading-spinner"></span>
+                Creando cuenta...
+              } @else {
+                <i class="fa-solid fa-user-plus"></i>
+                Crear mi cuenta
+              }
             </button>
           </div>
         </form>
 
+        <!-- Link a login -->
         <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-green); max-width: 700px; margin-left: auto; margin-right: auto;">
-          <p style="font-size: 1.1rem;">¿Ya tienes una cuenta? <li><a href="/login" style="color: var(--primary-color); font-weight: 600;">Inicia Sesión</a></li></p>
+          <p style="font-size: 1.1rem;">
+            ¿Ya tienes una cuenta?
+            <a href="/login" style="color: var(--primary-color); font-weight: 600;">Inicia Sesión</a>
+          </p>
         </div>
       </div>
 

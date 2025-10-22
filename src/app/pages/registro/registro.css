@@ -1,49 +1,228 @@
-.password-requirements {
-  background-color: var(--light-green);
-  border-radius: 12px;
-  padding: 1rem;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.password-requirements p {
-  margin-bottom: 0.5rem;
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-.password-requirements ul {
-  margin: 0;
-  padding-left: 1.5rem;
-}
-
-.password-requirements li {
-  margin-bottom: 0.3rem;
-  color: var(--text-color);
-}
-
-.password-requirements li.valid {
-  color: var(--success-color);
-}
-
-.password-requirements li.valid::before {
-  content: "✓ ";
-  font-weight: bold;
-}
-
+/* ==================== MENSAJES DE ERROR ==================== */
 .error-message {
   color: var(--danger-color);
   font-size: 0.85rem;
   margin-top: 0.5rem;
   display: none;
+  animation: fadeInError 0.3s ease-in-out;
 }
 
 .error-message.show {
   display: block;
 }
 
+@keyframes fadeInError {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== INPUTS CON ERROR ==================== */
 .form-group input.error,
 .form-group select.error {
   border-color: var(--danger-color);
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ==================== REQUISITOS DE CONTRASEÑA ==================== */
+.password-requirements {
+  background-color: var(--light-green);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid rgba(46, 139, 87, 0.1);
+  transition: all 0.3s ease;
+}
+
+.password-requirements p {
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.password-requirements li {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.password-requirements li:last-child {
+  margin-bottom: 0;
+}
+
+.password-requirements li.valid {
+  color: var(--success-color);
+  background-color: rgba(46, 139, 87, 0.1);
+  font-weight: 600;
+}
+
+.password-requirements li.valid i {
+  color: var(--success-color);
+  animation: checkmark 0.3s ease-in-out;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==================== BOTÓN DE MOSTRAR/OCULTAR CONTRASEÑA ==================== */
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #7F8C8D;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: var(--primary-color);
+  background-color: var(--light-green);
+}
+
+.password-toggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* ==================== ANIMACIÓN DEL CONTENEDOR ==================== */
+.register-layout {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== BOTONES DESHABILITADOS ==================== */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn:disabled:hover {
+  transform: none !important;
+}
+
+/* ==================== SPINNER DE CARGA ==================== */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== CHECKBOX PERSONALIZADO ==================== */
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+input[type="checkbox"]:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* ==================== INPUTS DE FECHA ==================== */
+input[type="date"] {
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  color: var(--primary-color);
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+/* ==================== MEJORAS DE ACCESIBILIDAD ==================== */
+.form-group label {
+  cursor: pointer;
+}
+
+/* Focus visible para navegación con teclado */
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* ==================== RESPONSIVE (OPCIONAL) ==================== */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-navigation button {
+    width: 100% !important;
+  }
 }
