@@ -21,13 +21,14 @@ export class Registro {
       telefono: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^[\+]?[0-9\s\-\(\)]{10,}$/)]],
       fechaNacimiento: ['', [Validators.required, this.edadMinimaValidador(18)]],
       email: ['', [Validators.required, Validators.email]],
-      contrasena: ['', [Validators.required, Validators.minLength(8), this.ContrasenaFuerteValidador]],
+      contrasena: ['', [Validators.required, Validators.minLength(8), this.ContrasenaFuerteValidador()]],
       confirmarContrasena: ['', [Validators.required]],
       terminos: [false, [Validators.requiredTrue]]
     },
     { validators: this.contrasenasMatchValidador } as AbstractControlOptions
     );
   }
+
   public contrasenasMatchValidador(formGroup: FormGroup) {
     const contrasena = formGroup.get('contrasena')?.value;
     const confirmarContrasena = formGroup.get('confirmarContrasena')?.value;
@@ -52,7 +53,6 @@ export class Registro {
   }
 
   public crearUsuario() {
-    if (this.registroForm.valid) {
       const formValues = this.registroForm.value;
 
       const fullName = `${formValues.nombre} ${formValues.apellido}`;
@@ -64,12 +64,7 @@ export class Registro {
         email: formValues.email,
         contrasena: formValues.contrasena
       };
-
       console.log('Usuario a registrar:', user);
-
-    } else {
-      console.log('Formulario no válido', this.registroForm.value);
-    }
   }
 
   edadMinimaValidador(edadMinima: number) {
