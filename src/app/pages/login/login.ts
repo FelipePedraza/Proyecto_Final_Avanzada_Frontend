@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import {ReactiveFormsModule, FormGroup, FormBuilder, Validators, AbstractControlOptions} from '@angular/forms';
+import {ReactiveFormsModule, FormGroup, FormBuilder, Validators} from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import {RouterLink} from '@angular/router';
 
 // Enum para manejar las vistas
 enum VistaLogin {
@@ -11,7 +12,7 @@ enum VistaLogin {
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })

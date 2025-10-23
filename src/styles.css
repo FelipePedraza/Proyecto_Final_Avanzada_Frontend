@@ -130,9 +130,8 @@ ul { list-style: none; }
 }
 .logo-house {
   color: #F9D71C;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   transform: rotate(45deg);
-  margin-top: -4px;
 }
 .logo-text {
   color: var(--primary-color);

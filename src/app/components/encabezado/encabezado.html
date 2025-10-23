@@ -1,16 +1,19 @@
 <header class="main-header">
-  <div class="container">
-    <a href="index.html" class="logo">
+  <div class="container header-content">
+    <!-- Logo -->
+    <a routerLink="/" class="logo">
       <div class="logo-icon">
-        <i class="fa-solid fa-house-chimney logo-house"></i>
+        <i class="fa-solid fa-house-chimney logo-house" ></i>
       </div>
       <span class="logo-text">ViviGo</span>
     </a>
+
+    <!-- Navegación -->
     <nav class="main-nav">
       <ul>
-        <li><a href="/login">Conviértete en Anfitrión</a></li>
-        <li><a href="/login" class="btn btn-secondary">Iniciar Sesión</a></li>
-        <li><a href="/registro" class="btn btn-primary">Regístrate</a></li>
+        <li><a routerLink="/login" class="nav-link">Conviértete en Anfitrión</a></li>
+        <li><a routerLink="/login" class="btn btn-secondary">Iniciar Sesión</a></li>
+        <li><a routerLink="/registro" class="btn btn-primary">Regístrate</a></li>
       </ul>
     </nav>
   </div>
