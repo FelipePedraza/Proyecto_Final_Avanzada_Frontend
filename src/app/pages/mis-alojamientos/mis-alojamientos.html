@@ -1,61 +1,168 @@
 <main class="container dashboard-container">
   <div class="dashboard-layout">
 
+    <!-- Panel Lateral del Usuario -->
     <app-panel-usuario></app-panel-usuario>
 
+    <!-- Contenido Principal -->
     <section class="dashboard-content">
 
+      <!-- Encabezado con título y botón -->
       <div class="content-header">
         <h1>Mis Alojamientos</h1>
-        <a href="#" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Añadir Alojamiento</a>
+        <a routerLink="/crear-alojamiento" class="btn btn-primary">
+          <i class="fa-solid fa-plus"></i> Añadir Alojamiento
+        </a>
       </div>
 
-      <div class="table-container">
-        <table class="accommodations-table">
+      <!-- Barra de Búsqueda -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input
+            type="text"
+            [(ngModel)]="terminoBusqueda"
+            (input)="buscarAlojamientos()"
+            placeholder="Buscar por título o ciudad..."
+            class="search-input">
 
-          <thead>
-          <tr>
-            <th>Alojamiento</th>
-            <th>Estado</th>
-            <th>Reservas (30d)</th>
-            <th>Calificación</th>
-            <th>Acciones</th>
-          </tr>
-          </thead>
+          @if (terminoBusqueda) {
+            <button
+              type="button"
+              class="clear-search"
+              (click)="limpiarBusqueda()"
+              title="Limpiar búsqueda">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          }
+        </div>
 
-          <tbody>
-            <tr>
-              <td data-label="Alojamiento">
-                <div class="property-cell">
-                  <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=200&auto=format&fit=crop" alt="Villa con Piscina en la Montaña">
-                  <div>
-                    <strong>Villa con Piscina en la Montaña</strong>
-                    <span>La Calera, Cundinamarca</span>
+        <div class="search-info">
+          <p>
+            <i class="fa-solid fa-info-circle"></i>
+            Mostrando <strong>{{ alojamientosFiltrados.length }}</strong> de
+            <strong>{{ alojamientos.length }}</strong> alojamientos
+          </p>
+        </div>
+      </div>
+
+      <!-- Estado de Carga -->
+      @if (cargando) {
+        <div class="loading-container">
+          <div class="loading-spinner-large"></div>
+          <p>Cargando alojamientos...</p>
+        </div>
+      }
+
+      <!-- Lista de Alojamientos (Cards) -->
+      @if (alojamientosFiltrados.length > 0) {
+        <div class="alojamientos-grid">
+
+          @for (alojamiento of alojamientosFiltrados; track alojamiento.id) {
+            <div class="alojamiento-card">
+
+              <!-- Imagen del Alojamiento -->
+              <div class="alojamiento-image">
+                <img [src]="alojamiento.imagenPrincipal" [alt]="alojamiento.titulo">
+                <div class="alojamiento-badge">
+                  <i class="fa-solid fa-circle-check"></i> Publicado
+                </div>
+              </div>
+
+              <!-- Información del Alojamiento -->
+              <div class="alojamiento-info">
+
+                <!-- Título y Ubicación -->
+                <div class="alojamiento-header">
+                  <h3>{{ alojamiento.titulo }}</h3>
+                  <p class="location">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ alojamiento.direccion.ciudad }}
+                  </p>
+                </div>
+
+                <!-- Calificación -->
+                <div class="alojamiento-rating">
+                  @for (star of generarEstrellas(alojamiento.promedioCalificaciones); track $index) {
+                    <i class="fa-solid fa-star"></i>
+                  }
+                  <span class="rating-number">
+                    {{ alojamiento.promedioCalificaciones }}
+                  </span>
+                </div>
+
+                <!-- Métricas -->
+                @if (obtenerMetricas(alojamiento.id); as metricas) {
+                  <div class="alojamiento-stats">
+                    <div class="stat-item">
+                      <i class="fa-solid fa-calendar-check"></i>
+                      <span>{{ metricas.totalReservas }} reservas</span>
+                    </div>
+                    <div class="stat-item">
+                      <i class="fa-solid fa-comment"></i>
+                      <span>{{ metricas.totalResenas }} reseñas</span>
+                    </div>
                   </div>
+                }
+
+                <!-- Precio -->
+                <div class="alojamiento-price">
+                  <span class="price-label">Precio por noche</span>
+                  <span class="price-amount">
+                    {{ formatearPrecio(alojamiento.precioPorNoche) }}
+                  </span>
                 </div>
-              </td>
 
-              <td data-label="Estado">
-                <span class="status published">Publicado</span>
-              </td>
-
-              <td data-label="Reservas (30d)">8</td>
-
-              <td data-label="Calificación">
-                <i class="fa-solid fa-star"></i> 4.95
-              </td>
-
-              <td data-label="Acciones">
-                <div class="actions-cell">
-                  <a href="#" class="btn-icon" title="Editar"><i class="fa-solid fa-pen"></i></a>
-                  <a href="#" class="btn-icon btn-icon-danger" title="Eliminar"><i class="fa-solid fa-trash"></i></a>
+                <!-- Acciones -->
+                <div class="alojamiento-actions">
+                  <a
+                    [routerLink]="['/alojamiento', alojamiento.id]"
+                    class="btn btn-secondary btn-small">
+                    <i class="fa-solid fa-eye"></i> Ver
+                  </a>
+                  <a
+                    [routerLink]="['/editar-alojamiento', alojamiento.id]"
+                    class="btn btn-secondary btn-small">
+                    <i class="fa-solid fa-pen"></i> Editar
+                  </a>
+                  <button
+                    type="button"
+                    (click)="confirmarEliminar(alojamiento.id, alojamiento.titulo)"
+                    class="btn btn-danger btn-small">
+                    <i class="fa-solid fa-trash"></i> Eliminar
+                  </button>
                 </div>
-              </td>
-            </tr>
 
-          </tbody>
-        </table>
-      </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- Estado Vacío -->
+      @if (!cargando && alojamientos.length === 0) {
+        <div class="empty-state">
+          <i class="fa-solid fa-house-circle-exclamation"></i>
+          <h3>Aún no tienes alojamientos</h3>
+          <p>Crea tu primer alojamiento para comenzar a recibir huéspedes</p>
+          <a routerLink="/crear-alojamiento" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Crear Alojamiento
+          </a>
+        </div>
+      }
+
+      <!-- Sin Resultados de Búsqueda -->
+      @if (!cargando && alojamientosFiltrados.length === 0 && terminoBusqueda) {
+        <div class="empty-state">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <h3>No se encontraron resultados</h3>
+          <p>No hay alojamientos que coincidan con "{{ terminoBusqueda }}"</p>
+          <button type="button" (click)="limpiarBusqueda()" class="btn btn-secondary">
+            <i class="fa-solid fa-rotate-left"></i> Limpiar Búsqueda
+          </button>
+        </div>
+      }
 
     </section>
   </div>
