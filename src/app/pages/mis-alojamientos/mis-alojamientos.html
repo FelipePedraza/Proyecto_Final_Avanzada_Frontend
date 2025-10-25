@@ -1,1 +1,65 @@
-<p>mis-alojamientos works!</p>
+<main class="container dashboard-container">
+  <div class="dashboard-layout">
+
+    <app-panel-usuario></app-panel-usuario>
+
+    <section class="dashboard-content">
+
+      <div class="content-header">
+        <h1>Mis Alojamientos</h1>
+        <a href="#" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Añadir Alojamiento</a>
+      </div>
+
+      <div class="table-container">
+        <table class="accommodations-table">
+
+          <thead>
+          <tr>
+            <th>Alojamiento</th>
+            <th>Estado</th>
+            <th>Reservas (30d)</th>
+            <th>Calificación</th>
+            <th>Acciones</th>
+          </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td data-label="Alojamiento">
+                <div class="property-cell">
+                  <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=200&auto=format&fit=crop" alt="Villa con Piscina en la Montaña">
+                  <div>
+                    <strong>Villa con Piscina en la Montaña</strong>
+                    <span>La Calera, Cundinamarca</span>
+                  </div>
+                </div>
+              </td>
+
+              <td data-label="Estado">
+                <span class="status published">Publicado</span>
+              </td>
+
+              <td data-label="Reservas (30d)">8</td>
+
+              <td data-label="Calificación">
+                <i class="fa-solid fa-star"></i> 4.95
+              </td>
+
+              <td data-label="Acciones">
+                <div class="actions-cell">
+                  <a href="#" class="btn-icon" title="Editar"><i class="fa-solid fa-pen"></i></a>
+
+                  <a href="#" class="btn-icon" title="Pausar"><i class="fa-solid fa-pause"></i></a>
+
+                  <a href="#" class="btn-icon btn-icon-danger" title="Eliminar"><i class="fa-solid fa-trash"></i></a>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+  </div>
+</main>

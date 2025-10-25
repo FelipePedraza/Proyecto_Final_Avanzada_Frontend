@@ -1,1 +1,26 @@
-<p>mis-reservas works!</p>
+<main class="container dashboard-container">
+  <div class="dashboard-layout">
+    <app-panel-usuario></app-panel-usuario>
+    <section class="dashboard-content">
+      <h1>Mis Reservas</h1>
+
+      <div class="tabs">
+        <button class="tab-link active" data-tab="activas">Activas</button>
+        <button class="tab-link" data-tab="pasadas">Pasadas</button>
+        <button class="tab-link" data-tab="canceladas">Canceladas</button>
+      </div>
+
+      <div id="activas" class="tab-content active">
+        <div class="reservation-card"> ... </div>
+      </div>
+
+      <div id="pasadas" class="tab-content">
+        <div class="reservation-card"> ... </div>
+      </div>
+
+      <div id="canceladas" class="tab-content">
+        <div class="reservation-card"> ... </div>
+      </div>
+    </section>
+  </div>
+</main>
