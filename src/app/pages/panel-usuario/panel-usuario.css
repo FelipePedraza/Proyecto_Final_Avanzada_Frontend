@@ -1,0 +1,210 @@
+/* ==================== ANIMACIONES ==================== */
+.dashboard-layout {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== TABS PERSONALIZADAS ==================== */
+.tabs {
+  margin-bottom: 2.5rem;
+}
+
+.tab-link {
+  position: relative;
+  padding: 1.2rem 2rem;
+  font-size: 1.05rem;
+}
+
+.tab-link:hover {
+  color: var(--primary-color);
+  background-color: var(--light-green);
+}
+
+/* ==================== TARJETAS DE RESERVA ==================== */
+.reservation-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reservation-card:hover {
+  box-shadow: 0 12px 40px rgba(46, 139, 87, 0.15);
+}
+
+.reservation-card img {
+  transition: transform 0.3s ease;
+}
+
+.reservation-card:hover img {
+  transform: scale(1.05);
+}
+
+/* ==================== ESTADOS DE RESERVA ==================== */
+.status {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.status.confirmed {
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(46, 139, 87, 0.3);
+  }
+  50% {
+    box-shadow: 0 2px 16px rgba(46, 139, 87, 0.5);
+  }
+}
+
+/* ==================== BOTONES EN RESERVAS ==================== */
+.reservation-actions .btn {
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.reservation-actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.reservation-actions .btn:active {
+  transform: translateY(0);
+}
+
+/* ==================== NAVEGACIÓN LATERAL ==================== */
+.dashboard-nav ul li a {
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-nav ul li a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: var(--primary-color);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.dashboard-nav ul li.active a::before,
+.dashboard-nav ul li a:hover::before {
+  transform: translateX(0);
+}
+
+/* ==================== PERFIL DE USUARIO ==================== */
+.user-profile-summary {
+  position: relative;
+  overflow: hidden;
+}
+
+.user-profile-summary::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(46, 139, 87, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.user-profile-summary img {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.user-profile-summary:hover img {
+  transform: scale(1.1);
+}
+
+/* ==================== MENSAJE VACÍO ==================== */
+.tab-content > div[style*="text-align: center"] {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ==================== RESPONSIVE IMPROVEMENTS ==================== */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-nav {
+    position: relative;
+    top: 0;
+  }
+
+  .reservation-card {
+    flex-direction: column;
+  }
+
+  .reservation-card img {
+    width: 100%;
+    height: 200px;
+  }
+
+  .reservation-actions {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .reservation-actions .btn {
+    flex: 1;
+    min-width: auto;
+  }
+}
+
+/* ==================== MEJORAS DE ACCESIBILIDAD ==================== */
+.tab-link:focus-visible,
+.btn:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* ==================== LOADING STATE (para futuro) ==================== */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 12px;
+  height: 200px;
+  margin-bottom: 2rem;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ==================== SMOOTH TRANSITIONS ==================== */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
