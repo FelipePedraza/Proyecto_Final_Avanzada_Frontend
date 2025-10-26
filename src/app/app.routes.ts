@@ -19,6 +19,6 @@ export const routes: Routes = [
   { path: 'crear-alojamiento', component: CrearAlojamiento },
   { path: 'editar-alojamiento/:id', component: CrearAlojamiento },
   { path: 'editar-perfil', component: EditarPerfil },
-  { path: "mis-reservas", component: MisReservas },
-  { path: "**", pathMatch: "full", redirectTo: "" }
+  { path: 'mis-reservas', component: MisReservas },
+  { path: '**', pathMatch: "full", redirectTo: "" }
 ];

@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
-import {ReactiveFormsModule, FormGroup, FormBuilder, Validators} from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {RouterLink} from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { Subject, takeUntil, finalize } from 'rxjs';
+import Swal from 'sweetalert2';
+import { AuthService } from '../../services/auth-service';
+import { LoginDTO, OlvidoContrasenaDTO } from '../../models/usuario-dto';
 
-// Enum para manejar las vistas
 enum VistaLogin {
   LOGIN = 'login',
   RECUPERAR = 'recuperar',
@@ -17,51 +20,50 @@ enum VistaLogin {
   styleUrl: './login.css'
 })
 export class Login {
-  //formularios
+  // Formularios
   loginForm!: FormGroup;
   recuperarForm!: FormGroup;
 
   // Control de vistas
   vistaActual: VistaLogin = VistaLogin.LOGIN;
-  readonly VistaLogin = VistaLogin; // Para usar en el template
+  readonly VistaLogin = VistaLogin;
 
   // Estado de la UI
   mostrarContrasena = false;
   cargando = false;
   emailRecuperacion = '';
 
-  constructor(private formBuilder: FormBuilder) {
+  // Subject para cancelar subscripciones
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.crearFormularios();
   }
 
-  crearFormularios() {
-
+  crearFormularios(): void {
     // Formulario de login
     this.loginForm = this.formBuilder.group({
-        email: ['', [Validators.required, Validators.email]],
-        contrasena: ['', [Validators.required, Validators.minLength(8)]]
+      email: ['', [Validators.required, Validators.email]],
+      contrasena: ['', [Validators.required, Validators.minLength(8)]]
     });
+
     // Formulario de recuperación de contraseña
     this.recuperarForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]]
     });
-
   }
 
-  /**
-   * Alterna la visibilidad de la contraseña
-   */
-  toggleContrasena() {
+  toggleContrasena(): void {
     this.mostrarContrasena = !this.mostrarContrasena;
   }
 
-  /**
-   * Cambia entre las diferentes vistas
-   */
   cambiarVista(vista: VistaLogin): void {
     this.vistaActual = vista;
 
-    // Resetear formularios al cambiar de vista
     if (vista === VistaLogin.LOGIN) {
       this.loginForm.reset();
       this.cargando = false;
@@ -71,26 +73,56 @@ export class Login {
     }
   }
 
-  public login() {
-
+  login(): void {
     if (this.loginForm.invalid) {
-      // Marcar todos los campos como tocados para mostrar errores
       Object.keys(this.loginForm.controls).forEach(key => {
         this.loginForm.get(key)?.markAsTouched();
       });
-
-      // Scroll al primer error
       this.scrollAlPrimerError();
       return;
     }
+
     this.cargando = true;
 
-    console.log('login de:', this.loginForm.value);
+    const dto: LoginDTO = {
+      email: this.loginForm.value.email,
+      contrasena: this.loginForm.value.contrasena
+    };
+
+    this.authService.login(dto)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response.error) {
+            // Guardar token
+            this.authService.guardarToken(response.respuesta.token);
+
+            // Mostrar mensaje de éxito
+            Swal.fire({
+              title: '¡Bienvenido!',
+              text: 'Has iniciado sesión correctamente',
+              icon: 'success',
+              confirmButtonColor: '#2e8b57',
+              timer: 2000,
+              timerProgressBar: true
+            }).then(() => {
+              // Redirigir al dashboard o página principal
+              this.router.navigate(['/']);
+            });
+          } else {
+            this.mostrarError('Credenciales incorrectas');
+          }
+        },
+        error: (error) => {
+          console.error('Error en login:', error);
+          this.mostrarError('Email o contraseña incorrectos. Por favor, intenta de nuevo.');
+        }
+      });
   }
 
-  /**
-   * Procesa la recuperación de contraseña
-   */
   recuperarContrasena(): void {
     if (this.recuperarForm.invalid) {
       Object.keys(this.recuperarForm.controls).forEach(key => {
@@ -101,14 +133,65 @@ export class Login {
 
     this.cargando = true;
     this.emailRecuperacion = this.recuperarForm.value.email;
-    console.log('Email de recuperación enviado a:', this.emailRecuperacion);
-    this.cargando = false;
-    this.cambiarVista(VistaLogin.EXITO);
+
+    const dto: OlvidoContrasenaDTO = {
+      email: this.emailRecuperacion
+    };
+
+    this.authService.solicitarRecuperacion(dto)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response.error) {
+            this.cambiarVista(VistaLogin.EXITO);
+          } else {
+            this.mostrarError('No se pudo enviar el correo de recuperación');
+          }
+        },
+        error: (error) => {
+          console.error('Error al recuperar contraseña:', error);
+          this.mostrarError('No se pudo procesar tu solicitud. Por favor, intenta de nuevo.');
+        }
+      });
   }
 
-  /**
-   * Obtiene el mensaje de error para un campo específico
-   */
+  reenviarEmail(): void {
+    if (!this.emailRecuperacion) return;
+
+    this.cargando = true;
+
+    const dto: OlvidoContrasenaDTO = {
+      email: this.emailRecuperacion
+    };
+
+    this.authService.solicitarRecuperacion(dto)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: (response) => {
+          if (!response.error) {
+            Swal.fire({
+              title: 'Correo reenviado',
+              text: 'Hemos enviado nuevamente el enlace de recuperación',
+              icon: 'success',
+              confirmButtonColor: '#2e8b57',
+              timer: 3000,
+              timerProgressBar: true
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error al reenviar email:', error);
+          this.mostrarError('No se pudo reenviar el correo. Por favor, intenta más tarde.');
+        }
+      });
+  }
+
   obtenerErrorCampo(formulario: FormGroup, campo: string): string {
     const control = formulario.get(campo);
 
@@ -132,29 +215,24 @@ export class Login {
     return 'Campo inválido';
   }
 
-  /**
-   * Reenvía el email de recuperación
-   */
-  reenviarEmail(): void {
-    this.cargando = true;
-    console.log('Email reenviado a:', this.emailRecuperacion);
-  }
-
-  /**
-   * Valida si un campo específico tiene errores
-   */
   campoInvalido(formulario: FormGroup, campo: string): boolean {
     const control = formulario.get(campo);
     return !!(control && control.invalid && control.touched);
   }
 
-  /**
-   * Scroll al primer campo con error
-   */
   private scrollAlPrimerError(): void {
     const primerError = document.querySelector('.error');
     if (primerError) {
       primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  }
+
+  private mostrarError(mensaje: string): void {
+    Swal.fire({
+      title: 'Error',
+      text: mensaje,
+      icon: 'error',
+      confirmButtonColor: '#2e8b57'
+    });
   }
 }
