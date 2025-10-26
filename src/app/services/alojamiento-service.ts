@@ -1,106 +1,232 @@
 import { Injectable } from '@angular/core';
-import { ItemAlojamientoDTO, MetricasDTO } from '../models/alojamiento-dto';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import {
+  AlojamientoDTO,
+  ItemAlojamientoDTO,
+  CreacionAlojamientoDTO,
+  EdicionAlojamientoDTO,
+  AlojamientoFiltroDTO,
+  MetricasDTO
+} from '../models/alojamiento-dto';
+import { ItemReservaDTO, ReservaEstado } from '../models/reserva-dto';
+import {
+  ItemResenaDTO,
+  CreacionResenaDTO,
+  CreacionRespuestaDTO
+} from '../models/resena-dto';
 
+/**
+ * Servicio para gestionar alojamientos
+ * Mapea directamente a los endpoints de AlojamientoControlador.java
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class AlojamientoService {
+  private readonly API_URL = 'http://localhost:8080/api/alojamientos';
 
-  // Datos mock para simular alojamientos del usuario
-  private misAlojamientos: ItemAlojamientoDTO[] = [
-    {
-      id: 1,
-      titulo: 'Villa con Piscina en la Montaña',
-      imagenPrincipal: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=400&auto=format&fit=crop',
-      precioPorNoche: 250000,
-      direccion: {
-        ciudad: 'La Calera',
-        direccion: 'Km 5 Vía La Calera',
-        localizacion: { latitud: 4.7234, longitud: -73.9764 }
-      },
-      promedioCalificaciones: 4.95
-    },
-    {
-      id: 2,
-      titulo: 'Apartamento Moderno en el Centro',
-      imagenPrincipal: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400&auto=format&fit=crop',
-      precioPorNoche: 180000,
-      direccion: {
-        ciudad: 'Bogotá',
-        direccion: 'Calle 82 #10-20',
-        localizacion: { latitud: 4.6692, longitud: -74.0555 }
-      },
-      promedioCalificaciones: 4.7
-    },
-    {
-      id: 3,
-      titulo: 'Casa Campestre con Jacuzzi',
-      imagenPrincipal: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=400&auto=format&fit=crop',
-      precioPorNoche: 320000,
-      direccion: {
-        ciudad: 'Girardot',
-        direccion: 'Vereda El Peñón',
-        localizacion: { latitud: 4.3056, longitud: -74.8036 }
-      },
-      promedioCalificaciones: 4.85
-    }
-  ];
+  constructor(private http: HttpClient) {}
 
-  constructor() { }
+  // ==================== CRUD BÁSICO ====================
 
   /**
-   * Obtiene todos los alojamientos del usuario
+   * POST /api/alojamientos
+   * Crea un nuevo alojamiento
    */
-  obtenerMisAlojamientos(): ItemAlojamientoDTO[] {
-    return this.misAlojamientos;
+  crear(dto: CreacionAlojamientoDTO, imagenes?: File[]): Observable<{ error: boolean; respuesta: string }> {
+    const formData = new FormData();
+    formData.append('alojamiento', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+
+    if (imagenes && imagenes.length > 0) {
+      imagenes.forEach((imagen) => {
+        formData.append('imagenes', imagen);
+      });
+    }
+
+    return this.http.post<{ error: boolean; respuesta: string }>(this.API_URL, formData);
   }
 
   /**
-   * Busca alojamientos por título o ciudad
+   * GET /api/alojamientos/{id}
+   * Obtiene un alojamiento por ID
    */
-  buscarAlojamientos(termino: string): ItemAlojamientoDTO[] {
+  obtenerPorId(id: number): Observable<{ error: boolean; respuesta: AlojamientoDTO }> {
+    return this.http.get<{ error: boolean; respuesta: AlojamientoDTO }>(`${this.API_URL}/${id}`);
+  }
+
+  /**
+   * PUT /api/alojamientos/{id}
+   * Edita un alojamiento existente
+   */
+  editar(id: number, dto: EdicionAlojamientoDTO, imagenes?: File[]): Observable<{ error: boolean; respuesta: string }> {
+    const formData = new FormData();
+    formData.append('alojamiento', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
+
+    if (imagenes && imagenes.length > 0) {
+      imagenes.forEach((imagen) => {
+        formData.append('imagenes', imagen);
+      });
+    }
+
+    return this.http.put<{ error: boolean; respuesta: string }>(`${this.API_URL}/${id}`, formData);
+  }
+
+  /**
+   * DELETE /api/alojamientos/{id}
+   * Elimina un alojamiento
+   */
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/${id}`);
+  }
+
+  // ==================== BÚSQUEDA Y FILTROS ====================
+
+  /**
+   * GET /api/alojamientos?filtros...
+   * Obtiene lista de alojamientos con filtros
+   */
+  obtenerAlojamientos(filtros: Partial<AlojamientoFiltroDTO>, pagina: number = 0): Observable<{ error: boolean; respuesta: ItemAlojamientoDTO[] }> {
+    let params = new HttpParams().set('pagina', pagina.toString());
+
+    if (filtros.ciudad) {
+      params = params.set('ciudad', filtros.ciudad);
+    }
+    if (filtros.fechaEntrada) {
+      params = params.set('fechaEntrada', filtros.fechaEntrada.toISOString());
+    }
+    if (filtros.fechaSalida) {
+      params = params.set('fechaSalida', filtros.fechaSalida.toISOString());
+    }
+    if (filtros.huespedes) {
+      params = params.set('huespedes', filtros.huespedes.toString());
+    }
+    if (filtros.precioMin) {
+      params = params.set('precioMin', filtros.precioMin.toString());
+    }
+    if (filtros.precioMax) {
+      params = params.set('precioMax', filtros.precioMax.toString());
+    }
+    if (filtros.servicios && filtros.servicios.length > 0) {
+      filtros.servicios.forEach(servicio => {
+        params = params.append('servicios', servicio);
+      });
+    }
+
+    return this.http.get<{ error: boolean; respuesta: ItemAlojamientoDTO[] }>(this.API_URL, { params });
+  }
+
+  /**
+   * GET /api/alojamientos/sugerencias?ciudad=...
+   * Obtiene sugerencias de alojamientos por ciudad
+   */
+  sugerirAlojamientos(ciudad: string): Observable<{ error: boolean; respuesta: ItemAlojamientoDTO[] }> {
+    const params = new HttpParams().set('ciudad', ciudad);
+    return this.http.get<{ error: boolean; respuesta: ItemAlojamientoDTO[] }>(`${this.API_URL}/sugerencias`, { params });
+  }
+
+  // ==================== MÉTRICAS ====================
+
+  /**
+   * GET /api/alojamientos/{id}/metricas
+   * Obtiene métricas de un alojamiento
+   */
+  obtenerMetricas(id: number): Observable<{ error: boolean; respuesta: MetricasDTO }> {
+    return this.http.get<{ error: boolean; respuesta: MetricasDTO }>(`${this.API_URL}/${id}/metricas`);
+  }
+
+  // ==================== RESERVAS ====================
+
+  /**
+   * GET /api/alojamientos/{id}/reservas
+   * Obtiene las reservas de un alojamiento con filtros opcionales
+   */
+  obtenerReservasAlojamiento(
+    id: number,
+    estado?: ReservaEstado,
+    fechaEntrada?: Date,
+    fechaSalida?: Date,
+    pagina: number = 0
+  ): Observable<{ error: boolean; respuesta: ItemReservaDTO[] }> {
+    let params = new HttpParams().set('pagina', pagina.toString());
+
+    if (estado) {
+      params = params.set('estado', estado);
+    }
+    if (fechaEntrada) {
+      params = params.set('fechaEntrada', fechaEntrada.toISOString());
+    }
+    if (fechaSalida) {
+      params = params.set('fechaSalida', fechaSalida.toISOString());
+    }
+
+    return this.http.get<{ error: boolean; respuesta: ItemReservaDTO[] }>(`${this.API_URL}/${id}/reservas`, { params });
+  }
+
+  // ==================== RESEÑAS ====================
+
+  /**
+   * GET /api/alojamientos/{id}/resenas
+   * Obtiene las reseñas de un alojamiento
+   */
+  obtenerResenasAlojamiento(id: number, pagina: number = 0): Observable<{ error: boolean; respuesta: ItemResenaDTO[] }> {
+    const params = new HttpParams().set('pagina', pagina.toString());
+    return this.http.get<{ error: boolean; respuesta: ItemResenaDTO[] }>(`${this.API_URL}/${id}/resenas`, { params });
+  }
+
+  /**
+   * POST /api/alojamientos/{id}/resenas
+   * Crea una nueva reseña para un alojamiento
+   */
+  crearResena(id: number, dto: CreacionResenaDTO): Observable<{ error: boolean; respuesta: string }> {
+    return this.http.post<{ error: boolean; respuesta: string }>(`${this.API_URL}/${id}/resenas`, dto);
+  }
+
+  /**
+   * POST /api/alojamientos/{id}/resenas/{idResena}/respuesta
+   * Responde a una reseña
+   */
+  responderResena(idAlojamiento: number, idResena: number, dto: CreacionRespuestaDTO): Observable<{ error: boolean; respuesta: string }> {
+    return this.http.post<{ error: boolean; respuesta: string }>(
+      `${this.API_URL}/${idAlojamiento}/resenas/${idResena}/respuesta`,
+      dto
+    );
+  }
+
+  // ==================== MÉTODOS AUXILIARES (SOLO FRONTEND) ====================
+
+  /**
+   * Busca alojamientos localmente (cliente)
+   * NOTA: Este método NO existe en el backend, es solo para búsqueda local
+   */
+  buscarAlojamientosLocal(alojamientos: ItemAlojamientoDTO[], termino: string): ItemAlojamientoDTO[] {
     if (!termino || termino.trim() === '') {
-      return this.misAlojamientos;
+      return alojamientos;
     }
 
     const terminoLower = termino.toLowerCase().trim();
 
-    return this.misAlojamientos.filter(alojamiento =>
+    return alojamientos.filter(alojamiento =>
       alojamiento.titulo.toLowerCase().includes(terminoLower) ||
       alojamiento.direccion.ciudad.toLowerCase().includes(terminoLower)
     );
   }
 
   /**
-   * Obtiene un alojamiento por su ID
+   * Formatea precio con formato de moneda colombiana
    */
-  obtenerAlojamientoPorId(id: number): ItemAlojamientoDTO | undefined {
-    return this.misAlojamientos.find(alojamiento => alojamiento.id === id);
+  formatearPrecio(precio: number): string {
+    return precio.toLocaleString('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0
+    });
   }
 
   /**
-   * Elimina un alojamiento (simulado)
+   * Genera array de estrellas para UI
    */
-  eliminarAlojamiento(id: number): boolean {
-    const index = this.misAlojamientos.findIndex(alojamiento => alojamiento.id === id);
-
-    if (index !== -1) {
-      this.misAlojamientos.splice(index, 1);
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Obtiene métricas de un alojamiento específico
-   */
-  obtenerMetricas(id: number): MetricasDTO {
-    // Datos simulados - en producción vendrían del backend
-    return {
-      totalResenas: Math.floor(Math.random() * 50) + 10,
-      promedioCalificaciones: Number((Math.random() * (5 - 4) + 4).toFixed(2)),
-      totalReservas: Math.floor(Math.random() * 30) + 5
-    };
+  generarEstrellas(calificacion: number): number[] {
+    return Array(Math.floor(calificacion)).fill(0);
   }
 }

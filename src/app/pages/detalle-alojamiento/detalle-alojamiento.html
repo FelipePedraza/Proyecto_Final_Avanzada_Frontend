@@ -1,1 +1,355 @@
-<p>detalle-alojamiento works!</p>
+<!-- ==================== ESTADO DE CARGA ==================== -->
+@if (cargando) {
+  <main class="container details-page-container">
+    <div class="loading-container" style="text-align: center; padding: 4rem 2rem;">
+      <div class="loading-spinner-large"></div>
+      <p style="color: var(--text-color); font-size: 1.1rem; margin-top: 1rem;">
+        Cargando información del alojamiento...
+      </p>
+    </div>
+  </main>
+}
+
+<!-- ==================== ERROR DE CARGA ==================== -->
+@if (errorCarga && !cargando) {
+  <main class="container details-page-container">
+    <div class="empty-state">
+      <i class="fa-solid fa-exclamation-triangle" style="color: var(--danger-color);"></i>
+      <h3>No se pudo cargar el alojamiento</h3>
+      <p>Por favor, verifica tu conexión e intenta de nuevo.</p>
+      <button type="button" (click)="volver()" class="btn btn-primary">
+        <i class="fa-solid fa-arrow-left"></i> Volver
+      </button>
+    </div>
+  </main>
+}
+
+<!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+@if (alojamiento && !cargando) {
+  <main class="container details-page-container">
+
+    <!-- Sección de Título -->
+    <section class="title-section">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+        <div>
+          <h1>{{ alojamiento.titulo }}</h1>
+          <div class="title-meta">
+            @if (metricas) {
+              <span class="rating">
+                <i class="fa-solid fa-star"></i>
+                {{ metricas.promedioCalificaciones.toFixed(2) }}
+                ({{ metricas.totalResenas }} reseñas)
+              </span>
+            }
+            <span class="location">
+              <i class="fa-solid fa-location-dot"></i>
+              {{ alojamiento.direccion.ciudad }}, {{ alojamiento.direccion.direccion }}
+            </span>
+          </div>
+        </div>
+        <button type="button" (click)="volver()" class="btn btn-secondary">
+          <i class="fa-solid fa-arrow-left"></i> Volver
+        </button>
+      </div>
+    </section>
+
+    <!-- Galería de Imágenes -->
+    <section class="image-gallery">
+      <div class="main-image">
+        <img [src]="imagenPrincipal" [alt]="alojamiento.titulo">
+      </div>
+      <div class="thumbnail-images">
+        @for (imagen of imagenesGaleria; track imagen) {
+          <img
+            [src]="imagen"
+            [alt]="'Vista ' + ($index + 1) + ' de ' + alojamiento.titulo"
+            (click)="cambiarImagenPrincipal(imagen)"
+            style="cursor: pointer;">
+        }
+      </div>
+    </section>
+
+    <!-- Layout de Detalles y Widget de Reserva -->
+    <div class="details-layout">
+
+      <!-- Detalles Principales -->
+      <section class="main-details">
+
+        <!-- Encabezado con Anfitrión -->
+        <div class="details-header">
+          <div>
+            <h2>{{ alojamiento.titulo }}</h2>
+            <p style="color: #7F8C8D; margin-top: 0.5rem;">
+              <i class="fa-solid fa-users"></i> Hasta {{ alojamiento.maxHuespedes }} huéspedes
+            </p>
+          </div>
+          <div class="host-info" style="text-align: center;">
+            <img
+              src="https://placehold.co/60x60/2e8b57/fff?text=A"
+              [alt]="'Avatar de ' + alojamiento.nombreAnfitrion"
+              class="host-avatar">
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-color);">
+              <strong>{{ alojamiento.nombreAnfitrion }}</strong>
+            </p>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Descripción -->
+        <div class="description-section">
+          <h3>Acerca de este lugar</h3>
+          <p>{{ alojamiento.descripcion }}</p>
+        </div>
+
+        <hr>
+
+        <!-- Servicios -->
+        <div class="amenities-section">
+          <h3>Servicios destacados</h3>
+          <ul class="amenities-list">
+            @for (servicio of alojamiento.servicios; track servicio) {
+              <li>
+                @switch (servicio) {
+                  @case ('WIFI') {
+                    <i class="fa-solid fa-wifi"></i> Wi-Fi
+                  }
+                  @case ('PISCINA') {
+                    <i class="fa-solid fa-person-swimming"></i> Piscina
+                  }
+                  @case ('DESAYUNO') {
+                    <i class="fa-solid fa-mug-hot"></i> Desayuno incluido
+                  }
+                  @case ('AIRE_ACONDICIONADO') {
+                    <i class="fa-solid fa-snowflake"></i> Aire acondicionado
+                  }
+                  @case ('ESTACIONAMIENTO') {
+                    <i class="fa-solid fa-car"></i> Estacionamiento
+                  }
+                  @default {
+                    <i class="fa-solid fa-check"></i> {{ servicio }}
+                  }
+                }
+              </li>
+            }
+          </ul>
+        </div>
+
+        <hr>
+
+        <!-- Sección de Reseñas -->
+        <div class="reviews-section">
+          <h3>
+            <i class="fa-solid fa-star"></i>
+            @if (metricas) {
+              {{ metricas.promedioCalificaciones.toFixed(2) }}
+              ({{ metricas.totalResenas }} reseñas)
+            }
+          </h3>
+
+          @if (resenas.length > 0) {
+            <div class="reviews-grid">
+              @for (resena of resenas; track resena.id) {
+                <div class="review-card">
+                  <div class="review-author">
+                    <img
+                      [src]="resena.usuario.foto || 'https://placehold.co/40x40/3f51b5/fff?text=' + resena.usuario.nombre.charAt(0)"
+                      [alt]="'Avatar de ' + resena.usuario.nombre">
+                    <div>
+                      <strong>{{ resena.usuario.nombre }}</strong>
+                      <span>{{ formatearFechaCorta(resena.creadoEn) }}</span>
+                    </div>
+                  </div>
+
+                  <div style="margin: 0.5rem 0;">
+                    @for (star of generarEstrellas(resena.calificacion); track $index) {
+                      <i class="fa-solid fa-star" style="color: #F39C12; font-size: 0.9rem;"></i>
+                    }
+                  </div>
+
+                  <p>{{ resena.comentario }}</p>
+
+                  @if (resena.respuesta) {
+                    <div style="margin-top: 1rem; padding: 1rem; background-color: var(--light-green); border-radius: 8px;">
+                      <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        <strong><i class="fa-solid fa-reply"></i> Respuesta del anfitrión:</strong>
+                      </p>
+                      <p style="font-size: 0.9rem;">{{ resena.respuesta.mensaje }}</p>
+                      <p style="font-size: 0.8rem; color: #7F8C8D; margin-top: 0.5rem;">
+                        {{ formatearFechaCorta(resena.respuesta.respondidoEn) }}
+                      </p>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            @if (hayMasResenas) {
+              <div style="text-align: center; margin-top: 2rem;">
+                <button
+                  type="button"
+                  (click)="cargarMasResenas()"
+                  [disabled]="cargandoResenas"
+                  class="btn btn-secondary">
+                  @if (cargandoResenas) {
+                    <span class="loading-spinner"></span> Cargando...
+                  } @else {
+                    <i class="fa-solid fa-arrow-down"></i> Ver más reseñas
+                  }
+                </button>
+              </div>
+            }
+          } @else {
+            <p style="text-align: center; color: #7F8C8D; padding: 2rem;">
+              Aún no hay reseñas para este alojamiento. ¡Sé el primero en dejar una!
+            </p>
+          }
+
+          <!-- Formulario para Dejar Reseña -->
+          <div style="margin-top: 3rem; padding: 2rem; background-color: var(--light-green); border-radius: 16px;">
+            <h4 style="margin-bottom: 1.5rem; color: var(--dark-green);">
+              <i class="fa-solid fa-comment"></i> Deja tu reseña
+            </h4>
+
+            <form [formGroup]="resenaForm" (ngSubmit)="enviarResena()">
+              <div class="form-group">
+                <label for="calificacion">Calificación *</label>
+                <select id="calificacion" formControlName="calificacion">
+                  <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                  <option value="4">⭐⭐⭐⭐ Muy bueno</option>
+                  <option value="3">⭐⭐⭐ Bueno</option>
+                  <option value="2">⭐⭐ Regular</option>
+                  <option value="1">⭐ Malo</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="comentario">Comentario * (10-500 caracteres)</label>
+                <textarea
+                  id="comentario"
+                  formControlName="comentario"
+                  rows="4"
+                  placeholder="Comparte tu experiencia..."
+                  [class.error]="campoInvalido(resenaForm, 'comentario')"></textarea>
+
+                @if (campoInvalido(resenaForm, 'comentario')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo(resenaForm, 'comentario') }}
+                  </div>
+                }
+
+                <div style="text-align: right; font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
+                  {{ resenaForm.value.comentario?.length || 0 }}/500
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="resenaForm.invalid">
+                <i class="fa-solid fa-paper-plane"></i> Enviar reseña
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Widget de Reserva (Sticky) -->
+      <aside class="booking-widget">
+        <div class="booking-price">
+          <strong>{{ formatearPrecio(alojamiento.precioPorNoche) }}</strong> / noche
+        </div>
+
+        <form [formGroup]="reservaForm" (ngSubmit)="realizarReserva()" class="booking-form">
+
+          <div class="form-group">
+            <label for="fechaEntrada">Check-in *</label>
+            <input
+              type="date"
+              id="fechaEntrada"
+              formControlName="fechaEntrada"
+              [min]="obtenerFechaMinima()"
+              [class.error]="campoInvalido(reservaForm, 'fechaEntrada')">
+
+            @if (campoInvalido(reservaForm, 'fechaEntrada')) {
+              <div class="error-message show">
+                {{ obtenerErrorCampo(reservaForm, 'fechaEntrada') }}
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="fechaSalida">Check-out *</label>
+            <input
+              type="date"
+              id="fechaSalida"
+              formControlName="fechaSalida"
+              [min]="obtenerFechaMinimaSalida()"
+              [class.error]="campoInvalido(reservaForm, 'fechaSalida')">
+
+            @if (campoInvalido(reservaForm, 'fechaSalida')) {
+              <div class="error-message show">
+                {{ obtenerErrorCampo(reservaForm, 'fechaSalida') }}
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="huespedes">Número de huéspedes *</label>
+            <input
+              type="number"
+              id="huespedes"
+              formControlName="cantidadHuespedes"
+              [max]="alojamiento.maxHuespedes"
+              min="1"
+              placeholder="Cantidad de huéspedes"
+              [class.error]="campoInvalido(reservaForm, 'cantidadHuespedes')">
+
+            <p style="font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
+              Máximo {{ alojamiento.maxHuespedes }} huéspedes
+            </p>
+
+            @if (campoInvalido(reservaForm, 'cantidadHuespedes')) {
+              <div class="error-message show">
+                {{ obtenerErrorCampo(reservaForm, 'cantidadHuespedes') }}
+              </div>
+            }
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            [disabled]="reservaForm.invalid">
+            <i class="fa-solid fa-calendar-check"></i> Reservar ahora
+          </button>
+        </form>
+
+        <!-- Desglose de Precio -->
+        <div class="price-breakdown">
+          <p style="text-align: center; color: #7F8C8D; margin-bottom: 1.5rem; font-size: 0.9rem;">
+            <i class="fa-solid fa-info-circle"></i> No se te cobrará nada aún
+          </p>
+
+          @if (numeroNoches > 0) {
+            <ul>
+              <li>
+                <span>{{ formatearPrecio(alojamiento.precioPorNoche) }} x {{ numeroNoches }} noche{{ numeroNoches > 1 ? 's' : '' }}</span>
+                <span>{{ formatearPrecio(alojamiento.precioPorNoche * numeroNoches) }}</span>
+              </li>
+              <li>
+                <span>Tarifa de servicio</span>
+                <span>{{ formatearPrecio(tarifaServicio) }}</span>
+              </li>
+            </ul>
+            <hr>
+            <p class="total-price">
+              <span><strong>Total</strong></span>
+              <span><strong>{{ formatearPrecio(precioTotal) }}</strong></span>
+            </p>
+          }
+        </div>
+      </aside>
+
+    </div>
+  </main>
+}
