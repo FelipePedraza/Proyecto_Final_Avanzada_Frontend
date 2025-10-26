@@ -1,15 +1,53 @@
- <aside class="dashboard-nav">
-      <div class="user-profile-summary">
-        <img src="https://placehold.co/80x80/3f51b5/fff?text=DP" alt="Avatar de usuario">
-        <h3>David Alfonso Posso Cano</h3>
-        <p>Miembro desde 2024</p>
-      </div>
-      <ul>
-        <li><a routerLink="/mis-reservas"><i class="fa-solid fa-briefcase"></i> Mis Reservas</a></li>
-        <li><a routerLink="#"><i class="fa-solid fa-user"></i> Mi Perfil</a></li>
-        <li><a routerLink="#"><i class="fa-solid fa-message"></i> Mensajes</a></li>
+<aside class="dashboard-nav">
+
+  @if (cargando) {
+    <div style="text-align: center; padding: 2rem;">
+      <div class="loading-spinner-large"></div>
+      <p style="color: #7F8C8D; margin-top: 1rem;">Cargando...</p>
+    </div>
+  }
+
+  @if (!cargando && usuario) {
+    <div class="user-profile-summary">
+      <img
+        [src]="usuario.foto || 'https://placehold.co/80x80/2e8b57/fff?text=' + obtenerIniciales()"
+        [alt]="'Avatar de ' + usuario.nombre">
+      <h3>{{ usuario.nombre }}</h3>
+      <p>Miembro desde {{ obtenerAnioRegistro() }}</p>
+
+      @if (usuario.esAnfitrion) {
+        <div style="margin-top: 0.5rem; padding: 4px 12px; background-color: var(--primary-color); color: white; border-radius: 12px; font-size: 0.85rem; display: inline-block;">
+          <i class="fa-solid fa-star"></i> Anfitrión
+        </div>
+      }
+    </div>
+
+    <ul>
+      <li><a routerLink="/mis-reservas"><i class="fa-solid fa-briefcase"></i> Mis Reservas</a></li>
+      <li><a routerLink="/editar-perfil"><i class="fa-solid fa-user"></i> Mi Perfil</a></li>
+
+      @if (usuario.esAnfitrion) {
         <li><a routerLink="/mis-alojamientos"><i class="fa-solid fa-house-user"></i> Mis Alojamientos</a></li>
-        <li><a routerLink="#"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
-        <li><a routerLink="#"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
-      </ul>
- </aside>
+        <li><a routerLink="/crear-alojamiento"><i class="fa-solid fa-plus"></i> Crear Alojamiento</a></li>
+      } @else {
+        <li>
+          <a routerLink="/login" style="color: var(--primary-color);">
+            <i class="fa-solid fa-star"></i> Conviértete en Anfitrión
+          </a>
+        </li>
+      }
+
+      <li><a (click)="cerrarSesion()" style="cursor: pointer;"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
+    </ul>
+  }
+
+  @if (!cargando && !usuario) {
+    <div style="text-align: center; padding: 2rem;">
+      <p style="color: #7F8C8D; margin-bottom: 1rem;">Debes iniciar sesión</p>
+      <a routerLink="/login" class="btn btn-primary">
+        <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+      </a>
+    </div>
+  }
+
+</aside>
