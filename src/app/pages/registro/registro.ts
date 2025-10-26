@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import {
   FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControlOptions, AbstractControl, ValidationErrors
 } from '@angular/forms';
@@ -15,7 +15,7 @@ import { CreacionUsuarioDTO } from '../../models/usuario-dto';
   templateUrl: './registro.html',
   styleUrl: './registro.css'
 })
-export class Registro {
+export class Registro implements OnDestroy {
   registroForm!: FormGroup;
   cargando = false;
   mostrarContrasena = false;
@@ -38,6 +38,11 @@ export class Registro {
   ) {
     this.crearForm();
     this.configurarValidacionContrasena();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private crearForm(): void {

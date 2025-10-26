@@ -33,17 +33,10 @@ export class UsuarioService {
    * PUT /api/usuarios/{id}
    * Edita la información de un usuario
    */
-  editar(id: string, dto: EdicionUsuarioDTO, foto?: File): Observable<{ error: boolean; respuesta: string }> {
-    const formData = new FormData();
-    formData.append('usuario', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
-
-    if (foto) {
-      formData.append('foto', foto);
-    }
-
+  editar(id: string, dto: EdicionUsuarioDTO): Observable<{ error: boolean; respuesta: string }> {
     return this.http.put<{ error: boolean; respuesta: string }>(
       `${this.API_URL}/${id}`,
-      formData
+      dto
     );
   }
 

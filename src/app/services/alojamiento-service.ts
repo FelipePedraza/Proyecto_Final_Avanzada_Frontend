@@ -34,19 +34,9 @@ export class AlojamientoService {
    * POST /api/alojamientos
    * Crea un nuevo alojamiento
    */
-  crear(dto: CreacionAlojamientoDTO, imagenes?: File[]): Observable<{ error: boolean; respuesta: string }> {
-    const formData = new FormData();
-    formData.append('alojamiento', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
-
-    if (imagenes && imagenes.length > 0) {
-      imagenes.forEach((imagen) => {
-        formData.append('imagenes', imagen);
-      });
-    }
-
-    return this.http.post<{ error: boolean; respuesta: string }>(this.API_URL, formData);
+  crear(dto: CreacionAlojamientoDTO): Observable<{ error: boolean; respuesta: string }> {
+    return this.http.post<{ error: boolean; respuesta: string }>(this.API_URL, dto);
   }
-
   /**
    * GET /api/alojamientos/{id}
    * Obtiene un alojamiento por ID
@@ -59,17 +49,8 @@ export class AlojamientoService {
    * PUT /api/alojamientos/{id}
    * Edita un alojamiento existente
    */
-  editar(id: number, dto: EdicionAlojamientoDTO, imagenes?: File[]): Observable<{ error: boolean; respuesta: string }> {
-    const formData = new FormData();
-    formData.append('alojamiento', new Blob([JSON.stringify(dto)], { type: 'application/json' }));
-
-    if (imagenes && imagenes.length > 0) {
-      imagenes.forEach((imagen) => {
-        formData.append('imagenes', imagen);
-      });
-    }
-
-    return this.http.put<{ error: boolean; respuesta: string }>(`${this.API_URL}/${id}`, formData);
+  editar(id: number, dto: EdicionAlojamientoDTO): Observable<{ error: boolean; respuesta: string }> {
+    return this.http.put<{ error: boolean; respuesta: string }>(`${this.API_URL}/${id}`, dto);
   }
 
   /**

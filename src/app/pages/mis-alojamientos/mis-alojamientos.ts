@@ -1,4 +1,4 @@
-import { Component} from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -7,6 +7,8 @@ import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
 import Swal from 'sweetalert2';
+import { UsuarioService } from '../../services/usuario-service';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-mis-alojamientos',
@@ -14,33 +16,24 @@ import Swal from 'sweetalert2';
   templateUrl: './mis-alojamientos.html',
   styleUrl: './mis-alojamientos.css'
 })
-export class MisAlojamientos {
+export class MisAlojamientos implements OnDestroy {
+
   // ==================== PROPIEDADES ====================
-
-  // Lista de todos los alojamientos
   alojamientos: ItemAlojamientoDTO[] = [];
-
-  // Lista filtrada que se muestra en pantalla
   alojamientosFiltrados: ItemAlojamientoDTO[] = [];
-
-  // Término de búsqueda
   terminoBusqueda: string = '';
-
-  // Estado de carga
   cargando: boolean = false;
-
-  // Métricas por alojamiento (id -> métricas)
   metricasPorAlojamiento: Map<number, MetricasDTO> = new Map();
-
-  // Paginación
   paginaActual: number = 0;
-
-  // Subject para cancelar subscripciones
   private destroy$ = new Subject<void>();
 
   // ==================== CONSTRUCTOR ====================
 
-  constructor(private alojamientoService: AlojamientoService) {
+  constructor(
+    private alojamientoService: AlojamientoService,
+    private usuarioService: UsuarioService,
+    private authService: AuthService
+  ) {
     this.cargarAlojamientos();
   }
 
@@ -48,17 +41,27 @@ export class MisAlojamientos {
   // ==================== MÉTODOS DE CARGA ====================
 
   /**
-   * Carga todos los alojamientos del usuario desde el backend
+   * Carga los alojamientos del usuario autenticado
    */
   cargarAlojamientos(): void {
     this.cargando = true;
 
-    // TODO: En producción, necesitarás un endpoint específico para obtener
-    // los alojamientos del usuario autenticado. Por ahora usamos obtenerAlojamientos
-    // pero deberías crear un método obtenerMisAlojamientos() que llame a un endpoint
-    // como GET /api/usuarios/{id}/alojamientos
+    // --- LÓGICA CORREGIDA ---
+    // 1. Obtenemos los datos del token
+    const datosToken = this.authService.obtenerDatosToken();
 
-    this.alojamientoService.obtenerAlojamientos({}, this.paginaActual)
+    // 2. Validamos que existan y que tengan el campo 'sub' (ID del usuario)
+    if (!datosToken || !datosToken.sub) {
+      this.mostrarError('No se pudo identificar al usuario. Por favor, inicia sesión de nuevo.');
+      this.cargando = false;
+      return;
+    }
+
+    // 3. Extraemos el ID del usuario
+    const idUsuario = datosToken.sub;
+
+    // 4. Usamos el servicio de USUARIO para obtener SUS alojamientos
+    this.usuarioService.obtenerAlojamientosUsuario(idUsuario, this.paginaActual)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
@@ -68,8 +71,6 @@ export class MisAlojamientos {
           if (!response.error) {
             this.alojamientos = response.respuesta;
             this.alojamientosFiltrados = [...this.alojamientos];
-
-            // Cargar métricas para cada alojamiento
             this.cargarMetricasDeAlojamientos();
           } else {
             this.mostrarError('Error al cargar alojamientos');
@@ -86,6 +87,7 @@ export class MisAlojamientos {
    * Carga las métricas de todos los alojamientos
    */
   private cargarMetricasDeAlojamientos(): void {
+    // (Este método no cambia)
     this.alojamientos.forEach(alojamiento => {
       this.cargarMetricas(alojamiento.id);
     });
@@ -95,6 +97,7 @@ export class MisAlojamientos {
    * Carga las métricas de un alojamiento específico
    */
   private cargarMetricas(id: number): void {
+    // (Este método no cambia)
     this.alojamientoService.obtenerMetricas(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -111,10 +114,6 @@ export class MisAlojamientos {
 
   // ==================== BÚSQUEDA Y FILTROS ====================
 
-  /**
-   * Busca alojamientos según el término ingresado
-   * Realiza búsqueda local en los alojamientos ya cargados
-   */
   buscarAlojamientos(): void {
     this.alojamientosFiltrados = this.alojamientoService.buscarAlojamientosLocal(
       this.alojamientos,
@@ -122,9 +121,6 @@ export class MisAlojamientos {
     );
   }
 
-  /**
-   * Limpia la búsqueda y muestra todos los alojamientos
-   */
   limpiarBusqueda(): void {
     this.terminoBusqueda = '';
     this.alojamientosFiltrados = [...this.alojamientos];
@@ -132,34 +128,22 @@ export class MisAlojamientos {
 
   // ==================== OBTENCIÓN DE DATOS ====================
 
-  /**
-   * Obtiene las métricas de un alojamiento específico
-   */
   obtenerMetricas(id: number): MetricasDTO | undefined {
     return this.metricasPorAlojamiento.get(id);
   }
 
   // ==================== FORMATEO Y UTILIDADES ====================
 
-  /**
-   * Formatea el precio con separadores de miles
-   */
   formatearPrecio(precio: number): string {
     return this.alojamientoService.formatearPrecio(precio);
   }
 
-  /**
-   * Genera un array de estrellas para mostrar la calificación
-   */
   generarEstrellas(calificacion: number): number[] {
     return this.alojamientoService.generarEstrellas(calificacion);
   }
 
   // ==================== ELIMINACIÓN ====================
 
-  /**
-   * Confirma y elimina un alojamiento
-   */
   confirmarEliminar(id: number, titulo: string): void {
     Swal.fire({
       title: '¿Estás seguro?',
@@ -178,16 +162,11 @@ export class MisAlojamientos {
     });
   }
 
-  /**
-   * Elimina un alojamiento del sistema
-   */
   private eliminarAlojamiento(id: number, titulo: string): void {
-    // Mostrar indicador de carga
     Swal.fire({
       title: 'Eliminando...',
-      text: 'Por favor espera',
+      text: `Eliminando ${titulo}...`,
       allowOutsideClick: false,
-      allowEscapeKey: false,
       didOpen: () => {
         Swal.showLoading();
       }
@@ -197,25 +176,18 @@ export class MisAlojamientos {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          // Eliminar de las listas locales
           this.alojamientos = this.alojamientos.filter(a => a.id !== id);
           this.alojamientosFiltrados = this.alojamientosFiltrados.filter(a => a.id !== id);
           this.metricasPorAlojamiento.delete(id);
-
-          // Mostrar mensaje de éxito
           Swal.fire({
             title: '¡Eliminado!',
-            text: `El alojamiento "${titulo}" ha sido eliminado correctamente.`,
+            text: `El alojamiento "${titulo}" ha sido eliminado.`,
             icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 3000,
-            timerProgressBar: true
+            confirmButtonColor: '#2e8b57'
           });
         },
         error: (error) => {
           console.error('Error al eliminar alojamiento:', error);
-
-          // Mostrar mensaje de error
           Swal.fire({
             title: 'Error',
             text: 'No se pudo eliminar el alojamiento. Por favor, intenta de nuevo.',
@@ -226,11 +198,6 @@ export class MisAlojamientos {
       });
   }
 
-  // ==================== RECARGAR ====================
-
-  /**
-   * Recarga la lista de alojamientos
-   */
   recargar(): void {
     this.paginaActual = 0;
     this.terminoBusqueda = '';
@@ -248,10 +215,24 @@ export class MisAlojamientos {
   cargarMasAlojamientos(): void {
     if (this.cargando) return;
 
+    // --- LÓGICA CORREGIDA ---
+    // 1. Obtenemos los datos del token
+    const datosToken = this.authService.obtenerDatosToken();
+
+    // 2. Validamos que existan y que tengan el campo 'sub' (ID del usuario)
+    if (!datosToken || !datosToken.sub) {
+      this.mostrarError('No se pudo identificar al usuario.');
+      return;
+    }
+
+    // 3. Extraemos el ID del usuario
+    const idUsuario = datosToken.sub;
+
     this.paginaActual++;
     this.cargando = true;
 
-    this.alojamientoService.obtenerAlojamientos({}, this.paginaActual)
+    // 4. Usamos el servicio de USUARIO para obtener la siguiente página
+    this.usuarioService.obtenerAlojamientosUsuario(idUsuario, this.paginaActual)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
@@ -262,7 +243,6 @@ export class MisAlojamientos {
             this.alojamientos = [...this.alojamientos, ...response.respuesta];
             this.alojamientosFiltrados = [...this.alojamientos];
 
-            // Cargar métricas de los nuevos alojamientos
             response.respuesta.forEach(alojamiento => {
               this.cargarMetricas(alojamiento.id);
             });
@@ -275,11 +255,6 @@ export class MisAlojamientos {
       });
   }
 
-  // ==================== MANEJO DE ERRORES ====================
-
-  /**
-   * Muestra un mensaje de error con SweetAlert2
-   */
   private mostrarError(mensaje: string): void {
     Swal.fire({
       title: 'Error',
@@ -287,5 +262,10 @@ export class MisAlojamientos {
       icon: 'error',
       confirmButtonColor: '#2e8b57'
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -83,4 +83,21 @@ export class AuthService {
   cerrarSesion(): void {
     this.eliminarToken();
   }
+
+  obtenerDatosToken(): any {
+    const token = this.obtenerToken(); // Usa el método que SÍ existe
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const payload = token.split('.')[1]; // 1. Obtener el payload (la parte del medio)
+      const payloadDecodificado = atob(payload); // 2. Decodificar de Base64
+      const datos = JSON.parse(payloadDecodificado); // 3. Convertir de String JSON a Objeto
+      return datos;
+    } catch (e) {
+      console.error("Error decodificando el token", e);
+      return null; // El token es inválido o está mal formado
+    }
+  }
 }

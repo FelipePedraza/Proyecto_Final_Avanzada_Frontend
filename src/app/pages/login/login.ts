@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -19,7 +19,7 @@ enum VistaLogin {
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
+export class Login implements OnDestroy  {
   // Formularios
   loginForm!: FormGroup;
   recuperarForm!: FormGroup;
@@ -234,5 +234,10 @@ export class Login {
       icon: 'error',
       confirmButtonColor: '#2e8b57'
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
