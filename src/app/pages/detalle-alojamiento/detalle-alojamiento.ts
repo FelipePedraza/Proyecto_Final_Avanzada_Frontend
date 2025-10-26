@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router} from '@angular/router';
+import { Router} from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize, forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -15,7 +15,7 @@ import { ItemResenaDTO, CreacionResenaDTO } from '../../models/resena-dto';
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css'
 })
-export class DetalleAlojamiento implements OnInit, OnDestroy {
+export class DetalleAlojamiento {
   // ==================== PROPIEDADES ====================
 
   alojamiento: AlojamientoDTO | null = null;
@@ -48,35 +48,11 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   // ==================== CONSTRUCTOR ====================
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder,
     private alojamientoService: AlojamientoService
   ) {
     this.crearFormularios();
-  }
-
-  // ==================== LIFECYCLE HOOKS ====================
-
-  ngOnInit(): void {
-    this.route.params
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(params => {
-        const id = Number(params['id']);
-        if (id) {
-          this.cargarDatosAlojamiento(id);
-        } else {
-          this.router.navigate(['/']);
-        }
-      });
-
-    // Escuchar cambios en fechas para recalcular precio
-    this.configurarCalculoPrecio();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   // ==================== FORMULARIOS ====================
