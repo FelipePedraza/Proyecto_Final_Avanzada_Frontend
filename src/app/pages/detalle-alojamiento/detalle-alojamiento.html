@@ -162,7 +162,7 @@
                   </div>
 
                   <div style="margin: 0.5rem 0;">
-                    @for (star of generarEstrellas(resena.calificacion); track $index) {
+                    @for (star of alojamientoService.generarEstrellas(resena.calificacion); track $index) {
                       <i class="fa-solid fa-star" style="color: #F39C12; font-size: 0.9rem;"></i>
                     }
                   </div>

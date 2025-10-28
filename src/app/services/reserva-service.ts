@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreacionReservaDTO } from '../models/reserva-dto';
+import { RespuestaDTO } from '../models/respuesta-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,8 @@ export class ReservaService {
    * POST /api/reservas
    * Crea una nueva reserva
    */
-  crear(dto: CreacionReservaDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.post<{ error: boolean; respuesta: string }>(
+  crear(dto: CreacionReservaDTO): Observable<RespuestaDTO> {
+    return this.http.post<RespuestaDTO>(
       this.API_URL,
       dto
     );
@@ -26,8 +27,8 @@ export class ReservaService {
    * PATCH /api/reservas/{id}/cancelar
    * Cancela una reserva
    */
-  cancelar(id: number): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.patch<{ error: boolean; respuesta: string }>(
+  cancelar(id: number): Observable<RespuestaDTO> {
+    return this.http.patch<RespuestaDTO>(
       `${this.API_URL}/${id}/cancelar`,
       null
     );
@@ -37,8 +38,8 @@ export class ReservaService {
    * PATCH /api/reservas/{id}/aceptar
    * Acepta una reserva (para anfitriones)
    */
-  aceptar(id: number): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.patch<{ error: boolean; respuesta: string }>(
+  aceptar(id: number): Observable<RespuestaDTO> {
+    return this.http.patch<RespuestaDTO>(
       `${this.API_URL}/${id}/aceptar`,
       null
     );
@@ -48,8 +49,8 @@ export class ReservaService {
    * PATCH /api/reservas/{id}/rechazar
    * Rechaza una reserva (para anfitriones)
    */
-  rechazar(id: number): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.patch<{ error: boolean; respuesta: string }>(
+  rechazar(id: number): Observable<RespuestaDTO> {
+    return this.http.patch<RespuestaDTO>(
       `${this.API_URL}/${id}/rechazar`,
       null
     );

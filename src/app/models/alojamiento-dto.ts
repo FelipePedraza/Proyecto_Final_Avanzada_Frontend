@@ -5,7 +5,7 @@ export interface AlojamientoDTO {
   direccion: Direccion;
   precioPorNoche: number;
   maxHuespedes: number;
-  servicios: Servicio[];
+  servicios: string[];
   imagenes: string[];
   nombreAnfitrion: string;
 }
@@ -25,7 +25,7 @@ export interface CreacionAlojamientoDTO {
   maxHuespedes: number;
   direccion: Direccion;
   precioPorNoche: number;
-  servicios: Servicio[];
+  servicios: string[];
   imagenes: string[];
 }
 
@@ -34,7 +34,7 @@ export interface EdicionAlojamientoDTO {
   descripcion: string;
   maxHuespedes: number;
   precioPorNoche: number;
-  servicios: Servicio[];
+  servicios: string[];
   imagenes: string[];
   direccion: Direccion;
 }
@@ -46,7 +46,7 @@ export interface AlojamientoFiltroDTO {
   huespedes: number;
   precioMin: number;
   precioMax: number;
-  servicios: Servicio[];
+  servicios: string[];
 }
 
 export interface MetricasDTO {
@@ -64,13 +64,5 @@ export interface Direccion {
 export interface Localizacion {
   latitud: number;
   longitud: number;
-}
-
-export enum Servicio {
-  PISCINA = 'PISCINA',
-  DESAYUNO = 'DESAYUNO',
-  AIRE_ACONDICIONADO = 'AIRE_ACONDICIONADO',
-  WIFI = 'WIFI',
-  ESTACIONAMIENTO = 'ESTACIONAMIENTO'
 }
 

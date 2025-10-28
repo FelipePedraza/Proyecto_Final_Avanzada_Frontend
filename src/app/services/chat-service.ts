@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ChatDTO, MensajeDTO } from '../models/chat-dto';
+import { RespuestaDTO } from '../models/respuesta-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -19,12 +19,12 @@ export class ChatService {
     chatId: number,
     pagina: number = 0,
     tamano: number = 20
-  ): Observable<{ error: boolean; respuesta: ChatDTO }> {
+  ): Observable<RespuestaDTO> {
     const params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('tamano', tamano.toString());
 
-    return this.http.get<{ error: boolean; respuesta: ChatDTO }>(
+    return this.http.get<RespuestaDTO>(
       `${this.API_URL}/${chatId}`,
       { params }
     );
@@ -34,8 +34,8 @@ export class ChatService {
    * GET /api/chat/usuario/{id}/conversaciones
    * Lista todas las conversaciones de un usuario
    */
-  listarConversaciones(usuarioId: string): Observable<{ error: boolean; respuesta: ChatDTO[] }> {
-    return this.http.get<{ error: boolean; respuesta: ChatDTO[] }>(
+  listarConversaciones(usuarioId: string): Observable<RespuestaDTO> {
+    return this.http.get<RespuestaDTO>(
       `${this.API_URL}/usuario/${usuarioId}/conversaciones`
     );
   }
@@ -44,8 +44,8 @@ export class ChatService {
    * GET /api/chat/usuario/{id}/mensajes-no-leidos
    * Obtiene la cantidad de mensajes no leídos
    */
-  obtenerMensajesNoLeidos(usuarioId: string): Observable<{ error: boolean; respuesta: number }> {
-    return this.http.get<{ error: boolean; respuesta: number }>(
+  obtenerMensajesNoLeidos(usuarioId: string): Observable<RespuestaDTO> {
+    return this.http.get<RespuestaDTO>(
       `${this.API_URL}/usuario/${usuarioId}/mensajes-no-leidos`
     );
   }
@@ -57,10 +57,10 @@ export class ChatService {
   marcarChatComoLeido(
     chatId: number,
     usuarioId: string
-  ): Observable<{ error: boolean; respuesta: string }> {
+  ): Observable<RespuestaDTO> {
     const params = new HttpParams().set('usuarioId', usuarioId);
 
-    return this.http.put<{ error: boolean; respuesta: string }>(
+    return this.http.put<RespuestaDTO>(
       `${this.API_URL}/${chatId}/marcar-leido`,
       null,
       { params }

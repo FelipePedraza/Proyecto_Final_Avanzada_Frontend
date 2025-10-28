@@ -22,7 +22,7 @@
           <input
             type="text"
             [(ngModel)]="terminoBusqueda"
-            (input)="buscarAlojamientos()"
+            (input)="filtrarAlojamientos()"
             placeholder="Buscar por título o ciudad..."
             class="search-input">
 
@@ -83,7 +83,7 @@
 
                 <!-- Calificación -->
                 <div class="alojamiento-rating">
-                  @for (star of generarEstrellas(alojamiento.promedioCalificaciones); track $index) {
+                  @for (star of alojamientoService.generarEstrellas(alojamiento.promedioCalificaciones); track $index) {
                     <i class="fa-solid fa-star"></i>
                   }
                   <span class="rating-number">
@@ -92,7 +92,7 @@
                 </div>
 
                 <!-- Métricas -->
-                @if (obtenerMetricas(alojamiento.id); as metricas) {
+                @if (metricasPorAlojamiento.get(alojamiento.id); as metricas) {
                   <div class="alojamiento-stats">
                     <div class="stat-item">
                       <i class="fa-solid fa-calendar-check"></i>
@@ -109,7 +109,7 @@
                 <div class="alojamiento-price">
                   <span class="price-label">Precio por noche</span>
                   <span class="price-amount">
-                    {{ formatearPrecio(alojamiento.precioPorNoche) }}
+                    {{ alojamientoService.formatearPrecio(alojamiento.precioPorNoche) }}
                   </span>
                 </div>
 

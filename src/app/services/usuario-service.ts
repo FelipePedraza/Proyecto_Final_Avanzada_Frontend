@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {
-  UsuarioDTO,
-  EdicionUsuarioDTO,
-  CambioContrasenaDTO,
-  CreacionAnfitrionDTO
-} from '../models/usuario-dto';
-import { ItemAlojamientoDTO } from '../models/alojamiento-dto';
-import { ItemReservaDTO, ReservaEstado } from '../models/reserva-dto';
+import { EdicionUsuarioDTO, CambioContrasenaDTO, CreacionAnfitrionDTO } from '../models/usuario-dto';
+import { ReservaEstado } from '../models/reserva-dto';
+import { RespuestaDTO } from '../models/respuesta-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -22,8 +17,8 @@ export class UsuarioService {
    * POST /api/usuarios/anfitrion
    * Convierte un usuario en anfitrión
    */
-  crearAnfitrion(dto: CreacionAnfitrionDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.post<{ error: boolean; respuesta: string }>(
+  crearAnfitrion(dto: CreacionAnfitrionDTO): Observable<RespuestaDTO> {
+    return this.http.post<RespuestaDTO>(
       `${this.API_URL}/anfitrion`,
       dto
     );
@@ -33,8 +28,8 @@ export class UsuarioService {
    * PUT /api/usuarios/{id}
    * Edita la información de un usuario
    */
-  editar(id: string, dto: EdicionUsuarioDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.put<{ error: boolean; respuesta: string }>(
+  editar(id: string, dto: EdicionUsuarioDTO): Observable<RespuestaDTO> {
+    return this.http.put<RespuestaDTO>(
       `${this.API_URL}/${id}`,
       dto
     );
@@ -44,8 +39,8 @@ export class UsuarioService {
    * GET /api/usuarios/{id}
    * Obtiene la información de un usuario
    */
-  obtener(id: string): Observable<{ error: boolean; respuesta: UsuarioDTO }> {
-    return this.http.get<{ error: boolean; respuesta: UsuarioDTO }>(
+  obtener(id: string): Observable<RespuestaDTO> {
+    return this.http.get<RespuestaDTO>(
       `${this.API_URL}/${id}`
     );
   }
@@ -54,8 +49,8 @@ export class UsuarioService {
    * DELETE /api/usuarios/{id}
    * Elimina un usuario
    */
-  eliminar(id: string): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.delete<{ error: boolean; respuesta: string }>(
+  eliminar(id: string): Observable<RespuestaDTO> {
+    return this.http.delete<RespuestaDTO>(
       `${this.API_URL}/${id}`
     );
   }
@@ -64,8 +59,8 @@ export class UsuarioService {
    * PATCH /api/usuarios/{id}/contrasena
    * Cambia la contraseña de un usuario
    */
-  cambiarContrasena(id: string, dto: CambioContrasenaDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.patch<{ error: boolean; respuesta: string }>(
+  cambiarContrasena(id: string, dto: CambioContrasenaDTO): Observable<RespuestaDTO> {
+    return this.http.patch<RespuestaDTO>(
       `${this.API_URL}/${id}/contrasena`,
       dto
     );
@@ -75,13 +70,9 @@ export class UsuarioService {
    * GET /api/usuarios/{id}/alojamientos
    * Obtiene los alojamientos de un usuario
    */
-  obtenerAlojamientosUsuario(id: string, pagina: number = 0): Observable<{ error: boolean; respuesta: ItemAlojamientoDTO[] }> {
-    const params = new HttpParams().set('pagina', pagina.toString());
+  obtenerAlojamientosUsuario(id: string, pagina: number = 0): Observable<RespuestaDTO> {
 
-    return this.http.get<{ error: boolean; respuesta: ItemAlojamientoDTO[] }>(
-      `${this.API_URL}/${id}/alojamientos`,
-      { params }
-    );
+    return this.http.get<RespuestaDTO>(`${this.API_URL}/${id}/alojamientos`, { params: { pagina }});
   }
 
   /**
@@ -94,7 +85,7 @@ export class UsuarioService {
     fechaEntrada?: Date,
     fechaSalida?: Date,
     pagina: number = 0
-  ): Observable<{ error: boolean; respuesta: ItemReservaDTO[] }> {
+  ): Observable<RespuestaDTO> {
     let params = new HttpParams().set('pagina', pagina.toString());
 
     if (estado) {
@@ -107,7 +98,7 @@ export class UsuarioService {
       params = params.set('fechaSalida', fechaSalida.toISOString());
     }
 
-    return this.http.get<{ error: boolean; respuesta: ItemReservaDTO[] }>(
+    return this.http.get<RespuestaDTO>(
       `${this.API_URL}/${id}/reservas`,
       { params }
     );

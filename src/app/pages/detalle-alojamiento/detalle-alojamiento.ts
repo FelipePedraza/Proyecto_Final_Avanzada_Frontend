@@ -1,13 +1,19 @@
-import { Component} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router} from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, takeUntil, finalize, forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
 
+// Servicios
 import { AlojamientoService } from '../../services/alojamiento-service';
+import { ReservaService } from '../../services/reserva-service';
+import { TokenService } from '../../services/token-service';
+
+// DTOs
 import { AlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
 import { ItemResenaDTO, CreacionResenaDTO } from '../../models/resena-dto';
+import { CreacionReservaDTO } from '../../models/reserva-dto';
 
 @Component({
   selector: 'app-detalle-alojamiento',
@@ -15,11 +21,11 @@ import { ItemResenaDTO, CreacionResenaDTO } from '../../models/resena-dto';
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css'
 })
-export class DetalleAlojamiento {
+export class DetalleAlojamiento implements OnInit, OnDestroy {
   // ==================== PROPIEDADES ====================
 
-  alojamiento: AlojamientoDTO | null = null;
-  metricas: MetricasDTO | null = null;
+  alojamiento: AlojamientoDTO | undefined;
+  metricas: MetricasDTO | undefined;
   resenas: ItemResenaDTO[] = [];
 
   cargando: boolean = false;
@@ -32,6 +38,7 @@ export class DetalleAlojamiento {
   // Paginación de reseñas
   paginaResenas: number = 0;
   hayMasResenas: boolean = true;
+  idAlojamiento: number = 0;
 
   // Gestión de imágenes
   imagenPrincipal: string = '';
@@ -48,11 +55,40 @@ export class DetalleAlojamiento {
   // ==================== CONSTRUCTOR ====================
 
   constructor(
+    private route: ActivatedRoute,
     private router: Router,
+    private location: Location,
     private formBuilder: FormBuilder,
-    private alojamientoService: AlojamientoService
+    public alojamientoService: AlojamientoService,
+    private reservaService: ReservaService,
+    private tokenService: TokenService
   ) {
-    this.crearFormularios();
+    this.route.params.subscribe(params => {
+      this.idAlojamiento = params['id'];
+    })
+  }
+
+  // ==================== CICLO DE VIDA ====================
+
+  ngOnInit(): void {
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        this.idAlojamiento = +params['id'];
+        if (this.idAlojamiento && !isNaN(this.idAlojamiento)) {
+          this.crearFormularios();
+          this.cargarDatosAlojamiento();
+        } else {
+          this.mostrarError('ID de alojamiento no válido', () => {
+            this.router.navigate(['/']);
+          });
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // ==================== FORMULARIOS ====================
@@ -72,9 +108,8 @@ export class DetalleAlojamiento {
       calificacion: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
       comentario: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]]
     });
-  }
 
-  private configurarCalculoPrecio(): void {
+    // Configurar cálculo de precio
     this.reservaForm.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
@@ -84,41 +119,43 @@ export class DetalleAlojamiento {
 
   // ==================== CARGA DE DATOS ====================
 
-  private cargarDatosAlojamiento(id: number): void {
+  private cargarDatosAlojamiento(): void {
     this.cargando = true;
     this.errorCarga = false;
 
-    // Cargar alojamiento, métricas y reseñas en paralelo
     forkJoin({
-      alojamiento: this.alojamientoService.obtenerPorId(id),
-      metricas: this.alojamientoService.obtenerMetricas(id),
-      resenas: this.alojamientoService.obtenerResenasAlojamiento(id, 0)
+      alojamiento: this.alojamientoService.obtenerPorId(this.idAlojamiento),
+      metricas: this.alojamientoService.obtenerMetricas(this.idAlojamiento),
+      resenas: this.alojamientoService.obtenerResenasAlojamiento(this.idAlojamiento, 0)
     })
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
       )
       .subscribe({
-        next: (response) => {
-          if (!response.alojamiento.error) {
-            this.alojamiento = response.alojamiento.respuesta;
-            this.configurarImagenes();
-            this.calcularPrecioTotal();
-          }
+        next: (respuesta) => {
+          this.alojamiento = respuesta.alojamiento.data;
+          this.metricas = respuesta.metricas.data;
+          this.resenas = respuesta.resenas.data;
+          this.hayMasResenas = respuesta.resenas.data.length > 0;
 
-          if (!response.metricas.error) {
-            this.metricas = response.metricas.respuesta;
-          }
+          // Validar capacidad máxima en el formulario
+          this.reservaForm.get('cantidadHuespedes')?.setValidators([
+            Validators.required,
+            Validators.min(1),
+            Validators.max(this.alojamiento!.maxHuespedes)
+          ]);
+          this.reservaForm.get('cantidadHuespedes')?.updateValueAndValidity();
 
-          if (!response.resenas.error) {
-            this.resenas = response.resenas.respuesta;
-            this.hayMasResenas = response.resenas.respuesta.length > 0;
-          }
+          this.configurarImagenes();
+          this.calcularPrecioTotal();
         },
         error: (error) => {
-          console.error('Error al cargar alojamiento:', error);
           this.errorCarga = true;
-          this.mostrarError('No se pudo cargar el alojamiento. Por favor, intenta de nuevo.');
+          const mensajeError = error?.error?.respuesta || 'No se pudo cargar el alojamiento. Intenta de nuevo.';
+          this.mostrarError(mensajeError, () => {
+            this.router.navigate(['/']);
+          });
         }
       });
   }
@@ -133,35 +170,43 @@ export class DetalleAlojamiento {
   // ==================== RESEÑAS ====================
 
   cargarMasResenas(): void {
-    if (!this.alojamiento || this.cargandoResenas || !this.hayMasResenas) return;
+    if (this.cargandoResenas || !this.hayMasResenas) return;
 
     this.cargandoResenas = true;
     this.paginaResenas++;
 
-    this.alojamientoService.obtenerResenasAlojamiento(this.alojamiento.id, this.paginaResenas)
+    this.alojamientoService.obtenerResenasAlojamiento(this.idAlojamiento, this.paginaResenas)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargandoResenas = false)
       )
       .subscribe({
-        next: (response) => {
-          if (!response.error && response.respuesta.length > 0) {
-            this.resenas = [...this.resenas, ...response.respuesta];
-            this.hayMasResenas = response.respuesta.length > 0;
+        next: (respuesta) => {
+          const nuevasResenas = respuesta.data as ItemResenaDTO[];
+          if (nuevasResenas.length > 0) {
+            this.resenas = [...this.resenas, ...nuevasResenas];
           } else {
             this.hayMasResenas = false;
           }
         },
         error: (error) => {
-          console.error('Error al cargar más reseñas:', error);
+          this.hayMasResenas = false;
+          this.mostrarError('Error al cargar más reseñas');
           this.paginaResenas--;
         }
       });
   }
 
   enviarResena(): void {
-    if (this.resenaForm.invalid || !this.alojamiento) {
+    if (this.resenaForm.invalid) {
       this.marcarCamposComoTocados(this.resenaForm);
+      return;
+    }
+
+    if (!this.tokenService.isLogged()) {
+      this.mostrarError('Debes iniciar sesión para dejar una reseña.', () => {
+        this.router.navigate(['/login']);
+      });
       return;
     }
 
@@ -170,40 +215,38 @@ export class DetalleAlojamiento {
       comentario: this.resenaForm.value.comentario
     };
 
-    this.alojamientoService.crearResena(this.alojamiento.id, dto)
+    this.alojamientoService.crearResena(this.idAlojamiento, dto)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            Swal.fire({
-              title: '¡Reseña enviada!',
-              text: 'Tu reseña ha sido publicada correctamente.',
-              icon: 'success',
-              confirmButtonColor: '#2e8b57'
-            });
+        next: (respuesta) => {
+          Swal.fire({
+            title: '¡Reseña enviada!',
+            text: 'Tu reseña ha sido publicada.',
+            icon: 'success',
+            confirmButtonColor: '#2e8b57'
+          });
 
-            this.resenaForm.reset({ calificacion: 5, comentario: '' });
-            this.recargarResenas();
-          }
+          this.resenaForm.reset({ calificacion: 5, comentario: '' });
+          this.recargarResenas();
         },
         error: (error) => {
-          console.error('Error al enviar reseña:', error);
           this.mostrarError('No se pudo enviar la reseña. Por favor, intenta de nuevo.');
         }
       });
   }
 
   private recargarResenas(): void {
-    if (!this.alojamiento) return;
-
     this.paginaResenas = 0;
-    this.alojamientoService.obtenerResenasAlojamiento(this.alojamiento.id, 0)
-      .pipe(takeUntil(this.destroy$))
+    this.cargandoResenas = true;
+    this.alojamientoService.obtenerResenasAlojamiento(this.idAlojamiento, 0)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargandoResenas = false)
+      )
       .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            this.resenas = response.respuesta;
-          }
+        next: (respuesta) => {
+          this.resenas = respuesta.data;
+          this.hayMasResenas = respuesta.data.length > 0;
         }
       });
   }
@@ -211,42 +254,31 @@ export class DetalleAlojamiento {
   // ==================== RESERVA ====================
 
   realizarReserva(): void {
-    if (this.reservaForm.invalid || !this.alojamiento) {
+    if (this.reservaForm.invalid) {
       this.marcarCamposComoTocados(this.reservaForm);
       return;
     }
 
-    // Validar fechas
+    if (!this.tokenService.isLogged()) {
+      this.mostrarError('Debes iniciar sesión para poder reservar.', () => {
+        this.router.navigate(['/login']);
+      });
+      return;
+    }
+
     const fechaEntrada = new Date(this.reservaForm.value.fechaEntrada);
     const fechaSalida = new Date(this.reservaForm.value.fechaSalida);
 
     if (fechaEntrada >= fechaSalida) {
-      Swal.fire({
-        title: 'Fechas inválidas',
-        text: 'La fecha de salida debe ser posterior a la fecha de entrada.',
-        icon: 'warning',
-        confirmButtonColor: '#2e8b57'
-      });
+      this.mostrarError('La fecha de salida debe ser posterior a la fecha de entrada.');
       return;
     }
 
-    // Validar capacidad
-    if (this.reservaForm.value.cantidadHuespedes > this.alojamiento.maxHuespedes) {
-      Swal.fire({
-        title: 'Capacidad excedida',
-        text: `Este alojamiento admite máximo ${this.alojamiento.maxHuespedes} huéspedes.`,
-        icon: 'warning',
-        confirmButtonColor: '#2e8b57'
-      });
-      return;
-    }
-
-    // Mostrar confirmación con resumen
     Swal.fire({
       title: '¿Confirmar reserva?',
       html: `
         <div style="text-align: left;">
-          <p><strong>Alojamiento:</strong> ${this.alojamiento.titulo}</p>
+          <p><strong>Alojamiento:</strong> ${this.alojamiento!.titulo}</p>
           <p><strong>Check-in:</strong> ${this.formatearFecha(fechaEntrada)}</p>
           <p><strong>Check-out:</strong> ${this.formatearFecha(fechaSalida)}</p>
           <p><strong>Huéspedes:</strong> ${this.reservaForm.value.cantidadHuespedes}</p>
@@ -268,7 +300,14 @@ export class DetalleAlojamiento {
   }
 
   private procesarReserva(): void {
-    // TODO: Implementar con el servicio de reservas cuando esté listo
+    if (!this.alojamiento) return;
+
+    const idUsuario = this.tokenService.getUserId();
+    if (!idUsuario) {
+      this.mostrarError('No se pudo identificar al usuario. Inicia sesión de nuevo.');
+      return;
+    }
+
     Swal.fire({
       title: 'Procesando...',
       text: 'Estamos procesando tu reserva',
@@ -278,17 +317,34 @@ export class DetalleAlojamiento {
       }
     });
 
-    // Simulación - reemplazar con llamada real al backend
-    setTimeout(() => {
-      Swal.fire({
-        title: '¡Reserva exitosa!',
-        text: 'Tu reserva ha sido confirmada. Recibirás un correo con los detalles.',
-        icon: 'success',
-        confirmButtonColor: '#2e8b57'
-      }).then(() => {
-        this.router.navigate(['/mis-reservas']);
+    const creacionReservaDTO: CreacionReservaDTO = {
+      alojamientoId: this.idAlojamiento,
+      usuarioId: this.tokenService.getUserId(),
+      fechaEntrada: this.reservaForm.value.fechaEntrada,
+      fechaSalida: this.reservaForm.value.fechaSalida,
+      cantidadHuespedes: this.reservaForm.value.cantidadHuespedes
+    };
+
+    this.reservaService.crear(creacionReservaDTO)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (respuesta) => {
+          Swal.close();
+          Swal.fire({
+            title: '¡Reserva exitosa!',
+            text: 'Tu reserva ha sido confirmada.',
+            icon: 'success',
+            confirmButtonColor: '#2e8b57'
+          }).then(() => {
+              this.router.navigate(['/mis-reservas']);
+          });
+        },
+        error: (error) => {
+          Swal.close();
+          const mensajeError = error?.data || 'No se pudo procesar tu reserva. Intenta de nuevo.';
+          this.mostrarError(mensajeError);
+        }
       });
-    }, 2000);
   }
 
   private calcularPrecioTotal(): void {
@@ -300,9 +356,19 @@ export class DetalleAlojamiento {
     if (fechaEntrada < fechaSalida) {
       this.numeroNoches = Math.ceil((fechaSalida.getTime() - fechaEntrada.getTime()) / (1000 * 60 * 60 * 24));
       const subtotal = this.alojamiento.precioPorNoche * this.numeroNoches;
-      this.tarifaServicio = Math.round(subtotal * 0.1); // 10% de tarifa de servicio
+      this.tarifaServicio = Math.round(subtotal * 0.1);
       this.precioTotal = subtotal + this.tarifaServicio;
+    } else {
+      this.numeroNoches = 0;
+      this.tarifaServicio = 0;
+      this.precioTotal = 0;
     }
+  }
+
+  // ==================== NAVEGACIÓN ====================
+
+  volver(): void {
+    this.location.back();
   }
 
   // ==================== UTILIDADES ====================
@@ -311,27 +377,19 @@ export class DetalleAlojamiento {
     const imagenAnterior = this.imagenPrincipal;
     this.imagenPrincipal = imagen;
 
-    // Actualizar la galería
     const index = this.imagenesGaleria.indexOf(imagen);
     if (index !== -1) {
       this.imagenesGaleria[index] = imagenAnterior;
     }
   }
 
-  generarEstrellas(calificacion: number): number[] {
-    return Array(Math.floor(calificacion)).fill(0);
-  }
-
   formatearPrecio(precio: number): string {
-    return precio.toLocaleString('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    });
+    return this.alojamientoService.formatearPrecio(precio);
   }
 
   formatearFecha(fecha: Date): string {
-    return fecha.toLocaleDateString('es-CO', {
+    const fechaAjustada = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
+    return fechaAjustada.toLocaleDateString('es-CO', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -341,7 +399,8 @@ export class DetalleAlojamiento {
 
   formatearFechaCorta(fecha: string | Date): string {
     const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    return f.toLocaleDateString('es-CO', {
+    const fechaAjustada = new Date(f.getTime() + f.getTimezoneOffset() * 60000);
+    return fechaAjustada.toLocaleDateString('es-CO', {
       year: 'numeric',
       month: 'short'
     });
@@ -353,6 +412,7 @@ export class DetalleAlojamiento {
 
   obtenerFechaMinimaSalida(): string {
     const fechaEntrada = new Date(this.reservaForm.value.fechaEntrada);
+    fechaEntrada.setMinutes(fechaEntrada.getMinutes() + fechaEntrada.getTimezoneOffset());
     fechaEntrada.setDate(fechaEntrada.getDate() + 1);
     return fechaEntrada.toISOString().split('T')[0];
   }
@@ -368,7 +428,12 @@ export class DetalleAlojamiento {
 
     if (control.errors['required']) return 'Este campo es obligatorio';
     if (control.errors['min']) return `El valor mínimo es ${control.errors['min'].min}`;
-    if (control.errors['max']) return `El valor máximo es ${control.errors['max'].max}`;
+    if (control.errors['max']) {
+      if (campo === 'cantidadHuespedes') {
+        return `Máximo ${control.errors['max'].max} huéspedes`;
+      }
+      return `El valor máximo es ${control.errors['max'].max}`;
+    }
     if (control.errors['minlength']) {
       return `Debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
     }
@@ -385,16 +450,16 @@ export class DetalleAlojamiento {
     });
   }
 
-  private mostrarError(mensaje: string): void {
+  private mostrarError(mensaje: string, callback?: () => void): void {
     Swal.fire({
       title: 'Error',
       text: mensaje,
       icon: 'error',
       confirmButtonColor: '#2e8b57'
+    }).then(() => {
+      if (callback) {
+        callback();
+      }
     });
-  }
-
-  volver(): void {
-    this.router.navigate(['/busqueda']);
   }
 }

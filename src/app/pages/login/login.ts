@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -6,6 +6,7 @@ import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth-service';
 import { LoginDTO, OlvidoContrasenaDTO } from '../../models/usuario-dto';
+import {TokenService} from '../../services/token-service';
 
 enum VistaLogin {
   LOGIN = 'login',
@@ -19,7 +20,7 @@ enum VistaLogin {
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login implements OnDestroy  {
+export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
   // Formularios
   loginForm!: FormGroup;
   recuperarForm!: FormGroup;
@@ -39,8 +40,13 @@ export class Login implements OnDestroy  {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private tokenService: TokenService,
     private router: Router
   ) {
+  }
+
+  // --- CORRECCIÓN: Añadido ngOnInit ---
+  ngOnInit(): void {
     this.crearFormularios();
   }
 
@@ -84,41 +90,20 @@ export class Login implements OnDestroy  {
 
     this.cargando = true;
 
-    const dto: LoginDTO = {
-      email: this.loginForm.value.email,
-      contrasena: this.loginForm.value.contrasena
-    };
+    const loginDTO = this.loginForm.value as LoginDTO;
 
-    this.authService.login(dto)
+    this.authService.login(loginDTO)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
       )
       .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            // Guardar token
-            this.authService.guardarToken(response.respuesta.token);
-
-            // Mostrar mensaje de éxito
-            Swal.fire({
-              title: '¡Bienvenido!',
-              text: 'Has iniciado sesión correctamente',
-              icon: 'success',
-              confirmButtonColor: '#2e8b57',
-              timer: 2000,
-              timerProgressBar: true
-            }).then(() => {
-              // Redirigir al dashboard o página principal
-              this.router.navigate(['/']);
-            });
-          } else {
-            this.mostrarError('Credenciales incorrectas');
-          }
+        next: (respuesta) => {
+          this.tokenService.login(respuesta.data.token)
+          this.router.navigate(['/']).then(() => window.location.reload());
         },
         error: (error) => {
-          console.error('Error en login:', error);
-          this.mostrarError('Email o contraseña incorrectos. Por favor, intenta de nuevo.');
+          this.mostrarError(error);
         }
       });
   }
@@ -132,28 +117,20 @@ export class Login implements OnDestroy  {
     }
 
     this.cargando = true;
-    this.emailRecuperacion = this.recuperarForm.value.email;
 
-    const dto: OlvidoContrasenaDTO = {
-      email: this.emailRecuperacion
-    };
+    const olvidoContrasenaDTO = this.recuperarForm.value as OlvidoContrasenaDTO;
 
-    this.authService.solicitarRecuperacion(dto)
+    this.authService.solicitarRecuperacion(olvidoContrasenaDTO)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
       )
       .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            this.cambiarVista(VistaLogin.EXITO);
-          } else {
-            this.mostrarError('No se pudo enviar el correo de recuperación');
-          }
+        next: (respuesta) => {
+          this.cambiarVista(VistaLogin.EXITO);
         },
         error: (error) => {
-          console.error('Error al recuperar contraseña:', error);
-          this.mostrarError('No se pudo procesar tu solicitud. Por favor, intenta de nuevo.');
+          this.mostrarError(error);
         }
       });
   }
@@ -163,31 +140,26 @@ export class Login implements OnDestroy  {
 
     this.cargando = true;
 
-    const dto: OlvidoContrasenaDTO = {
-      email: this.emailRecuperacion
-    };
+    const olvidoContrasenaDTO = this.recuperarForm.value as OlvidoContrasenaDTO;
 
-    this.authService.solicitarRecuperacion(dto)
+    this.authService.solicitarRecuperacion(olvidoContrasenaDTO)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
       )
       .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            Swal.fire({
-              title: 'Correo reenviado',
-              text: 'Hemos enviado nuevamente el enlace de recuperación',
-              icon: 'success',
-              confirmButtonColor: '#2e8b57',
-              timer: 3000,
-              timerProgressBar: true
-            });
-          }
+        next: (respuesta) => {
+          Swal.fire({
+            title: 'Correo reenviado',
+            text: 'Hemos enviado nuevamente el enlace de recuperación',
+            icon: 'success',
+            confirmButtonColor: '#2e8b57',
+            timer: 3000,
+            timerProgressBar: true
+          });
         },
         error: (error) => {
-          console.error('Error al reenviar email:', error);
-          this.mostrarError('No se pudo reenviar el correo. Por favor, intenta más tarde.');
+          this.mostrarError(error);
         }
       });
   }
@@ -227,10 +199,10 @@ export class Login implements OnDestroy  {
     }
   }
 
-  private mostrarError(mensaje: string): void {
+  private mostrarError(error: any): void {
     Swal.fire({
       title: 'Error',
-      text: mensaje,
+      text: error.error.data,
       icon: 'error',
       confirmButtonColor: '#2e8b57'
     });

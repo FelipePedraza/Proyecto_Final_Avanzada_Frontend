@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControlOptions, AbstractControl, ValidationErrors
 } from '@angular/forms';
@@ -15,7 +15,7 @@ import { CreacionUsuarioDTO } from '../../models/usuario-dto';
   templateUrl: './registro.html',
   styleUrl: './registro.css'
 })
-export class Registro implements OnDestroy {
+export class Registro implements OnDestroy, OnInit {
   registroForm!: FormGroup;
   cargando = false;
   mostrarContrasena = false;
@@ -36,6 +36,9 @@ export class Registro implements OnDestroy {
     private authService: AuthService,
     private router: Router
   ) {
+  }
+
+  ngOnInit() {
     this.crearForm();
     this.configurarValidacionContrasena();
   }
@@ -111,41 +114,29 @@ export class Registro implements OnDestroy {
     }
 
     this.cargando = true;
-    const formValues = this.registroForm.value;
 
-    const dto: CreacionUsuarioDTO = {
-      nombre: `${formValues.nombre} ${formValues.apellido}`,
-      telefono: formValues.telefono,
-      fechaNacimiento: new Date(formValues.fechaNacimiento),
-      email: formValues.email,
-      contrasena: formValues.contrasena
-    };
+    const CreacionUsuarioDTO = this.registroForm.value as CreacionUsuarioDTO;
 
-    this.authService.registro(dto)
+    this.authService.registro(CreacionUsuarioDTO)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
       )
       .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            Swal.fire({
-              title: '¡Registro exitoso!',
-              text: 'Tu cuenta ha sido creada correctamente',
-              icon: 'success',
-              confirmButtonColor: '#2e8b57',
-              timer: 2000,
-              timerProgressBar: true
-            }).then(() => {
-              this.router.navigate(['/login']);
-            });
-          } else {
-            this.mostrarError('No se pudo completar el registro');
-          }
+        next: (respuesta) => {
+          Swal.fire({
+            title: '¡Registro exitoso!',
+            text: respuesta.data,
+            icon: 'success',
+            confirmButtonColor: '#2e8b57',
+            timer: 2000,
+            timerProgressBar: true
+          }).then(() => {
+            this.router.navigate(['/login']);
+          });
         },
         error: (error) => {
-          console.error('Error en registro:', error);
-          this.mostrarError('No se pudo completar el registro. Por favor, intenta de nuevo.');
+          this.mostrarError(error);
         }
       });
   }
@@ -167,6 +158,8 @@ export class Registro implements OnDestroy {
       const hoy = new Date();
       let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
       const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+      const offsetMinutos = fechaNacimiento.getTimezoneOffset();
+      fechaNacimiento.setMinutes(fechaNacimiento.getMinutes() + offsetMinutos);
 
       if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
         edad--;
@@ -219,12 +212,16 @@ export class Registro implements OnDestroy {
   obtenerFechaMaxima(): string {
     const hoy = new Date();
     hoy.setFullYear(hoy.getFullYear() - 18);
+    // Ajuste para el offset de la zona horaria al generar el string
+    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
     return hoy.toISOString().split('T')[0];
   }
 
   obtenerFechaMinima(): string {
     const hoy = new Date();
     hoy.setFullYear(hoy.getFullYear() - 120);
+    // Ajuste para el offset de la zona horaria al generar el string
+    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
     return hoy.toISOString().split('T')[0];
   }
 
@@ -234,10 +231,10 @@ export class Registro implements OnDestroy {
     });
   }
 
-  private mostrarError(mensaje: string): void {
+  private mostrarError(error: any): void {
     Swal.fire({
       title: 'Error',
-      text: mensaje,
+      text: error.error.data,
       icon: 'error',
       confirmButtonColor: '#2e8b57'
     });

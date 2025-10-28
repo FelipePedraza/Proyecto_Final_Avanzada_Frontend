@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -9,6 +9,7 @@ import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
 import Swal from 'sweetalert2';
 import { UsuarioService } from '../../services/usuario-service';
 import { AuthService } from '../../services/auth-service';
+import { TokenService } from '../../services/token-service';
 
 @Component({
   selector: 'app-mis-alojamientos',
@@ -16,7 +17,7 @@ import { AuthService } from '../../services/auth-service';
   templateUrl: './mis-alojamientos.html',
   styleUrl: './mis-alojamientos.css'
 })
-export class MisAlojamientos implements OnDestroy {
+export class MisAlojamientos implements OnDestroy, OnInit {
 
   // ==================== PROPIEDADES ====================
   alojamientos: ItemAlojamientoDTO[] = [];
@@ -28,233 +29,173 @@ export class MisAlojamientos implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   // ==================== CONSTRUCTOR ====================
-
   constructor(
-    private alojamientoService: AlojamientoService,
+    public alojamientoService: AlojamientoService, // Cambiado a public para acceder desde el template
     private usuarioService: UsuarioService,
-    private authService: AuthService
-  ) {
-    this.cargarAlojamientos();
+    private authService: AuthService,
+    private tokenService: TokenService
+  ) { }
+
+  // ==================== CICLO DE VIDA ====================
+  ngOnInit(): void {
+    this.cargarAlojamientosIniciales();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-  // ==================== MÉTODOS DE CARGA ====================
+  // ==================== MÉTODOS PÚBLICOS ====================
 
   /**
-   * Carga los alojamientos del usuario autenticado
+   * Filtra alojamientos localmente según el término de búsqueda
    */
-  cargarAlojamientos(): void {
-    this.cargando = true;
-
-    // --- LÓGICA CORREGIDA ---
-    // 1. Obtenemos los datos del token
-    const datosToken = this.authService.obtenerDatosToken();
-
-    // 2. Validamos que existan y que tengan el campo 'sub' (ID del usuario)
-    if (!datosToken || !datosToken.sub) {
-      this.mostrarError('No se pudo identificar al usuario. Por favor, inicia sesión de nuevo.');
-      this.cargando = false;
+  filtrarAlojamientos(): void {
+    if (!this.terminoBusqueda.trim()) {
+      this.alojamientosFiltrados = [...this.alojamientos];
       return;
     }
 
-    // 3. Extraemos el ID del usuario
-    const idUsuario = datosToken.sub;
-
-    // 4. Usamos el servicio de USUARIO para obtener SUS alojamientos
-    this.usuarioService.obtenerAlojamientosUsuario(idUsuario, this.paginaActual)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.cargando = false)
-      )
-      .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            this.alojamientos = response.respuesta;
-            this.alojamientosFiltrados = [...this.alojamientos];
-            this.cargarMetricasDeAlojamientos();
-          } else {
-            this.mostrarError('Error al cargar alojamientos');
-          }
-        },
-        error: (error) => {
-          console.error('Error al cargar alojamientos:', error);
-          this.mostrarError('No se pudieron cargar los alojamientos. Por favor, intenta de nuevo.');
-        }
-      });
-  }
-
-  /**
-   * Carga las métricas de todos los alojamientos
-   */
-  private cargarMetricasDeAlojamientos(): void {
-    // (Este método no cambia)
-    this.alojamientos.forEach(alojamiento => {
-      this.cargarMetricas(alojamiento.id);
-    });
-  }
-
-  /**
-   * Carga las métricas de un alojamiento específico
-   */
-  private cargarMetricas(id: number): void {
-    // (Este método no cambia)
-    this.alojamientoService.obtenerMetricas(id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            this.metricasPorAlojamiento.set(id, response.respuesta);
-          }
-        },
-        error: (error) => {
-          console.error(`Error al cargar métricas del alojamiento ${id}:`, error);
-        }
-      });
-  }
-
-  // ==================== BÚSQUEDA Y FILTROS ====================
-
-  buscarAlojamientos(): void {
-    this.alojamientosFiltrados = this.alojamientoService.buscarAlojamientosLocal(
-      this.alojamientos,
-      this.terminoBusqueda
+    const terminoLower = this.terminoBusqueda.toLowerCase().trim();
+    this.alojamientosFiltrados = this.alojamientos.filter(a =>
+      a.titulo.toLowerCase().includes(terminoLower) ||
+      a.direccion.ciudad.toLowerCase().includes(terminoLower)
     );
   }
 
+  /**
+   * Limpia la búsqueda y restaura todos los alojamientos
+   */
   limpiarBusqueda(): void {
     this.terminoBusqueda = '';
     this.alojamientosFiltrados = [...this.alojamientos];
   }
 
-  // ==================== OBTENCIÓN DE DATOS ====================
-
-  obtenerMetricas(id: number): MetricasDTO | undefined {
-    return this.metricasPorAlojamiento.get(id);
-  }
-
-  // ==================== FORMATEO Y UTILIDADES ====================
-
-  formatearPrecio(precio: number): string {
-    return this.alojamientoService.formatearPrecio(precio);
-  }
-
-  generarEstrellas(calificacion: number): number[] {
-    return this.alojamientoService.generarEstrellas(calificacion);
-  }
-
-  // ==================== ELIMINACIÓN ====================
-
+  /**
+   * Confirma y elimina un alojamiento
+   */
   confirmarEliminar(id: number, titulo: string): void {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: `El alojamiento "${titulo}" será eliminado permanentemente.`,
+      text: `Se eliminará el alojamiento "${titulo}"`,
       icon: 'warning',
       showCancelButton: true,
+      confirmButtonColor: '#2e8b57',
+      cancelButtonColor: '#e74c3c',
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#e74c3c',
-      cancelButtonColor: '#95a5a6',
-      reverseButtons: true
+      cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.eliminarAlojamiento(id, titulo);
+        this.eliminarAlojamiento(id);
       }
     });
   }
-
-  private eliminarAlojamiento(id: number, titulo: string): void {
-    Swal.fire({
-      title: 'Eliminando...',
-      text: `Eliminando ${titulo}...`,
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-
-    this.alojamientoService.eliminar(id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.alojamientos = this.alojamientos.filter(a => a.id !== id);
-          this.alojamientosFiltrados = this.alojamientosFiltrados.filter(a => a.id !== id);
-          this.metricasPorAlojamiento.delete(id);
-          Swal.fire({
-            title: '¡Eliminado!',
-            text: `El alojamiento "${titulo}" ha sido eliminado.`,
-            icon: 'success',
-            confirmButtonColor: '#2e8b57'
-          });
-        },
-        error: (error) => {
-          console.error('Error al eliminar alojamiento:', error);
-          Swal.fire({
-            title: 'Error',
-            text: 'No se pudo eliminar el alojamiento. Por favor, intenta de nuevo.',
-            icon: 'error',
-            confirmButtonColor: '#2e8b57'
-          });
-        }
-      });
-  }
-
-  recargar(): void {
-    this.paginaActual = 0;
-    this.terminoBusqueda = '';
-    this.alojamientos = [];
-    this.alojamientosFiltrados = [];
-    this.metricasPorAlojamiento.clear();
-    this.cargarAlojamientos();
-  }
-
-  // ==================== PAGINACIÓN ====================
 
   /**
-   * Carga la siguiente página de alojamientos
+   * Carga más alojamientos (paginación)
    */
   cargarMasAlojamientos(): void {
-    if (this.cargando) return;
-
-    // --- LÓGICA CORREGIDA ---
-    // 1. Obtenemos los datos del token
-    const datosToken = this.authService.obtenerDatosToken();
-
-    // 2. Validamos que existan y que tengan el campo 'sub' (ID del usuario)
-    if (!datosToken || !datosToken.sub) {
-      this.mostrarError('No se pudo identificar al usuario.');
-      return;
-    }
-
-    // 3. Extraemos el ID del usuario
-    const idUsuario = datosToken.sub;
-
+    const idUsuario = this.tokenService.getUserId();
     this.paginaActual++;
     this.cargando = true;
 
-    // 4. Usamos el servicio de USUARIO para obtener la siguiente página
     this.usuarioService.obtenerAlojamientosUsuario(idUsuario, this.paginaActual)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
       )
       .subscribe({
-        next: (response) => {
-          if (!response.error && response.respuesta.length > 0) {
-            this.alojamientos = [...this.alojamientos, ...response.respuesta];
-            this.alojamientosFiltrados = [...this.alojamientos];
+        next: (respuesta) => {
+          const nuevosAlojamientos = respuesta.data as ItemAlojamientoDTO[];
+          this.alojamientos = [...this.alojamientos, ...nuevosAlojamientos];
+          this.filtrarAlojamientos();
 
-            response.respuesta.forEach(alojamiento => {
-              this.cargarMetricas(alojamiento.id);
-            });
-          }
+          nuevosAlojamientos.forEach(alojamiento => {
+            this.cargarMetricas(alojamiento.id);
+          });
         },
         error: (error) => {
-          console.error('Error al cargar más alojamientos:', error);
-          this.paginaActual--; // Revertir incremento de página
+          this.mostrarError("Error al cargar más alojamientos");
         }
       });
   }
 
+  // ==================== MÉTODOS PRIVADOS ====================
+
+  /**
+   * Carga los alojamientos iniciales del usuario
+   */
+  private cargarAlojamientosIniciales(): void {
+    const idUsuario = this.tokenService.getUserId();
+    this.paginaActual = 0;
+    this.cargando = true;
+
+    this.usuarioService.obtenerAlojamientosUsuario(idUsuario, this.paginaActual)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: (respuesta) => {
+          this.alojamientos = respuesta.data as ItemAlojamientoDTO[];
+          this.alojamientosFiltrados = [...this.alojamientos];
+
+          this.alojamientos.forEach(alojamiento => {
+            this.cargarMetricas(alojamiento.id);
+          });
+        },
+        error: (error) => {
+          this.mostrarError("Error al obtener los alojamientos");
+        }
+      });
+  }
+
+  /**
+   * Carga las métricas de un alojamiento específico
+   */
+  private cargarMetricas(idAlojamiento: number): void {
+    this.alojamientoService.obtenerMetricas(idAlojamiento)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (respuesta) => {
+          this.metricasPorAlojamiento.set(idAlojamiento, respuesta.data);
+        },
+        error: (error) => {
+          console.error(`Error al cargar métricas para alojamiento ${idAlojamiento}:`, error);
+        }
+      });
+  }
+
+  /**
+   * Elimina un alojamiento del sistema
+   */
+  private eliminarAlojamiento(id: number): void {
+    this.alojamientoService.eliminar(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (respuesta) => {
+          Swal.fire({
+            title: '¡Eliminado!',
+            text: 'El alojamiento ha sido eliminado correctamente',
+            icon: 'success',
+            confirmButtonColor: '#2e8b57'
+          });
+
+          // Remover de las listas
+          this.alojamientos = this.alojamientos.filter(a => a.id !== id);
+          this.filtrarAlojamientos();
+          this.metricasPorAlojamiento.delete(id);
+        },
+        error: (error) => {
+          this.mostrarError("Error al eliminar el alojamiento");
+        }
+      });
+  }
+
+  /**
+   * Muestra mensaje de error con SweetAlert2
+   */
   private mostrarError(mensaje: string): void {
     Swal.fire({
       title: 'Error',
@@ -262,10 +203,5 @@ export class MisAlojamientos implements OnDestroy {
       icon: 'error',
       confirmButtonColor: '#2e8b57'
     });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }

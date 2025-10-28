@@ -1,20 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {
-  AlojamientoDTO,
-  ItemAlojamientoDTO,
-  CreacionAlojamientoDTO,
-  EdicionAlojamientoDTO,
-  AlojamientoFiltroDTO,
-  MetricasDTO
-} from '../models/alojamiento-dto';
-import { ItemReservaDTO, ReservaEstado } from '../models/reserva-dto';
-import {
-  ItemResenaDTO,
-  CreacionResenaDTO,
-  CreacionRespuestaDTO
-} from '../models/resena-dto';
+import { ItemAlojamientoDTO, CreacionAlojamientoDTO, EdicionAlojamientoDTO, AlojamientoFiltroDTO } from '../models/alojamiento-dto';
+import { ReservaEstado } from '../models/reserva-dto';
+import { CreacionResenaDTO, CreacionRespuestaDTO } from '../models/resena-dto';
+import { RespuestaDTO } from '../models/respuesta-dto';
 
 /**
  * Servicio para gestionar alojamientos
@@ -34,31 +24,31 @@ export class AlojamientoService {
    * POST /api/alojamientos
    * Crea un nuevo alojamiento
    */
-  crear(dto: CreacionAlojamientoDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.post<{ error: boolean; respuesta: string }>(this.API_URL, dto);
+  crear(dto: CreacionAlojamientoDTO): Observable<RespuestaDTO> {
+    return this.http.post<RespuestaDTO>(this.API_URL, dto);
   }
   /**
    * GET /api/alojamientos/{id}
    * Obtiene un alojamiento por ID
    */
-  obtenerPorId(id: number): Observable<{ error: boolean; respuesta: AlojamientoDTO }> {
-    return this.http.get<{ error: boolean; respuesta: AlojamientoDTO }>(`${this.API_URL}/${id}`);
+  obtenerPorId(id: number): Observable<RespuestaDTO> {
+    return this.http.get<RespuestaDTO>(`${this.API_URL}/${id}`);
   }
 
   /**
    * PUT /api/alojamientos/{id}
    * Edita un alojamiento existente
    */
-  editar(id: number, dto: EdicionAlojamientoDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.put<{ error: boolean; respuesta: string }>(`${this.API_URL}/${id}`, dto);
+  editar(id: number, dto: EdicionAlojamientoDTO): Observable<RespuestaDTO> {
+    return this.http.put<RespuestaDTO>(`${this.API_URL}/${id}`, dto);
   }
 
   /**
    * DELETE /api/alojamientos/{id}
    * Elimina un alojamiento
    */
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${id}`);
+  eliminar(id: number): Observable<RespuestaDTO> {
+    return this.http.delete<RespuestaDTO>(`${this.API_URL}/${id}`);
   }
 
   // ==================== BÚSQUEDA Y FILTROS ====================
@@ -67,7 +57,8 @@ export class AlojamientoService {
    * GET /api/alojamientos?filtros...
    * Obtiene lista de alojamientos con filtros
    */
-  obtenerAlojamientos(filtros: Partial<AlojamientoFiltroDTO>, pagina: number = 0): Observable<{ error: boolean; respuesta: ItemAlojamientoDTO[] }> {
+  obtenerAlojamientos(filtros: Partial<AlojamientoFiltroDTO>, pagina: number = 0): Observable<RespuestaDTO> {
+
     let params = new HttpParams().set('pagina', pagina.toString());
 
     if (filtros.ciudad) {
@@ -94,16 +85,15 @@ export class AlojamientoService {
       });
     }
 
-    return this.http.get<{ error: boolean; respuesta: ItemAlojamientoDTO[] }>(this.API_URL, { params });
+    return this.http.get<RespuestaDTO>(this.API_URL, { params });
   }
 
   /**
    * GET /api/alojamientos/sugerencias?ciudad=...
    * Obtiene sugerencias de alojamientos por ciudad
    */
-  sugerirAlojamientos(ciudad: string): Observable<{ error: boolean; respuesta: ItemAlojamientoDTO[] }> {
-    const params = new HttpParams().set('ciudad', ciudad);
-    return this.http.get<{ error: boolean; respuesta: ItemAlojamientoDTO[] }>(`${this.API_URL}/sugerencias`, { params });
+  sugerirAlojamientos(ciudad: string): Observable<RespuestaDTO> {
+    return this.http.get<RespuestaDTO>(`${this.API_URL}/sugerencias`, { params: {ciudad} });
   }
 
   // ==================== MÉTRICAS ====================
@@ -112,8 +102,8 @@ export class AlojamientoService {
    * GET /api/alojamientos/{id}/metricas
    * Obtiene métricas de un alojamiento
    */
-  obtenerMetricas(id: number): Observable<{ error: boolean; respuesta: MetricasDTO }> {
-    return this.http.get<{ error: boolean; respuesta: MetricasDTO }>(`${this.API_URL}/${id}/metricas`);
+  obtenerMetricas(id: number): Observable<RespuestaDTO> {
+    return this.http.get<RespuestaDTO>(`${this.API_URL}/${id}/metricas`);
   }
 
   // ==================== RESERVAS ====================
@@ -128,7 +118,8 @@ export class AlojamientoService {
     fechaEntrada?: Date,
     fechaSalida?: Date,
     pagina: number = 0
-  ): Observable<{ error: boolean; respuesta: ItemReservaDTO[] }> {
+  ): Observable<RespuestaDTO> {
+
     let params = new HttpParams().set('pagina', pagina.toString());
 
     if (estado) {
@@ -141,7 +132,7 @@ export class AlojamientoService {
       params = params.set('fechaSalida', fechaSalida.toISOString());
     }
 
-    return this.http.get<{ error: boolean; respuesta: ItemReservaDTO[] }>(`${this.API_URL}/${id}/reservas`, { params });
+    return this.http.get<RespuestaDTO>(`${this.API_URL}/${id}/reservas`, { params });
   }
 
   // ==================== RESEÑAS ====================
@@ -150,25 +141,25 @@ export class AlojamientoService {
    * GET /api/alojamientos/{id}/resenas
    * Obtiene las reseñas de un alojamiento
    */
-  obtenerResenasAlojamiento(id: number, pagina: number = 0): Observable<{ error: boolean; respuesta: ItemResenaDTO[] }> {
+  obtenerResenasAlojamiento(id: number, pagina: number = 0): Observable<RespuestaDTO> {
     const params = new HttpParams().set('pagina', pagina.toString());
-    return this.http.get<{ error: boolean; respuesta: ItemResenaDTO[] }>(`${this.API_URL}/${id}/resenas`, { params });
+    return this.http.get<RespuestaDTO>(`${this.API_URL}/${id}/resenas`, { params });
   }
 
   /**
    * POST /api/alojamientos/{id}/resenas
    * Crea una nueva reseña para un alojamiento
    */
-  crearResena(id: number, dto: CreacionResenaDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.post<{ error: boolean; respuesta: string }>(`${this.API_URL}/${id}/resenas`, dto);
+  crearResena(id: number, dto: CreacionResenaDTO): Observable<RespuestaDTO> {
+    return this.http.post<RespuestaDTO>(`${this.API_URL}/${id}/resenas`, dto);
   }
 
   /**
    * POST /api/alojamientos/{id}/resenas/{idResena}/respuesta
    * Responde a una reseña
    */
-  responderResena(idAlojamiento: number, idResena: number, dto: CreacionRespuestaDTO): Observable<{ error: boolean; respuesta: string }> {
-    return this.http.post<{ error: boolean; respuesta: string }>(
+  responderResena(idAlojamiento: number, idResena: number, dto: CreacionRespuestaDTO): Observable<RespuestaDTO> {
+    return this.http.post<RespuestaDTO>(
       `${this.API_URL}/${idAlojamiento}/resenas/${idResena}/respuesta`,
       dto
     );

@@ -4,8 +4,8 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
 import { UsuarioService } from '../../services/usuario-service';
-import { AuthService } from '../../services/auth-service';
 import { UsuarioDTO } from '../../models/usuario-dto';
+import { TokenService} from '../../services/token-service';
 
 @Component({
   selector: 'app-panel-usuario',
@@ -21,7 +21,7 @@ export class PanelUsuario {
 
   constructor(
     private usuarioService: UsuarioService,
-    private authService: AuthService,
+    private tokenService: TokenService,
     private router: Router
   ) {
     this.cargarUsuario()
@@ -31,7 +31,7 @@ export class PanelUsuario {
   private cargarUsuario(): void {
     // TODO: Obtener el ID del usuario autenticado desde el token
     // Por ahora usamos un ID de ejemplo
-    const usuarioId = this.obtenerIdUsuarioAutenticado();
+    const usuarioId = this.tokenService.getUserId();
 
     if (!usuarioId) {
       this.router.navigate(['/login']);
@@ -43,9 +43,9 @@ export class PanelUsuario {
     this.usuarioService.obtener(usuarioId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          if (!response.error) {
-            this.usuario = response.respuesta;
+        next: (respuesta) => {
+          if (!respuesta.error) {
+            this.usuario = respuesta.data;
           }
           this.cargando = false;
         },
@@ -68,16 +68,10 @@ export class PanelUsuario {
       cancelButtonColor: '#95a5a6'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.authService.cerrarSesion();
-        this.router.navigate(['/login']);
+        this.tokenService.logout();
+        this.router.navigate(['/inicio']);
       }
     });
-  }
-
-  private obtenerIdUsuarioAutenticado(): string | null {
-    // TODO: Implementar obtención del ID del usuario desde el token JWT
-    // Por ahora retornamos null para forzar el login
-    return null;
   }
 
   obtenerIniciales(): string {

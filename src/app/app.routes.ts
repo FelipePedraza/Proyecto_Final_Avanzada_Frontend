@@ -8,16 +8,18 @@ import { MisAlojamientos } from './pages/mis-alojamientos/mis-alojamientos';
 import { CrearAlojamiento } from './pages/crear-alojamiento/crear-alojamiento';
 import { EditarPerfil } from './pages/editar-perfil/editar-perfil';
 import { MisReservas } from './pages/mis-reservas/mis-reservas';
+import {LoginGuard} from './guards/login-service';
+import {RolGuard} from './guards/rol-service';
 
 export const routes: Routes = [
   { path: '', component: Inicio },
-  { path: 'login', component: Login },
-  { path: 'registro', component: Registro },
+  { path: 'login', component: Login, canActivate: [LoginGuard]},
+  { path: 'registro', component: Registro, canActivate: [LoginGuard]},
   { path: 'busqueda', component: Busqueda },
   { path: 'alojamiento/:id', component: DetalleAlojamiento },
-  { path: 'mis-alojamientos', component: MisAlojamientos },
-  { path: 'crear-alojamiento', component: CrearAlojamiento },
-  { path: 'editar-alojamiento/:id', component: CrearAlojamiento },
+  { path: 'mis-alojamientos', component: MisAlojamientos, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
+  { path: 'crear-alojamiento', component: CrearAlojamiento, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] }  },
+  { path: 'editar-alojamiento/:id', component: CrearAlojamiento, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
   { path: 'editar-perfil', component: EditarPerfil },
   { path: 'mis-reservas', component: MisReservas },
   { path: '**', pathMatch: "full", redirectTo: "" }
