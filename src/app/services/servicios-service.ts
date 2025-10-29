@@ -17,7 +17,7 @@ export class ServiciosService {
    * Obtiene la lista de todas las ciudades disponibles
    * @returns Observable con la respuesta que contiene el array de servicios
    */
-  obtenerCiudades(): Observable<RespuestaDTO> {
+  obtenerServicios(): Observable<RespuestaDTO> {
     return this.http.get<RespuestaDTO>(this.apiUrl);
   }
 

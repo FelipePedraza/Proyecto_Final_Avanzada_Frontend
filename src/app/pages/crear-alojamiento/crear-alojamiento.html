@@ -1,1 +1,349 @@
-<p>crear-alojamiento works!</p>
+<main class="container dashboard-container">
+  <div class="dashboard-layout" style="grid-template-columns: 1fr; max-width: 1000px; margin: 0 auto;">
+
+    <section class="dashboard-content">
+
+      <div class="content-header" style="margin-bottom: 3rem;">
+        <div>
+          <h1>{{ modoEdicion ? 'Editar Alojamiento' : 'Crear Nuevo Alojamiento' }}</h1>
+          <p style="color: #7F8C8D; margin-top: 0.5rem;">
+            {{ modoEdicion ? 'Actualiza la información de tu alojamiento' : 'Completa la información para publicar tu alojamiento' }}
+          </p>
+        </div>
+        <button type="button" (click)="volver()" class="btn btn-secondary">
+          <i class="fa-solid fa-arrow-left"></i> Volver
+        </button>
+      </div>
+
+      <div class="form-progress-bar">
+        @for (paso of [1, 2, 3, 4]; track paso) {
+          <div
+            class="step"
+            [class.active]="pasoActual === paso"
+            [class.completed]="pasoActual > paso"
+            (click)="irAPaso(paso)"
+            style="cursor: pointer;">
+            <span style="font-size: 1.2rem; margin-right: 8px;">
+              @if (pasoActual > paso) {
+                <i class="fa-solid fa-check-circle" style="color: var(--success-color);"></i>
+              } @else {
+                {{ paso }}
+              }
+            </span>
+            @switch (paso) {
+              @case (1) { Información Básica }
+              @case (2) { Ubicación }
+              @case (3) { Servicios }
+              @case (4) { Imágenes }
+            }
+          </div>
+        }
+      </div>
+
+      <form [formGroup]="alojamientoForm" (ngSubmit)="guardarAlojamiento()">
+
+        @if (pasoActual === 1) {
+          <div class="form-step-content active">
+            <h3 style="margin-bottom: 2rem; color: var(--dark-green);">
+              <i class="fa-solid fa-info-circle"></i> Información Básica
+            </h3>
+
+            <div class="form-grid">
+
+              <div class="form-group full-width">
+                <label for="titulo">Título del Alojamiento *</label>
+                <input
+                  type="text"
+                  id="titulo"
+                  formControlName="titulo"
+                  placeholder="Ej: Hermoso apartamento en el centro"
+                  [class.error]="campoInvalido('titulo')">
+
+                @if (campoInvalido('titulo')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo('titulo') }}
+                  </div>
+                }
+
+                <p style="font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem; text-align: right;">
+                  {{ alojamientoForm.value.titulo?.length || 0 }}/100
+                </p>
+              </div>
+
+              <div class="form-group full-width">
+                <label for="descripcion">Descripción *</label>
+                <textarea
+                  id="descripcion"
+                  formControlName="descripcion"
+                  rows="6"
+                  placeholder="Describe tu alojamiento: características, espacios, comodidades..."
+                  [class.error]="campoInvalido('descripcion')"></textarea>
+
+                @if (campoInvalido('descripcion')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo('descripcion') }}
+                  </div>
+                }
+
+                <p style="font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem; text-align: right;">
+                  {{ alojamientoForm.value.descripcion?.length || 0 }}/1000
+                </p>
+              </div>
+
+              <div class="form-group">
+                <label for="maxHuespedes">Máximo de Huéspedes *</label>
+                <input
+                  type="number"
+                  id="maxHuespedes"
+                  formControlName="maxHuespedes"
+                  min="1"
+                  max="20"
+                  [class.error]="campoInvalido('maxHuespedes')">
+
+                @if (campoInvalido('maxHuespedes')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo('maxHuespedes') }}
+                  </div>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="precioPorNoche">Precio por Noche (COP) *</label>
+                <input
+                  type="number"
+                  id="precioPorNoche"
+                  formControlName="precioPorNoche"
+                  min="10000"
+                  placeholder="50000"
+                  [class.error]="campoInvalido('precioPorNoche')">
+
+                @if (campoInvalido('precioPorNoche')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo('precioPorNoche') }}
+                  </div>
+                }
+              </div>
+
+            </div>
+          </div>
+        }
+
+        @if (pasoActual === 2) {
+          <div class="form-step-content active">
+            <h3 style="margin-bottom: 2rem; color: var(--dark-green);">
+              <i class="fa-solid fa-location-dot"></i> Ubicación
+            </h3>
+
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label for="ciudad">Ciudad *</label>
+                <select
+                  id="ciudad"
+                  formControlName="ciudad"
+                  [class.error]="campoInvalido('ciudad')">
+                  <option value="">Selecciona una ciudad</option>
+                  @for (ciudad of ciudades; track ciudad) {
+                    <option [value]="ciudad">{{ ciudad }}</option>
+                  }
+                </select>
+
+                @if (campoInvalido('ciudad')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo('ciudad') }}
+                  </div>
+                }
+              </div>
+
+              <div class="form-group">
+                <label for="direccion">Dirección *</label>
+                <input
+                  type="text"
+                  id="direccion"
+                  formControlName="direccion"
+                  placeholder="Calle 123 #45-67"
+                  [class.error]="campoInvalido('direccion')">
+
+                @if (campoInvalido('direccion')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo('direccion') }}
+                  </div>
+                }
+              </div>
+
+              <div class="form-group full-width">
+                <label>Ubicación en el Mapa *</label>
+                <p style="font-size: 0.9rem; color: #7F8C8D; margin-bottom: 1rem;">
+                  <i class="fa-solid fa-hand-pointer"></i> Haz clic en el mapa para seleccionar la ubicación exacta
+                </p>
+
+                <div
+                  id="map"
+                  style="width: 100%; height: 400px; border-radius: 16px; overflow: hidden; border: 2px solid var(--border-color);">
+                </div>
+
+                <div style="margin-top: 1rem; padding: 1rem; background-color: var(--light-green); border-radius: 12px;">
+                  <p style="font-size: 0.9rem; color: var(--text-color); margin: 0;">
+                    <strong>Coordenadas seleccionadas:</strong><br>
+                    Latitud: {{ alojamientoForm.value.localizacion?.latitud.toFixed(6) }}<br>
+                    Longitud: {{ alojamientoForm.value.localizacion?.longitud.toFixed(6) }}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+
+        @if (pasoActual === 3) {
+          <div class="form-step-content active" formArrayName="servicios">
+            <h3 style="margin-bottom: 2rem; color: var(--dark-green);">
+              <i class="fa-solid fa-list-check"></i> Servicios y Comodidades
+            </h3>
+
+            <p style="color: #7F8C8D; margin-bottom: 2rem;">
+              Selecciona todos los servicios que ofrece tu alojamiento
+            </p>
+
+            <div class="checkbox-grid">
+              @for (servicio of serviciosDisponibles; track servicio; let i = $index) {
+                <div class="checkbox-group">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <input
+                      type="checkbox"
+                      [id]="'servicio_' + i"
+                      [formControlName]="i" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label
+                      [for]="'servicio_' + i"
+                      style="cursor: pointer; margin: 0; display: flex; align-items: center; gap: 8px; flex: 1;">
+                      <i [class]="'fa-solid ' + obtenerIconoServicio(servicio)" style="color: var(--primary-color);"></i>
+                      {{ formatearServicio(servicio) }}
+                    </label>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (obtenerServiciosSeleccionados().length === 0) {
+              <div style="margin-top: 2rem; padding: 1rem; background-color: rgba(231, 76, 60, 0.1); border-radius: 12px; border: 1px solid var(--danger-color);">
+                <p style="color: var(--danger-color); margin: 0;">
+                  <i class="fa-solid fa-exclamation-triangle"></i>
+                  Debes seleccionar al menos un servicio
+                </p>
+              </div>
+            }
+
+          </div>
+        }
+
+        @if (pasoActual === 4) {
+          <div class="form-step-content active">
+            <h3 style="margin-bottom: 2rem; color: var(--dark-green);">
+              <i class="fa-solid fa-images"></i> Imágenes del Alojamiento
+            </h3>
+
+            <p style="color: #7F8C8D; margin-bottom: 2rem;">
+              Sube al menos 3 imágenes de tu alojamiento (máximo 10)
+            </p>
+
+            <div class="image-uploader" (click)="fileInput.click()">
+              @if (subiendoImagen) {
+                <div class="loading-spinner-large"></div>
+                <p>Subiendo imágenes...</p>
+              } @else {
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <p>Haz clic para seleccionar imágenes</p>
+                <p style="font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
+                  Formatos: JPG, PNG (máx. 5MB por imagen)
+                </p>
+              }
+              <input
+                #fileInput
+                type="file"
+                multiple
+                accept="image/*"
+                (change)="seleccionarImagenes($event)"
+                style="display: none;">
+            </div>
+
+            @if (imagenesSubidas.length > 0) {
+              <div class="image-preview-grid">
+                @for (imagen of imagenesSubidas; track imagen; let i = $index) {
+                  <div style="position: relative;">
+                    <img [src]="imagen" [alt]="'Imagen ' + (i + 1)">
+                    <button
+                      type="button"
+                      (click)="eliminarImagen(i)"
+                      class="btn-icon btn-icon-danger"
+                      style="position: absolute; top: 8px; right: 8px; background-color: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                    @if (i === 0) {
+                      <div style="position: absolute; bottom: 8px; left: 8px; background-color: var(--primary-color); color: white; padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+                        Principal
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <p style="text-align: center; margin-top: 1.5rem; color: var(--text-color);">
+                <i class="fa-solid fa-check-circle" style="color: var(--success-color);"></i>
+                {{ imagenesSubidas.length }} imagen{{ imagenesSubidas.length > 1 ? 'es' : '' }} subida{{ imagenesSubidas.length > 1 ? 's' : '' }}
+              </p>
+            }
+
+            @if (imagenesSubidas.length < 3) {
+              <div style="margin-top: 2rem; padding: 1rem; background-color: rgba(231, 76, 60, 0.1); border-radius: 12px; border: 1px solid var(--danger-color);">
+                <p style="color: var(--danger-color); margin: 0;">
+                  <i class="fa-solid fa-exclamation-triangle"></i>
+                  Necesitas subir al menos {{ 3 - imagenesSubidas.length }} imagen{{ (3 - imagenesSubidas.length) > 1 ? 'es' : '' }} más
+                </p>
+              </div>
+            }
+
+          </div>
+        }
+
+        <div class="form-navigation">
+
+          <button
+            type="button"
+            (click)="pasoAnterior()"
+            class="btn btn-secondary"
+            [disabled]="pasoActual === 1">
+            <i class="fa-solid fa-arrow-left"></i> Anterior
+          </button>
+
+          @if (pasoActual < totalPasos) {
+            <button
+              type="button"
+              (click)="siguientePaso()"
+              class="btn btn-primary">
+              Siguiente <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          }
+
+          @if (pasoActual === totalPasos) {
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="cargando || !validarFormularioCompleto()">
+              @if (cargando) {
+                <span class="loading-spinner"></span>
+                {{ modoEdicion ? 'Actualizando...' : 'Publicando...' }}
+              } @else {
+                <i class="fa-solid fa-check"></i>
+                {{ modoEdicion ? 'Guardar Cambios' : 'Publicar Alojamiento' }}
+              }
+            </button>
+          }
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </div>
+</main>

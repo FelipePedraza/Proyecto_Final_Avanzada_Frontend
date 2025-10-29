@@ -29,8 +29,8 @@ export class ImagenService {
    * DELETE /api/imagenes
    * Elimina una imagen de Cloudinary
    */
-  eliminarImagen(publicId: string): Observable<RespuestaDTO> {
-    const params = new HttpParams().set('id', publicId);
+  eliminarImagen(url: string): Observable<RespuestaDTO> {
+    const params = new HttpParams().set('url', url);
 
     return this.http.delete<RespuestaDTO>(
       this.API_URL,

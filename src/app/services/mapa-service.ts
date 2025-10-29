@@ -43,7 +43,10 @@ export class MapaService implements OnDestroy {
 
   /** Dibuja varios marcadores con popup */
   public drawMarkers(places: MarcadorDTO[]): void {
+
     if (!this.map) return;
+
+    this.clearMarkers();
 
     places.forEach(({ id, titulo, fotoUrl, localizacion }) => {
       const popupHtml = `
@@ -76,4 +79,41 @@ export class MapaService implements OnDestroy {
       this.map = undefined;
     }
   }
+
+  public addMarker(): Observable<mapboxgl.LngLat> {
+    return new Observable((observer) => {
+      if (!this.map) {
+        observer.error('Mapa no inicializado');
+        return;
+      }
+
+      // Limpia los marcadores existentes y agrega uno nuevo en la posición del click
+      const onClick = (e: MapMouseEvent) => {
+        this.clearMarkers();
+        const marker = new mapboxgl.Marker({ color: 'red' })
+          .setLngLat(e.lngLat)
+          .addTo(this.map!);
+
+        this.markers.push(marker);
+        // Emite las coordenadas del marcador al observador
+        observer.next(marker.getLngLat());
+      };
+
+      this.map.on('click', onClick);
+
+      // Limpieza al desuscribirse
+      return () => {
+        this.map?.off('click', onClick);
+      };
+    });
+
+  }
+
+  public clearMarkers(): void {
+    if (this.markers.length > 0) {
+      this.markers.forEach(marker => marker.remove());
+      this.markers = [];
+    }
+  }
+
 }
