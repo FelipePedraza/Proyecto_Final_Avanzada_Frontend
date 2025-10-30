@@ -1,1 +1,90 @@
-<p>barra-busqueda works!</p>
+<div class="search-bar">
+
+  <!-- Ciudad -->
+  <div class="search-field search-field-ciudad">
+    <label for="ciudad">Ciudad</label>
+    <select
+      id="ciudad"
+      [(ngModel)]="ciudad"
+      required>
+      <option value="">¿A dónde viajas?</option>
+      @for (ciudad of ciudades; track ciudad) {
+        <option [value]="ciudad">{{ ciudad }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Check-in -->
+  <div class="search-field search-field-date">
+    <label for="checkin">Check-in</label>
+    <input
+      type="date"
+      id="checkin"
+      [(ngModel)]="fechaEntrada"
+      [min]="obtenerFechaMinima()">
+  </div>
+
+  <!-- Check-out -->
+  <div class="search-field search-field-date">
+    <label for="checkout">Check-out</label>
+    <input
+      type="date"
+      id="checkout"
+      [(ngModel)]="fechaSalida"
+      [min]="obtenerFechaMinimaSalida()">
+  </div>
+
+  <!-- Huéspedes -->
+  <div class="search-field search-field-guests">
+    <label for="guests">Huéspedes</label>
+    <input
+      type="number"
+      id="guests"
+      [(ngModel)]="huespedes"
+      min="1"
+      max="20"
+      placeholder="1">
+  </div>
+
+  <!-- Servicios -->
+  <div class="search-field search-field-services">
+    <label>Servicios</label>
+    <button
+      type="button"
+      class="services-toggle"
+      (click)="mostrarServicios = !mostrarServicios">
+      <span class="services-text">
+        @if (serviciosSeleccionados.length > 0) {
+          {{ serviciosSeleccionados.length }} seleccionado{{ serviciosSeleccionados.length > 1 ? 's' : '' }}
+        } @else {
+          Opcional
+        }
+      </span>
+      <i [class]="mostrarServicios ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
+    </button>
+
+    @if (mostrarServicios) {
+      <div class="services-dropdown">
+        @for (servicio of serviciosDisponibles; track servicio) {
+          <label class="service-item">
+            <input
+              type="checkbox"
+              [checked]="estaSeleccionado(servicio)"
+              (change)="toggleServicio(servicio)">
+            <span>{{ formatearServicio(servicio) }}</span>
+          </label>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Botón de búsqueda -->
+  <button
+    type="button"
+    class="btn-search"
+    (click)="buscar()"
+    [disabled]="!ciudad"
+    title="Buscar">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+</div>

@@ -273,7 +273,7 @@ main:not(.dashboard-container) { background-color: transparent; }
   align-items: center;
   box-shadow: 0 8px 32px rgba(46, 139, 87, 0.2);
   width: 100%;
-  max-width: 800px;
+  max-width: 2000px;
   margin: 0 auto;
   border: 2px solid rgba(46, 139, 87, 0.1);
 }

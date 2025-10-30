@@ -1,0 +1,90 @@
+<!-- ==================== HERO SECTION ==================== -->
+<section class="hero">
+  <!-- Slideshow de imágenes de fondo -->
+  <div class="hero-slideshow">
+    <div class="slide-bg slide-1 active"></div>
+    <div class="slide-bg slide-2"></div>
+    <div class="slide-bg slide-3"></div>
+    <div class="slide-bg slide-4"></div>
+    <div class="slide-bg slide-5"></div>
+  </div>
+
+  <!-- Overlay oscuro -->
+  <div class="hero-background"></div>
+
+  <!-- Contenido del hero -->
+  <div class="container">
+    <div class="hero-content">
+      <h1>Tu próximo destino te espera</h1>
+      <p>Encuentra alojamientos únicos para tu próxima aventura.</p>
+
+      <!-- Barra de búsqueda integrada -->
+      <app-barra-busqueda></app-barra-busqueda>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ALOJAMIENTOS POPULARES ==================== -->
+<section class="popular-accommodations">
+  <div class="container">
+    <h2>Alojamientos Populares</h2>
+
+    <!-- Estado de carga -->
+    @if (cargandoPopulares) {
+      <div style="text-align: center; padding: 3rem;">
+        <div class="loading-spinner-large"></div>
+        <p style="color: var(--text-color); margin-top: 1rem;">Cargando alojamientos...</p>
+      </div>
+    }
+
+    <!-- Grid de alojamientos -->
+    @if (!cargandoPopulares && alojamientosPopulares.length > 0) {
+      <div class="accommodations-grid">
+        @for (alojamiento of alojamientosPopulares; track alojamiento.id) {
+          <app-alojamiento-item [alojamiento]="alojamiento"></app-alojamiento-item>
+        }
+      </div>
+    }
+
+    <!-- Estado vacío -->
+    @if (!cargandoPopulares && alojamientosPopulares.length === 0) {
+      <div class="empty-state" style="margin-top: 2rem;">
+        <i class="fa-solid fa-house-circle-exclamation"></i>
+        <h3>No hay alojamientos disponibles</h3>
+        <p>En este momento no hay alojamientos para mostrar</p>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- ==================== ALOJAMIENTOS SUGERIDOS POR CIUDAD ==================== -->
+@if (alojamientosSugeridos.length > 0) {
+  <section class="suggested-accommodations">
+    <div class="container">
+      <div class="section-header">
+        <h2>
+          <i class="fa-solid fa-location-dot"></i>
+          Descubre {{ ciudadSugerida }}
+        </h2>
+        <p>Alojamientos destacados en {{ ciudadSugerida }}</p>
+      </div>
+
+      <!-- Estado de carga -->
+      @if (cargandoSugeridos) {
+        <div style="text-align: center; padding: 3rem;">
+          <div class="loading-spinner-large"></div>
+          <p style="color: var(--text-color); margin-top: 1rem;">Cargando sugerencias...</p>
+        </div>
+      }
+
+      <!-- Grid de sugerencias -->
+      @if (!cargandoSugeridos) {
+        <div class="accommodations-grid">
+          @for (alojamiento of alojamientosSugeridos; track alojamiento.id) {
+            <app-alojamiento-item [alojamiento]="alojamiento"></app-alojamiento-item>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}

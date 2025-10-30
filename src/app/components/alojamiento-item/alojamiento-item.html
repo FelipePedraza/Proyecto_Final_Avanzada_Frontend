@@ -1,0 +1,34 @@
+<a [routerLink]="['/alojamiento', alojamiento.id]" class="accommodation-card">
+  <div class="card-image">
+    <img
+      [src]="alojamiento.imagenPrincipal"
+      [alt]="alojamiento.titulo"
+      loading="lazy">
+  </div>
+
+  <div class="card-info">
+    <div class="card-header">
+      <h3>{{ alojamiento.titulo }}</h3>
+      <p class="location">
+        <i class="fa-solid fa-location-dot"></i>
+        {{ alojamiento.direccion.ciudad }}
+      </p>
+    </div>
+
+    <div class="card-footer">
+      <div class="rating">
+        @for (star of generarEstrellas(); track $index) {
+          <i class="fa-solid fa-star"></i>
+        }
+        <span class="rating-number">
+          {{ alojamiento.promedioCalificaciones }}
+        </span>
+      </div>
+
+      <p class="price">
+        <strong>{{ formatearPrecio() }}</strong>
+        <span class="price-period">/ noche</span>
+      </p>
+    </div>
+  </div>
+</a>

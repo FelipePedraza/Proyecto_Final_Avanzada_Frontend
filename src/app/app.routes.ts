@@ -20,7 +20,7 @@ export const routes: Routes = [
   { path: 'mis-alojamientos', component: MisAlojamientos, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
   { path: 'crear-alojamiento', component: CrearAlojamiento, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] }  },
   { path: 'editar-alojamiento/:id', component: CrearAlojamiento, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
-  { path: 'editar-perfil', component: EditarPerfil },
-  { path: 'mis-reservas', component: MisReservas },
+  { path: 'editar-perfil', component: EditarPerfil, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion", "ROL_Huespedes"] } },
+  { path: 'mis-reservas', component: MisReservas, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion", "ROL_Huespedes"] } },
   { path: '**', pathMatch: "full", redirectTo: "" }
 ];

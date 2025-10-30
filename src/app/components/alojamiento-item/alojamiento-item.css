@@ -1,0 +1,130 @@
+/* El componente hereda los estilos de .accommodation-card del styles.css global */
+
+.accommodation-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-image {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.accommodation-card:hover .card-image img {
+  transform: scale(1.08);
+}
+
+/* Info de la tarjeta */
+.card-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.5rem;
+  gap: 1rem;
+}
+
+.card-header {
+  flex: 1;
+}
+
+.card-header h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--dark-green);
+  line-height: 1.4;
+  min-height: 2.8rem; /* 2 líneas mínimo */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-header .location {
+  font-size: 0.9rem;
+  color: #7F8C8D;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.card-header .location i {
+  color: var(--primary-color);
+}
+
+/* Footer de la tarjeta */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 2px solid var(--light-green);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.rating .fa-star {
+  font-size: 0.85rem;
+  color: #F39C12;
+}
+
+.rating-number {
+  margin-left: 6px;
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.95rem;
+}
+
+.price {
+  text-align: right;
+  margin: 0;
+}
+
+.price strong {
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  font-weight: 700;
+  display: block;
+}
+
+.price-period {
+  font-size: 0.85rem;
+  color: #7F8C8D;
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-header h3 {
+    font-size: 1.05rem;
+    min-height: 2.5rem;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .price {
+    text-align: left;
+    width: 100%;
+  }
+}

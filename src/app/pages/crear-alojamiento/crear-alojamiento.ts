@@ -208,6 +208,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
               }
             };
             this.mapaService.drawMarkers([marcadorDTO]);
+            this.mapaService.mapInstance?.setCenter([this.alojamientoForm.value.localizacion.longitud, this.alojamientoForm.value.localizacion.latitud]);
           }
           this.mapaService.addMarker()
             .pipe(takeUntil(this.destroy$))
