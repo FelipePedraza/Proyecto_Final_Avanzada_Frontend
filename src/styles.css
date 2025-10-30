@@ -1216,5 +1216,20 @@ hr {
   padding-top: 2rem;
 }
 
+.logo-icon:hover {
+  filter: brightness(0.85); /* lo oscurece un poco */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  cursor: pointer; /* indica que es interactivo */
+  transform: rotate(-45deg) scale(1.1); /* efecto de zoom suave */
+  transition: all 0.2s ease;
+}
+
+.logo-icon.selected {
+  filter: brightness(0.75);
+  box-shadow: 0 0 12px 4px rgba(255, 215, 0, 0.7);
+  transform: rotate(-45deg) scale(1.15);
+}
+
+
 /* --- Responsive Design (Simplificado sin media queries complejas) --- */
 /* Mantenemos solo los estilos base sin responsive como solicitaste */

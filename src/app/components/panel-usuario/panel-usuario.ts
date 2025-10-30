@@ -69,7 +69,8 @@ export class PanelUsuario {
     }).then((result) => {
       if (result.isConfirmed) {
         this.tokenService.logout();
-        this.router.navigate(['/inicio']);
+        this.usuario = null;
+        this.router.navigate(['/']);
       }
     });
   }

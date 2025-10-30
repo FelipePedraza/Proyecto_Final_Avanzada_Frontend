@@ -13,32 +13,90 @@ export class MapaService implements OnDestroy {
   private currentLocation: LngLatLike = [-75.6727, 4.53252];
   private readonly MAPBOX_TOKEN = 'pk.eyJ1IjoicGVkcmF6YTgzMCIsImEiOiJjbWg5OTQ0MjMxY2F6MmpxNmVibG5pc2V2In0.VrZ9nEk-zYTfqaUrE2rWwg';
   private destroy$ = new Subject<void>();
+  private marcadorElemento = document.createElement('div');
+
 
   constructor() {
     mapboxgl.accessToken = this.MAPBOX_TOKEN;
+    this.marcadorElemento.innerHTML = `      <div class="logo-icon">
+        <i class="fa-solid fa-house-chimney logo-house"></i>
+      </div>`;
   }
 
   /** Inicializa el mapa dentro del contenedor especificado */
-  public create(containerId: string = 'map'): void {
-    if (this.map) {
-      this.map.remove(); // Evita fugas si se recrea el mapa
-    }
+  public create(containerId: string = 'map'): Observable<void> {
 
-    this.map = new mapboxgl.Map({
-      container: containerId,
-      style: 'mapbox://styles/mapbox/standard',
-      center: this.currentLocation,
-      zoom: 17,
-      pitch: 45,
+    // Retornamos un NUEVO Observable que envuelve toda la lógica asíncrona
+    return new Observable<void>((observer) => {
+
+      if (this.map) {
+        this.map.remove();
+      }
+
+      // 1. Función interna para crear el mapa
+      // (La llamaremos después de la geolocalización)
+      const initMap = (lngLat: LngLatLike) => {
+
+        this.map = new mapboxgl.Map({
+          container: containerId,
+          style: 'mapbox://styles/mapbox/standard',
+          center: lngLat, // Usa la ubicación resuelta
+          zoom: 17,
+          pitch: 45,
+        });
+
+        this.map.addControl(new mapboxgl.NavigationControl());
+        this.map.addControl(
+          new mapboxgl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true,
+          })
+        );
+
+        // 2. Escuchar el evento 'load' del mapa
+        this.map.on('load', () => {
+          console.log('Mapa completamente cargado y listo.');
+
+          // 3. ¡ÉXITO! Notificar al suscriptor y completar
+          observer.next();
+        });
+
+        // Manejar errores de carga del mapa
+        this.map.on('error', (err) => {
+          observer.error(err); // Notificar un error
+        });
+      };
+
+      // 4. Intentar obtener la geolocalización
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            // ÉXITO Geo: Iniciar mapa con ubicación del usuario
+            const { longitude, latitude } = position.coords;
+            initMap([longitude, latitude]);
+          },
+          (error) => {
+            // ERROR Geo: Iniciar mapa con ubicación por defecto
+            console.warn('Error de geolocalización, usando default:', error.message);
+            initMap(this.currentLocation); // this.currentLocation es tu valor por defecto
+          }
+        );
+      } else {
+        // NO SOPORTADO: Iniciar mapa con ubicación por defecto
+        console.warn('Geolocalización no soportada.');
+        initMap(this.currentLocation);
+      }
+
+      // 5. Definir la limpieza (si el componente se destruye
+      //    antes de que el mapa cargue)
+      return () => {
+        if (this.map) {
+          this.map.remove();
+          this.map = undefined;
+        }
+      };
+
     });
-
-    this.map.addControl(new mapboxgl.NavigationControl());
-    this.map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-      })
-    );
   }
 
   /** Dibuja varios marcadores con popup */
@@ -57,7 +115,7 @@ export class MapaService implements OnDestroy {
         <a href="/place/${id}">Ver más</a>
       `;
 
-      new mapboxgl.Marker({ color: 'red' })
+      new mapboxgl.Marker({ element: this.marcadorElemento })
         .setLngLat([localizacion.longitud, localizacion.latitud])
         .setPopup(new mapboxgl.Popup().setHTML(popupHtml))
         .addTo(this.map!);
@@ -90,7 +148,8 @@ export class MapaService implements OnDestroy {
       // Limpia los marcadores existentes y agrega uno nuevo en la posición del click
       const onClick = (e: MapMouseEvent) => {
         this.clearMarkers();
-        const marker = new mapboxgl.Marker({ color: 'red' })
+
+        const marker = new mapboxgl.Marker({ element: this.marcadorElemento })
           .setLngLat(e.lngLat)
           .addTo(this.map!);
 

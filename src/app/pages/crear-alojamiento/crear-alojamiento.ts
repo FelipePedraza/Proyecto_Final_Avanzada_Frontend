@@ -13,6 +13,7 @@ import { ServiciosService } from '../../services/servicios-service';
 import { TokenService } from '../../services/token-service';
 import { MapaService } from '../../services/mapa-service';
 import { CreacionAlojamientoDTO, EdicionAlojamientoDTO, Direccion } from '../../models/alojamiento-dto';
+import { MarcadorDTO} from '../../models/marcador-dto';
 
 @Component({
   selector: 'app-crear-alojamiento',
@@ -92,7 +93,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
       // Paso 2: Ubicación
       ciudad: ['', Validators.required],
       direccion: ['', [Validators.required, Validators.minLength(5)]],
-      localizacion: [{ latitud: 4.53252, longitud: -75.6727 }, Validators.required],
+      localizacion: [{ latitud: 0, longitud: 0 }, Validators.required],
 
       // Paso 3: Servicios
       servicios: this.formBuilder.array([]),
@@ -194,18 +195,36 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
   private inicializarLogicaMapa(): void {
     // Espera a que el div del paso 2 sea visible
     setTimeout(() => {
-      this.mapaService.create('map'); // 1. Crea el mapa en el div 'map'
-      this.mapaService.addMarker()
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((markerCoords) => {
-          this.alojamientoForm.get('localizacion')?.setValue({
-            latitud: markerCoords.lat,
-            longitud: markerCoords.lng,
-          });
-        });
-      // 2. Obtiene la ubicación actual del formulario
-      const loc = this.alojamientoForm.value.localizacion;
-      if (!loc) return;
+      this.mapaService.create('map').pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          if (this.modoEdicion && this.idAlojamiento) {
+            const marcadorDTO: MarcadorDTO = {
+              id: this.idAlojamiento,
+              titulo: this.alojamientoForm.value.titulo,
+              fotoUrl: this.imagenesSubidas[0],
+              localizacion: {
+                latitud: this.alojamientoForm.value.localizacion.latitud,
+                longitud: this.alojamientoForm.value.localizacion.longitud
+              }
+            };
+            this.mapaService.drawMarkers([marcadorDTO]);
+          }
+          this.mapaService.addMarker()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((markerCoords) => {
+              this.alojamientoForm.get('localizacion')?.setValue({
+                latitud: markerCoords.lat,
+                longitud: markerCoords.lng,
+              });
+            });
+          // 2. Obtiene la ubicación actual del formulario
+          const loc = this.alojamientoForm.value.localizacion;
+          if (!loc) return;
+        },
+        error: (error) => {
+          console.error('No se pudo cargar el mapa', error);
+        }
+      }); // 1. Crea el mapa en el div 'map'
     }, 100);
   }
 
