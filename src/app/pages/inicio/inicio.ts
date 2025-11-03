@@ -1,16 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { AlojamientoItem } from '../../components/alojamiento-item/alojamiento-item';
 import { BarraBusqueda } from '../../components/barra-busqueda/barra-busqueda';
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { ItemAlojamientoDTO } from '../../models/alojamiento-dto';
-import { ItemReservaDTO} from '../../models/reserva-dto';
 
 @Component({
   selector: 'app-inicio',
-  imports: [CommonModule, RouterLink, AlojamientoItem, BarraBusqueda],
+  imports: [CommonModule, AlojamientoItem, BarraBusqueda],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css'
 })

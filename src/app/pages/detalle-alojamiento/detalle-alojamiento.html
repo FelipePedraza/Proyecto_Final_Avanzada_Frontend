@@ -137,6 +137,12 @@
 
         <hr>
 
+        <!-- Sección del mapa -->
+        <div
+          id="map"
+          style="width: 100%; height: 400px; border-radius: 16px; overflow: hidden; border: 2px solid var(--border-color);">
+        </div>
+
         <!-- Sección de Reseñas -->
         <div class="reviews-section">
           <h3>
@@ -204,53 +210,6 @@
               Aún no hay reseñas para este alojamiento. ¡Sé el primero en dejar una!
             </p>
           }
-
-          <!-- Formulario para Dejar Reseña -->
-          <div style="margin-top: 3rem; padding: 2rem; background-color: var(--light-green); border-radius: 16px;">
-            <h4 style="margin-bottom: 1.5rem; color: var(--dark-green);">
-              <i class="fa-solid fa-comment"></i> Deja tu reseña
-            </h4>
-
-            <form [formGroup]="resenaForm" (ngSubmit)="enviarResena()">
-              <div class="form-group">
-                <label for="calificacion">Calificación *</label>
-                <select id="calificacion" formControlName="calificacion">
-                  <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
-                  <option value="4">⭐⭐⭐⭐ Muy bueno</option>
-                  <option value="3">⭐⭐⭐ Bueno</option>
-                  <option value="2">⭐⭐ Regular</option>
-                  <option value="1">⭐ Malo</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="comentario">Comentario * (10-500 caracteres)</label>
-                <textarea
-                  id="comentario"
-                  formControlName="comentario"
-                  rows="4"
-                  placeholder="Comparte tu experiencia..."
-                  [class.error]="campoInvalido(resenaForm, 'comentario')"></textarea>
-
-                @if (campoInvalido(resenaForm, 'comentario')) {
-                  <div class="error-message show">
-                    {{ obtenerErrorCampo(resenaForm, 'comentario') }}
-                  </div>
-                }
-
-                <div style="text-align: right; font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
-                  {{ resenaForm.value.comentario?.length || 0 }}/500
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                class="btn btn-primary"
-                [disabled]="resenaForm.invalid">
-                <i class="fa-solid fa-paper-plane"></i> Enviar reseña
-              </button>
-            </form>
-          </div>
         </div>
       </section>
 

@@ -9,11 +9,13 @@ import Swal from 'sweetalert2';
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { ReservaService } from '../../services/reserva-service';
 import { TokenService } from '../../services/token-service';
+import { MapaService} from '../../services/mapa-service';
 
 // DTOs
 import { AlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
-import { ItemResenaDTO, CreacionResenaDTO } from '../../models/resena-dto';
+import { ItemResenaDTO} from '../../models/resena-dto';
 import { CreacionReservaDTO } from '../../models/reserva-dto';
+import {MarcadorDTO} from '../../models/marcador-dto';
 
 @Component({
   selector: 'app-detalle-alojamiento',
@@ -61,7 +63,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     public alojamientoService: AlojamientoService,
     private reservaService: ReservaService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private mapaService: MapaService
   ) {
     this.route.params.subscribe(params => {
       this.idAlojamiento = params['id'];
@@ -78,6 +81,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         if (this.idAlojamiento && !isNaN(this.idAlojamiento)) {
           this.crearFormularios();
           this.cargarDatosAlojamiento();
+          this.inicializarLogicaMapa();
         } else {
           this.mostrarError('ID de alojamiento no válido', () => {
             this.router.navigate(['/']);
@@ -160,6 +164,27 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       });
   }
 
+  private inicializarLogicaMapa(): void {
+    this.mapaService.create('map').pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          const marcadorDTO: MarcadorDTO = {
+            id: this.idAlojamiento,
+            titulo: this.alojamiento!.titulo,
+            fotoUrl: this.alojamiento!.imagenes[0],
+            localizacion: {
+              latitud: this.alojamiento!.direccion.localizacion.latitud,
+              longitud: this.alojamiento!.direccion.localizacion.longitud
+            }
+          };
+          this.mapaService.drawMarkers([marcadorDTO]);
+          this.mapaService.mapInstance?.setCenter([this.alojamiento!.direccion.localizacion.longitud, this.alojamiento!.direccion.localizacion.latitud]);
+        },
+        error: (error) => {
+          console.error('No se pudo cargar el mapa', error);
+        }
+    });
+  }
+
   private configurarImagenes(): void {
     if (this.alojamiento && this.alojamiento.imagenes.length > 0) {
       this.imagenPrincipal = this.alojamiento.imagenes[0];
@@ -193,60 +218,6 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.hayMasResenas = false;
           this.mostrarError('Error al cargar más reseñas');
           this.paginaResenas--;
-        }
-      });
-  }
-
-  enviarResena(): void {
-    if (this.resenaForm.invalid) {
-      this.marcarCamposComoTocados(this.resenaForm);
-      return;
-    }
-
-    if (!this.tokenService.isLogged()) {
-      this.mostrarError('Debes iniciar sesión para dejar una reseña.', () => {
-        this.router.navigate(['/login']);
-      });
-      return;
-    }
-
-    const dto: CreacionResenaDTO = {
-      calificacion: this.resenaForm.value.calificacion,
-      comentario: this.resenaForm.value.comentario
-    };
-
-    this.alojamientoService.crearResena(this.idAlojamiento, dto)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (respuesta) => {
-          Swal.fire({
-            title: '¡Reseña enviada!',
-            text: 'Tu reseña ha sido publicada.',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57'
-          });
-
-          this.resenaForm.reset({ calificacion: 5, comentario: '' });
-          this.recargarResenas();
-        },
-        error: (error) => {
-          this.mostrarError('No se pudo enviar la reseña. Por favor, intenta de nuevo.');
-        }
-      });
-  }
-
-  private recargarResenas(): void {
-    this.paginaResenas = 0;
-    this.cargandoResenas = true;
-    this.alojamientoService.obtenerResenasAlojamiento(this.idAlojamiento, 0)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.cargandoResenas = false)
-      )
-      .subscribe({
-        next: (respuesta) => {
-          this.resenas = respuesta.data;
-          this.hayMasResenas = respuesta.data.length > 0;
         }
       });
   }
