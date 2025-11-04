@@ -138,36 +138,46 @@
         <hr>
 
         <!-- Sección del mapa -->
-        <div
-          id="map"
-          style="width: 100%; height: 400px; border-radius: 16px; overflow: hidden; border: 2px solid var(--border-color);">
+        <div class="amenities-section">
+          <h3>Localización</h3>
+          <div
+            id="map"
+            style="width: 100%; height: 400px; border-radius: 16px; overflow: hidden; border: 2px solid var(--border-color);">
+          </div>
         </div>
+
+        <hr>
 
         <!-- Sección del calendario -->
-        <div class="calendar-header-new">
-          <div class="header-left">
-            <button type="button" class="btn btn-secondary" (click)="mesAnterior()">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="hoy()">
-              Hoy
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="mesSiguiente()">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
+        <div class="amenities-section">
+          <h3>Calendario</h3>
+          <div class="calendar-header-new">
+            <div class="header-left">
+              <button type="button" class="btn btn-secondary" (click)="mesAnterior()">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="hoy()">
+                Hoy
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="mesSiguiente()">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+            <div class="header-title">
+              <h2>{{ viewDate | date:'MMMM yyyy' | titlecase }}</h2>
+            </div>
           </div>
-          <div class="header-title">
-            <h2>{{ viewDate | date:'MMMM yyyy' | titlecase }}</h2>
+
+          <div class="calendar-container-lib">
+            <mwl-calendar-month-view
+              [viewDate]="viewDate"
+              [events]="events"
+              [locale]="locale"
+              [weekStartsOn]="1"> </mwl-calendar-month-view>
           </div>
         </div>
 
-        <div class="calendar-container-lib">
-          <mwl-calendar-month-view
-            [viewDate]="viewDate"
-            [events]="events"
-            [locale]="locale"
-            [weekStartsOn]="1"> </mwl-calendar-month-view>
-        </div>
+        <hr>
 
         <!-- Sección de Reseñas -->
         <div class="reviews-section">

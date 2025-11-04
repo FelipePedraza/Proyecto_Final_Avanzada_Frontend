@@ -77,7 +77,15 @@
                   <img [src]="reserva.alojamiento.imagenes[0]" [alt]="reserva.alojamiento.titulo" class="reservation-image">
                   <div class="reservation-info">
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
-                    <p><i class="fa-solid fa-calendar"></i> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</p>
+                    <p>
+                      <i class="fa-solid fa-user"></i>
+                      <strong>Huésped:</strong> {{ reserva.huesped.nombre }}
+                    </p>
+                    <p><i class="fa-solid fa-calendar"></i> <strong>{{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
+                    <p>
+                      <i class="fa-solid fa-users"></i>
+                      <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
+                    </p>
                   </div>
                   <div class="reservation-actions-compact">
                     <button type="button" (click)="aprobarReserva(reserva.id, reserva.alojamiento.titulo)" class="btn btn-primary btn-small">
@@ -105,7 +113,15 @@
                   <img [src]="reserva.alojamiento.imagenes[0]" [alt]="reserva.alojamiento.titulo" class="reservation-image">
                   <div class="reservation-info">
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
-                    <p><i class="fa-solid fa-calendar"></i> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</p>
+                    <p>
+                      <i class="fa-solid fa-user"></i>
+                      <strong>Huésped:</strong> {{ reserva.huesped.nombre }}
+                    </p>
+                    <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
+                    <p>
+                      <i class="fa-solid fa-users"></i>
+                      <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
+                    </p>
                   </div>
                   <div class="reservation-actions-compact">
                     <span class="status confirmed">
@@ -130,7 +146,15 @@
                   <img [src]="reserva.alojamiento.imagenes[0]" [alt]="reserva.alojamiento.titulo" class="reservation-image">
                   <div class="reservation-info">
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
-                    <p><i class="fa-solid fa-calendar"></i> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</p>
+                    <p>
+                      <i class="fa-solid fa-user"></i>
+                      <strong>Huésped:</strong> {{ reserva.huesped.nombre }}
+                    </p>
+                    <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
+                    <p>
+                      <i class="fa-solid fa-users"></i>
+                      <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
+                    </p>
                   </div>
                   <div class="reservation-actions-compact">
                     @if (reserva.estado === 'COMPLETADA') {

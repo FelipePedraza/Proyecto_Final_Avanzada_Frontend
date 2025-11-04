@@ -13,7 +13,7 @@ import { AlojamientoService } from '../../services/alojamiento-service';
 import { ReservaService } from '../../services/reserva-service';
 import { TokenService } from '../../services/token-service';
 import { UsuarioService } from '../../services/usuario-service';
-import { ItemReservaDTO, ReservaEstado } from '../../models/reserva-dto';
+import { ReservaDTO, ReservaEstado } from '../../models/reserva-dto';
 import { AlojamientoDTO } from '../../models/alojamiento-dto';
 import { RespuestaDTO } from '../../models/respuesta-dto';
 
@@ -45,14 +45,14 @@ export class GestionarReservas implements OnInit, OnDestroy {
 
   // ==================== PROPIEDADES ====================
   tabActiva: 'pendientes' | 'confirmadas' | 'historial' = 'pendientes';
-  reservasPendientes: ItemReservaDTO[] = [];
-  reservasConfirmadas: ItemReservaDTO[] = [];
-  reservasHistorial: ItemReservaDTO[] = [];
+  reservasPendientes: ReservaDTO[] = [];
+  reservasConfirmadas: ReservaDTO[] = [];
+  reservasHistorial: ReservaDTO[] = [];
   viewDate: Date = new Date();
   events: CalendarEvent[] = [];
   locale: string = 'es';
 
-  private todasLasReservas: ItemReservaDTO[] = [];
+  private todasLasReservas: ReservaDTO[] = [];
   cargando: boolean = false;
   private destroy$ = new Subject<void>();
 
@@ -116,10 +116,10 @@ export class GestionarReservas implements OnInit, OnDestroy {
               next: (respuestasReservas) => {
 
                 // 4. Juntar todas las reservas en una sola lista
-                const todasLasReservas: ItemReservaDTO[] = [];
+                const todasLasReservas: ReservaDTO[] = [];
                 respuestasReservas.forEach(respuesta => {
                   if (respuesta && !respuesta.error && respuesta.data) {
-                    todasLasReservas.push(...(respuesta.data as ItemReservaDTO[]));
+                    todasLasReservas.push(...(respuesta.data as ReservaDTO[]));
                   }
                 });
 
@@ -150,7 +150,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
       r.estado === ReservaEstado.PENDIENTE || r.estado === ReservaEstado.CONFIRMADA
     );
 
-    this.events = reservasActivas.map((reserva: ItemReservaDTO): CalendarEvent => {
+    this.events = reservasActivas.map((reserva: ReservaDTO): CalendarEvent => {
       let color = CALENDAR_COLORS.confirmada;
       let cssClass = 'cal-event-confirmed';
 
@@ -178,7 +178,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
   }
 
 
-  private clasificarReservas(reservas: ItemReservaDTO[]): void {
+  private clasificarReservas(reservas: ReservaDTO[]): void {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 

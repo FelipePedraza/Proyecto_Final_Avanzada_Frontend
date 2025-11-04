@@ -112,7 +112,7 @@ export class MapaService implements OnDestroy {
         <div>
           <img src="${fotoUrl}" alt="Imagen" style="width: 100px; height: 100px;">
         </div>
-        <a href="/place/${id}">Ver más</a>
+        <a href="/alojamiento/${id}">Ver más</a>
       `;
 
       new mapboxgl.Marker({ element: this.marcadorElemento })
