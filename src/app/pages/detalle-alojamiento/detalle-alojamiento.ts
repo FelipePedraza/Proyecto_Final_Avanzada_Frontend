@@ -312,8 +312,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     const creacionReservaDTO: CreacionReservaDTO = {
       alojamientoId: this.idAlojamiento,
       usuarioId: this.tokenService.getUserId(),
-      fechaEntrada: this.reservaForm.value.fechaEntrada,
-      fechaSalida: this.reservaForm.value.fechaSalida,
+      fechaEntrada: new Date(this.reservaForm.value.fechaEntrada + 'T00:00:00'),
+      fechaSalida: new Date(this.reservaForm.value.fechaSalida + 'T00:00:00'),
       cantidadHuespedes: this.reservaForm.value.cantidadHuespedes
     };
 
@@ -398,10 +398,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   }
 
   private toLocalDate(fecha: string | Date): Date {
-    const date = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    // Ajusta la hora eliminando el desplazamiento del huso horario
-    const local = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-    return local;
+    const date = typeof fecha === 'string' ? new Date(fecha + 'T00:00:00') : fecha;
+    return date;
   }
 
   // ==================== UTILIDADES ====================
@@ -444,8 +442,13 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   }
 
   obtenerFechaMinimaSalida(): string {
-    const fechaEntrada = new Date(this.reservaForm.value.fechaEntrada);
-    fechaEntrada.setMinutes(fechaEntrada.getMinutes() + fechaEntrada.getTimezoneOffset());
+    if (!this.reservaForm.value.fechaEntrada) {
+      const manana = new Date();
+      manana.setDate(manana.getDate() + 1);
+      return manana.toISOString().split('T')[0];
+    }
+
+    const fechaEntrada = new Date(this.reservaForm.value.fechaEntrada + 'T00:00:00');
     fechaEntrada.setDate(fechaEntrada.getDate() + 1);
     return fechaEntrada.toISOString().split('T')[0];
   }
