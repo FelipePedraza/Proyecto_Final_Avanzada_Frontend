@@ -1,26 +1,266 @@
 <main class="container dashboard-container">
   <div class="dashboard-layout">
+
+    <!-- Panel Lateral del Usuario -->
     <app-panel-usuario></app-panel-usuario>
+
+    <!-- Contenido Principal -->
     <section class="dashboard-content">
-      <h1>Mis Reservas</h1>
 
-      <div class="tabs">
-        <button class="tab-link active" data-tab="activas">Activas</button>
-        <button class="tab-link" data-tab="pasadas">Pasadas</button>
-        <button class="tab-link" data-tab="canceladas">Canceladas</button>
+      <div class="content-header">
+        <h1>Mis Reservas</h1>
       </div>
 
-      <div id="activas" class="tab-content active">
-        <div class="reservation-card"> ... </div>
-      </div>
+      <!-- Estado de Carga -->
+      @if (cargando) {
+        <div class="loading-container" style="text-align: center; padding: 4rem 2rem;">
+          <div class="loading-spinner-large"></div>
+          <p style="color: var(--text-color); font-size: 1.1rem; margin-top: 1rem;">
+            Cargando reservas...
+          </p>
+        </div>
+      }
 
-      <div id="pasadas" class="tab-content">
-        <div class="reservation-card"> ... </div>
-      </div>
+      <!-- Contenido de Reservas -->
+      @if (!cargando) {
 
-      <div id="canceladas" class="tab-content">
-        <div class="reservation-card"> ... </div>
-      </div>
+        <!-- Tabs de Navegación -->
+        <div class="tabs">
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'activas'"
+            (click)="cambiarTab('activas')">
+            Activas
+            @if (reservasActivas.length > 0) {
+              <span class="tab-badge" style="background-color: var(--success-color);">
+                {{ reservasActivas.length }}
+              </span>
+            }
+          </button>
+
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'pasadas'"
+            (click)="cambiarTab('pasadas')">
+            Pasadas
+          </button>
+
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'canceladas'"
+            (click)="cambiarTab('canceladas')">
+            Canceladas
+          </button>
+        </div>
+
+        <!-- ==================== TAB ACTIVAS ==================== -->
+        @if (tabActiva === 'activas') {
+          <div class="tab-content active">
+            @if (reservasActivas.length > 0) {
+              @for (reserva of reservasActivas; track reserva.id) {
+                <div class="reservation-card">
+
+                  <!-- Imagen del Alojamiento -->
+                  <img
+                    [src]="reserva.alojamiento.imagenes[0]"
+                    [alt]="reserva.alojamiento.titulo">
+
+                  <!-- Detalles de la Reserva -->
+                  <div class="reservation-details">
+                    <h4>{{ reserva.alojamiento.titulo }}</h4>
+
+                    <p>
+                      <i class="fa-solid fa-calendar"></i>
+                      {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
+                    </p>
+
+                    <p>
+                      <i class="fa-solid fa-moon"></i>
+                      {{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
+                      noche{{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
+                    </p>
+
+                    <p>
+                      <i class="fa-solid fa-dollar-sign"></i>
+                      {{ alojamientoService.formatearPrecio(reserva.alojamiento.precioPorNoche) }} / noche
+                    </p>
+                  </div>
+
+                  <!-- Acciones -->
+                  <div class="reservation-actions">
+
+                    <!-- Estado -->
+                    @if (reserva.estado === 'PENDIENTE') {
+                      <span class="status" style="background-color: #F39C12; color: white;">
+                        <i class="fa-solid fa-clock"></i> Pendiente
+                      </span>
+                    }
+                    @if (reserva.estado === 'CONFIRMADA') {
+                      <span class="status confirmed">
+                        <i class="fa-solid fa-check-circle"></i> Confirmada
+                      </span>
+                    }
+
+                    <!-- Botones -->
+                    <a
+                      [routerLink]="['/alojamiento', reserva.alojamiento.id]"
+                      class="btn btn-secondary btn-small">
+                      <i class="fa-solid fa-eye"></i> Ver Alojamiento
+                    </a>
+
+                    <button
+                      type="button"
+                      (click)="cancelarReserva(reserva.id, reserva.alojamiento.titulo)"
+                      class="btn btn-danger btn-small">
+                      <i class="fa-solid fa-times"></i> Cancelar Reserva
+                    </button>
+                  </div>
+                </div>
+              }
+            } @else {
+              <!-- Estado Vacío -->
+              <div class="empty-state">
+                <i class="fa-solid fa-calendar-xmark"></i>
+                <h3>No tienes reservas activas</h3>
+                <p>Cuando realices una reserva, aparecerá aquí</p>
+                <a routerLink="/" class="btn btn-primary">
+                  <i class="fa-solid fa-search"></i> Buscar Alojamientos
+                </a>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ==================== TAB PASADAS ==================== -->
+        @if (tabActiva === 'pasadas') {
+          <div class="tab-content active">
+            @if (reservasPasadas.length > 0) {
+              @for (reserva of reservasPasadas; track reserva.id) {
+                <div class="reservation-card">
+
+                  <!-- Imagen del Alojamiento -->
+                  <img
+                    [src]="reserva.alojamiento.imagenes[0]"
+                    [alt]="reserva.alojamiento.titulo">
+
+                  <!-- Detalles de la Reserva -->
+                  <div class="reservation-details">
+                    <h4>{{ reserva.alojamiento.titulo }}</h4>
+
+                    <p>
+                      <i class="fa-solid fa-calendar"></i>
+                      {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
+                    </p>
+
+                    <p>
+                      <i class="fa-solid fa-moon"></i>
+                      {{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
+                      noche{{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
+                    </p>
+
+                    <p>
+                      <i class="fa-solid fa-dollar-sign"></i>
+                      {{ alojamientoService.formatearPrecio(reserva.alojamiento.precioPorNoche) }} / noche
+                    </p>
+                  </div>
+
+                  <!-- Acciones -->
+                  <div class="reservation-actions">
+
+                    <!-- Estado -->
+                    <span class="status completed">
+                      <i class="fa-solid fa-flag-checkered"></i> Completada
+                    </span>
+
+                    <!-- Botones -->
+                    <a
+                      [routerLink]="['/alojamiento', reserva.alojamiento.id]"
+                      class="btn btn-secondary btn-small">
+                      <i class="fa-solid fa-eye"></i> Ver Alojamiento
+                    </a>
+
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-small"
+                      style="pointer-events: none; opacity: 0.6;">
+                      <i class="fa-solid fa-star"></i> Dejar Reseña
+                    </button>
+                  </div>
+                </div>
+              }
+            } @else {
+              <!-- Estado Vacío -->
+              <div class="empty-state">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <h3>No tienes reservas pasadas</h3>
+                <p>Tus reservas completadas aparecerán aquí</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ==================== TAB CANCELADAS ==================== -->
+        @if (tabActiva === 'canceladas') {
+          <div class="tab-content active">
+            @if (reservasCanceladas.length > 0) {
+              @for (reserva of reservasCanceladas; track reserva.id) {
+                <div class="reservation-card" style="opacity: 0.8;">
+
+                  <!-- Imagen del Alojamiento -->
+                  <img
+                    [src]="reserva.alojamiento.imagenes[0]"
+                    [alt]="reserva.alojamiento.titulo">
+
+                  <!-- Detalles de la Reserva -->
+                  <div class="reservation-details">
+                    <h4>{{ reserva.alojamiento.titulo }}</h4>
+
+                    <p>
+                      <i class="fa-solid fa-calendar"></i>
+                      {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
+                    </p>
+
+                    <p>
+                      <i class="fa-solid fa-moon"></i>
+                      {{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
+                      noche{{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
+                    </p>
+
+                    <p>
+                      <i class="fa-solid fa-dollar-sign"></i>
+                      {{ alojamientoService.formatearPrecio(reserva.alojamiento.precioPorNoche) }} / noche
+                    </p>
+                  </div>
+
+                  <!-- Acciones -->
+                  <div class="reservation-actions">
+
+                    <!-- Estado -->
+                    <span class="status cancelled">
+                      <i class="fa-solid fa-ban"></i> Cancelada
+                    </span>
+
+                    <!-- Botones -->
+                    <a
+                      [routerLink]="['/alojamiento', reserva.alojamiento.id]"
+                      class="btn btn-secondary btn-small">
+                      <i class="fa-solid fa-eye"></i> Ver Alojamiento
+                    </a>
+                  </div>
+                </div>
+              }
+            } @else {
+              <!-- Estado Vacío -->
+              <div class="empty-state">
+                <i class="fa-solid fa-circle-check"></i>
+                <h3>No tienes reservas canceladas</h3>
+                <p>Aquí aparecerán las reservas que canceles</p>
+              </div>
+            }
+          </div>
+        }
+
+      }
     </section>
   </div>
 </main>
