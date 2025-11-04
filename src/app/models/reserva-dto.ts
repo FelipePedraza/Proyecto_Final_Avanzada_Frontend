@@ -1,4 +1,4 @@
-import {AlojamientoDTO, ItemAlojamientoDTO} from './alojamiento-dto';
+import {AlojamientoDTO} from './alojamiento-dto';
 import {UsuarioDTO} from './usuario-dto';
 
 export interface ReservaDTO {
@@ -13,7 +13,7 @@ export interface ReservaDTO {
 
 export interface ItemReservaDTO {
   id: number;
-  alojamiento: ItemAlojamientoDTO;
+  alojamiento: AlojamientoDTO;
   fechaEntrada: Date;
   fechaSalida: Date;
   estado: ReservaEstado;

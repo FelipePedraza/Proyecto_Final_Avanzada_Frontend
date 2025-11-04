@@ -1,1 +1,167 @@
-<p>gestionar-reservas works!</p>
+<main class="container dashboard-container">
+  <div class="dashboard-layout">
+    <app-panel-usuario></app-panel-usuario>
+
+    <section class="dashboard-content">
+      <div class="content-header">
+        <h1>Gestión de Reservas</h1>
+      </div>
+
+      @if (cargando) {
+        <div class="loading-container" style="text-align: center; padding: 4rem 2rem;">
+          <div class="loading-spinner-large"></div>
+          <p style="color: var(--text-color); font-size: 1.1rem; margin-top: 1rem;">
+            Cargando reservas...
+          </p>
+        </div>
+      }
+
+      @if (!cargando) {
+
+        <div class="calendar-header-new">
+          <div class="header-left">
+            <button type="button" class="btn btn-secondary" (click)="mesAnterior()">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="hoy()">
+              Hoy
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="mesSiguiente()">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="header-title">
+            <h2>{{ viewDate | date:'MMMM yyyy' | titlecase }}</h2>
+          </div>
+        </div>
+
+        <div class="calendar-container-lib">
+          <mwl-calendar-month-view
+            [viewDate]="viewDate"
+            [events]="events"
+            [locale]="locale"
+            [weekStartsOn]="1"> </mwl-calendar-month-view>
+        </div>
+
+        <div class="tabs">
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'pendientes'"
+            (click)="cambiarTab('pendientes')">
+            Pendientes
+            @if (reservasPendientes.length > 0) {
+              <span class="tab-badge pending">{{ reservasPendientes.length }}</span>
+            }
+          </button>
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'confirmadas'"
+            (click)="cambiarTab('confirmadas')">
+            Confirmadas
+          </button>
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'historial'"
+            (click)="cambiarTab('historial')">
+            Historial
+          </button>
+        </div>
+
+        <div class="reservations-list">
+
+          @if (tabActiva === 'pendientes') {
+            <h3>Reservas Pendientes</h3>
+            @if (reservasPendientes.length > 0) {
+              @for (reserva of reservasPendientes; track reserva.id) {
+                <div class="reservation-card-compact">
+                  <img [src]="reserva.alojamiento.imagenes[0]" [alt]="reserva.alojamiento.titulo" class="reservation-image">
+                  <div class="reservation-info">
+                    <h4>{{ reserva.alojamiento.titulo }}</h4>
+                    <p><i class="fa-solid fa-calendar"></i> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</p>
+                  </div>
+                  <div class="reservation-actions-compact">
+                    <button type="button" (click)="aprobarReserva(reserva.id, reserva.alojamiento.titulo)" class="btn btn-primary btn-small">
+                      <i class="fa-solid fa-check"></i> Aprobar
+                    </button>
+                    <button type="button" (click)="rechazarReserva(reserva.id, reserva.alojamiento.titulo)" class="btn btn-danger btn-small">
+                      <i class="fa-solid fa-times"></i> Rechazar
+                    </button>
+                  </div>
+                </div>
+              }
+            } @else {
+              <div class="empty-state-small">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <p>No hay reservas pendientes</p>
+              </div>
+            }
+          }
+
+          @if (tabActiva === 'confirmadas') {
+            <h3>Reservas Confirmadas</h3>
+            @if (reservasConfirmadas.length > 0) {
+              @for (reserva of reservasConfirmadas; track reserva.id) {
+                <div class="reservation-card-compact">
+                  <img [src]="reserva.alojamiento.imagenes[0]" [alt]="reserva.alojamiento.titulo" class="reservation-image">
+                  <div class="reservation-info">
+                    <h4>{{ reserva.alojamiento.titulo }}</h4>
+                    <p><i class="fa-solid fa-calendar"></i> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</p>
+                  </div>
+                  <div class="reservation-actions-compact">
+                    <span class="status confirmed">
+                      <i class="fa-solid fa-check-circle"></i> Confirmada
+                    </span>
+                  </div>
+                </div>
+              }
+            } @else {
+              <div class="empty-state-small">
+                <i class="fa-solid fa-calendar-check"></i>
+                <p>No hay reservas confirmadas</p>
+              </div>
+            }
+          }
+
+          @if (tabActiva === 'historial') {
+            <h3>Historial de Reservas</h3>
+            @if (reservasHistorial.length > 0) {
+              @for (reserva of reservasHistorial; track reserva.id) {
+                <div class="reservation-card-compact">
+                  <img [src]="reserva.alojamiento.imagenes[0]" [alt]="reserva.alojamiento.titulo" class="reservation-image">
+                  <div class="reservation-info">
+                    <h4>{{ reserva.alojamiento.titulo }}</h4>
+                    <p><i class="fa-solid fa-calendar"></i> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</p>
+                  </div>
+                  <div class="reservation-actions-compact">
+                    @if (reserva.estado === 'COMPLETADA') {
+                      <span class="status completed">
+                        <i class="fa-solid fa-flag-checkered"></i> Completada
+                      </span>
+                    }
+                    @if (reserva.estado === 'CANCELADA') {
+                      <span class="status cancelled">
+                        <i class="fa-solid fa-ban"></i> Cancelada
+                      </span>
+                    }
+                    @if (reserva.estado === 'CONFIRMADA') {
+                      <span class="status completed">
+                        <i class="fa-solid fa-flag-checkered"></i> Completada
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+            } @else {
+              <div class="empty-state-small">
+                <i class="fa-solid fa-history"></i>
+                <p>No hay historial de reservas</p>
+              </div>
+            }
+          }
+        </div>
+
+      }
+
+    </section>
+  </div>
+</main>

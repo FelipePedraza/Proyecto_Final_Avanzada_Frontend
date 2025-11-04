@@ -21,8 +21,8 @@ export const routes: Routes = [
   { path: 'mis-alojamientos', component: MisAlojamientos, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
   { path: 'crear-alojamiento', component: CrearAlojamiento, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] }  },
   { path: 'editar-alojamiento/:id', component: CrearAlojamiento, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
-  { path: 'editar-perfil', component: EditarPerfil, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion", "ROL_Huespedes"] } },
-  { path: 'mis-reservas', component: MisReservas, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion", "ROL_Huespedes"] } },
+  { path: 'editar-perfil', component: EditarPerfil, canActivate: [RolGuard], data: { expectedRole: ["ROL_Huesped", "ROL_Anfitrion"] } },
+  { path: 'mis-reservas', component: MisReservas, canActivate: [RolGuard], data: { expectedRole: ["ROL_Huesped", "ROL_Anfitrion"] } },
   { path: 'gestionar-reservas', component: GestionarReservas, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
   { path: '**', pathMatch: "full", redirectTo: "" }
 ];

@@ -1230,6 +1230,65 @@ hr {
   transform: rotate(-45deg) scale(1.15);
 }
 
+/* ==================== HEADER DE CALENDARIO ==================== */
+
+.calendar-header-new {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: var(--light-green);
+  border-radius: 16px;
+}
+
+.calendar-header-new .header-left {
+  display: flex;
+  gap: 8px;
+}
+
+.calendar-header-new .header-title h2 {
+  font-size: 1.8rem;
+  color: var(--dark-green);
+  margin: 0;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+/* ==================== ESTILOS DE LA LIBRERÍA ==================== */
+
+.calendar-container-lib {
+  background-color: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 2rem;
+  border: 1px solid rgba(46, 139, 87, 0.05);
+}
+
+/* Usamos :host ::ng-deep para forzar los estilos */
+:host ::ng-deep .cal-month-view {
+  font-family: 'Poppins', sans-serif; /* Asegúrate que esta sea tu fuente */
+}
+
+/* Evento Pendiente (Naranja) */
+:host ::ng-deep .cal-event-pending .cal-event {
+  background-color: #f39c12 !important;
+  border-color: #d68910 !important;
+  color: white !important;
+}
+
+:host ::ng-deep .cal-month-view .cal-events {
+  display: none !important;
+}
+
+/* Evento Confirmado (Verde) */
+:host ::ng-deep .cal-event-confirmed .cal-event {
+  background-color: #2e8b57 !important;
+  border-color: #1e6a40 !important;
+  color: white !important;
+}
+
 
 /* --- Responsive Design (Simplificado sin media queries complejas) --- */
 /* Mantenemos solo los estilos base sin responsive como solicitaste */

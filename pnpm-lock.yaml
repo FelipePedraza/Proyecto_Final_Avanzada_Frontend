@@ -32,6 +32,18 @@ importers:
       '@types/mapbox-gl':
         specifier: ^3.4.1
         version: 3.4.1
+      angular-calendar:
+        specifier: ^0.32.0
+        version: 0.32.0(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1))(angular-draggable-droppable@9.0.1(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)))(angular-resizable-element@8.0.0(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)))(date-fns@4.1.0)
+      angular-draggable-droppable:
+        specifier: ^9.0.1
+        version: 9.0.1(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1))
+      angular-resizable-element:
+        specifier: ^8.0.0
+        version: 8.0.0(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1))
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       mapbox-gl:
         specifier: ^3.16.0
         version: 3.16.0
@@ -763,6 +775,9 @@ packages:
     resolution: {integrity: sha512-Es6WcD0nO5l+2BOQS4uLfNPYQaNDfbot3X1XUoloz+x0mPDS3eeORZJl06HXjwBG1fOGwCRnzK88LMdxKRrd6Q==}
     engines: {node: '>=6.0.0'}
 
+  '@mattlewis92/dom-autoscroller@2.4.2':
+    resolution: {integrity: sha512-YbrUWREPGEjE/FU6foXcAT1YbVwqD/jkYnY1dFb0o4AxtP3s4xKBthlELjndZih8uwsDWgQZx1eNskRNe2BgZQ==}
+
   '@modelcontextprotocol/sdk@1.17.3':
     resolution: {integrity: sha512-JPwUKWSsbzx+DLFznf/QZ32Qa+ptfbUlHhRLrBQBAFu9iI1iYvizM4p+zhhRDceSsPutXp4z+R/HPVphlIiclg==}
     engines: {node: '>=18'}
@@ -1136,6 +1151,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@scarf/scarf@1.4.0':
+    resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
+
   '@schematics/angular@20.3.6':
     resolution: {integrity: sha512-YPIEyKPBOyJYlda5fA49kMThzZ4WidomEMDghshux8xidbjDaPWBZdyVPQj3IXyW0teGlUM/TH0TH2weumMZrg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
@@ -1248,6 +1266,30 @@ packages:
     resolution: {integrity: sha512-Y+moNhsqgLmvJdgTsO4GZNgsaDWv8AOGAaPeIeHKlDn/XunoAqYbA+XNpBd1dW8GOXAUDyxC9Rxc7AV4kpFcIg==}
     engines: {node: '>= 14.0.0'}
 
+  angular-calendar@0.32.0:
+    resolution: {integrity: sha512-+iQ4j04SCxFv75bp8psx0Q9S7eefREE2IbwbeaSA3uqJcl7Rm1uo7mBwF9Pcg9gu6+U1NDVYlWzDsBpL9b4u3w==}
+    peerDependencies:
+      '@angular/core': '>=20.2.0'
+      angular-draggable-droppable: ^9.0.1
+      angular-resizable-element: ^8.0.0
+      date-fns: ^4.0.0
+      moment: ^2.0.0
+    peerDependenciesMeta:
+      date-fns:
+        optional: true
+      moment:
+        optional: true
+
+  angular-draggable-droppable@9.0.1:
+    resolution: {integrity: sha512-nxxFzBMEzB6RsRUqnHWelt9G7QXG2wc18czYL75YhJ9IkBJOBkxXBd0ZOTeDgV9C3mmkkw+PMLJOayx0GH6gXA==}
+    peerDependencies:
+      '@angular/core': '>=20.0.0'
+
+  angular-resizable-element@8.0.0:
+    resolution: {integrity: sha512-cHCfz4y/G8GiKS4WHDeRPv5NPZA4BnsnEgn+z/l7wGhAQv28g7fFRRVyWQu4ZFM5YGu/d7Irv1kUGZ02pCHVdQ==}
+    peerDependencies:
+      '@angular/core': '>=20.0.0'
+
   ansi-escapes@7.1.1:
     resolution: {integrity: sha512-Zhl0ErHcSRUaVfGUeUdDuLgpkEo8KIFjB4Y9uAc46ScOpdDiU1Dbyplh7qWJeJ/ZHpbyMSM26+X3BySgnIz40Q==}
     engines: {node: '>=18'}
@@ -1327,6 +1369,20 @@ packages:
   cacache@19.0.1:
     resolution: {integrity: sha512-hdsUxulXCi5STId78vRVYEtDAjq99ICAUktLTeTYsLoTE6Z8dS0c8pWNCxwdrk9YfJeobDZc2Y186hD/5ZQgFQ==}
     engines: {node: ^18.17.0 || >=20.5.0}
+
+  calendar-utils@0.12.4:
+    resolution: {integrity: sha512-OYhqJdeDRRVUdMYJMUrXtR7Go+80oEcA6VK4T3zjcUloQqcOVQKs/kp7j8Yw0HiLOcGwzF50WhLmzZoUNfkM7A==}
+    peerDependencies:
+      date-fns: ^4.0.0
+      luxon: ^3.0.0
+      moment: ^2.0.0
+    peerDependenciesMeta:
+      date-fns:
+        optional: true
+      luxon:
+        optional: true
+      moment:
+        optional: true
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -1447,6 +1503,9 @@ packages:
 
   custom-event@1.0.1:
     resolution: {integrity: sha512-GAj5FOq0Hd+RsCGVJxZuKaIDXDf3h6GQoNEjFgbLLI/trgtavwUbSnZ5pVfg27DVCaWjIohryS0JFwIJyT2cMg==}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   date-format@4.0.14:
     resolution: {integrity: sha512-39BOQLs9ZjKh0/patS9nrT8wc3ioX3/eA/zgbKNopnF2wCqJEoxywwwElATYvRsXdnOxA/OQeQoFZ3rFjVajhg==}
@@ -2366,6 +2425,9 @@ packages:
   pkce-challenge@5.0.0:
     resolution: {integrity: sha512-ueGLflrrnvwB3xuo/uGob5pd5FN7l0MsLf0Z87o/UQmRtwjvfylfc9MurIxRAWywCYTgrvpXBcqjV4OfCYGCIQ==}
     engines: {node: '>=16.20.0'}
+
+  positioning@3.0.1:
+    resolution: {integrity: sha512-cqg00fwFtEu14YwlLUuvFih5ztTd9RYUguJA55lWjeIGFQTpik7ca+TMU87YhAgwWjyjcGIG6l80eUh7X6uHog==}
 
   postcss-media-query-parser@0.2.3:
     resolution: {integrity: sha512-3sOlxmbKcSHMjlUXQZKQ06jOswE7oVkXPxmZdoB1r5l0q6gTFTQSHxNxOrCccElbW7dxNytifNEo8qidX2Vsig==}
@@ -3613,6 +3675,8 @@ snapshots:
 
   '@mapbox/whoots-js@3.1.0': {}
 
+  '@mattlewis92/dom-autoscroller@2.4.2': {}
+
   '@modelcontextprotocol/sdk@1.17.3':
     dependencies:
       ajv: 6.12.6
@@ -3909,6 +3973,8 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.3':
     optional: true
 
+  '@scarf/scarf@1.4.0': {}
+
   '@schematics/angular@20.3.6(chokidar@4.0.3)':
     dependencies:
       '@angular-devkit/core': 20.3.6(chokidar@4.0.3)
@@ -4043,6 +4109,31 @@ snapshots:
       '@algolia/requester-fetch': 5.35.0
       '@algolia/requester-node-http': 5.35.0
 
+  angular-calendar@0.32.0(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1))(angular-draggable-droppable@9.0.1(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)))(angular-resizable-element@8.0.0(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)))(date-fns@4.1.0):
+    dependencies:
+      '@angular/core': 20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)
+      '@scarf/scarf': 1.4.0
+      angular-draggable-droppable: 9.0.1(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1))
+      angular-resizable-element: 8.0.0(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1))
+      calendar-utils: 0.12.4(date-fns@4.1.0)
+      positioning: 3.0.1
+      tslib: 2.8.1
+    optionalDependencies:
+      date-fns: 4.1.0
+    transitivePeerDependencies:
+      - luxon
+
+  angular-draggable-droppable@9.0.1(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)):
+    dependencies:
+      '@angular/core': 20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)
+      '@mattlewis92/dom-autoscroller': 2.4.2
+      tslib: 2.8.1
+
+  angular-resizable-element@8.0.0(@angular/core@20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)):
+    dependencies:
+      '@angular/core': 20.3.5(@angular/compiler@20.3.5)(rxjs@7.8.2)(zone.js@0.15.1)
+      tslib: 2.8.1
+
   ansi-escapes@7.1.1:
     dependencies:
       environment: 1.1.0
@@ -4153,6 +4244,10 @@ snapshots:
       ssri: 12.0.0
       tar: 7.5.1
       unique-filename: 4.0.0
+
+  calendar-utils@0.12.4(date-fns@4.1.0):
+    optionalDependencies:
+      date-fns: 4.1.0
 
   call-bind-apply-helpers@1.0.2:
     dependencies:
@@ -4274,6 +4369,8 @@ snapshots:
   csscolorparser@1.0.3: {}
 
   custom-event@1.0.1: {}
+
+  date-fns@4.1.0: {}
 
   date-format@4.0.14: {}
 
@@ -5317,6 +5414,8 @@ snapshots:
       '@napi-rs/nice': 1.1.1
 
   pkce-challenge@5.0.0: {}
+
+  positioning@3.0.1: {}
 
   postcss-media-query-parser@0.2.3: {}
 

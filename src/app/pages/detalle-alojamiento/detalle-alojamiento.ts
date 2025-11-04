@@ -5,6 +5,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Subject, takeUntil, finalize, forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
 
+// IMPORTACIONES DE ANGULAR-CALENDAR
+import { CalendarModule, CalendarEvent } from 'angular-calendar';
+import { addMonths, subMonths, startOfDay, endOfDay } from 'date-fns';
+
 // Servicios
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { ReservaService } from '../../services/reserva-service';
@@ -14,12 +18,19 @@ import { MapaService} from '../../services/mapa-service';
 // DTOs
 import { AlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
 import { ItemResenaDTO} from '../../models/resena-dto';
-import { CreacionReservaDTO } from '../../models/reserva-dto';
+import {CreacionReservaDTO, ItemReservaDTO, ReservaEstado} from '../../models/reserva-dto';
 import {MarcadorDTO} from '../../models/marcador-dto';
 
+
+const CALENDAR_COLORS = {
+  confirmada: {
+    primary: '#2e8b57', // Verde
+    secondary: '#d9f0e3',
+  },
+}
 @Component({
   selector: 'app-detalle-alojamiento',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, CalendarModule],
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css'
 })
@@ -51,6 +62,13 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   tarifaServicio: number = 0;
   numeroNoches: number = 0;
 
+  //calendario
+  viewDate: Date = new Date();
+  events: CalendarEvent[] = [];
+  locale: string = 'es';
+
+  todasLasReservas: ItemReservaDTO[] = [];
+
   // Subject para cancelar subscripciones
   private destroy$ = new Subject<void>();
 
@@ -81,7 +99,6 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         if (this.idAlojamiento && !isNaN(this.idAlojamiento)) {
           this.crearFormularios();
           this.cargarDatosAlojamiento();
-          this.inicializarLogicaMapa();
         } else {
           this.mostrarError('ID de alojamiento no válido', () => {
             this.router.navigate(['/']);
@@ -130,7 +147,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     forkJoin({
       alojamiento: this.alojamientoService.obtenerPorId(this.idAlojamiento),
       metricas: this.alojamientoService.obtenerMetricas(this.idAlojamiento),
-      resenas: this.alojamientoService.obtenerResenasAlojamiento(this.idAlojamiento, 0)
+      resenas: this.alojamientoService.obtenerResenasAlojamiento(this.idAlojamiento, 0),
+      todasLasReservas: this.alojamientoService.obtenerReservasAlojamiento(this.idAlojamiento)
     })
       .pipe(
         takeUntil(this.destroy$),
@@ -142,6 +160,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.metricas = respuesta.metricas.data;
           this.resenas = respuesta.resenas.data;
           this.hayMasResenas = respuesta.resenas.data.length > 0;
+          this.todasLasReservas = respuesta.todasLasReservas.data;
 
           // Validar capacidad máxima en el formulario
           this.reservaForm.get('cantidadHuespedes')?.setValidators([
@@ -153,6 +172,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
           this.configurarImagenes();
           this.calcularPrecioTotal();
+          this.inicializarLogicaMapa();
+          this.actualizarEventosCalendario();
         },
         error: (error) => {
           this.errorCarga = true;
@@ -340,6 +361,47 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
   volver(): void {
     this.location.back();
+  }
+
+  // ==================== CONTROLES CALENDARIO ====================
+
+  mesAnterior(): void {
+    this.viewDate = subMonths(this.viewDate, 1);
+  }
+
+  mesSiguiente(): void {
+    this.viewDate = addMonths(this.viewDate, 1);
+  }
+
+  hoy(): void {
+    this.viewDate = new Date();
+  }
+
+  private actualizarEventosCalendario(): void {
+    const reservasActivas = this.todasLasReservas.filter(r =>
+      r.estado === ReservaEstado.CONFIRMADA
+    );
+
+    this.events = reservasActivas.map((reserva: ItemReservaDTO): CalendarEvent => {
+      let color = CALENDAR_COLORS.confirmada;
+      let cssClass = 'cal-event-confirmed';
+
+      return {
+        title: reserva.alojamiento.titulo,
+        start: startOfDay(this.toLocalDate(reserva.fechaEntrada)),
+        end: endOfDay(this.toLocalDate(reserva.fechaSalida)),
+        color: { ...color },
+        cssClass: cssClass,
+        meta: { id: reserva.id }
+      };
+    });
+  }
+
+  private toLocalDate(fecha: string | Date): Date {
+    const date = typeof fecha === 'string' ? new Date(fecha) : fecha;
+    // Ajusta la hora eliminando el desplazamiento del huso horario
+    const local = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    return local;
   }
 
   // ==================== UTILIDADES ====================
