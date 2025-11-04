@@ -29,6 +29,10 @@ const CALENDAR_COLORS = {
     primary: '#f39c12', // Naranja
     secondary: '#fdf3e1',
   },
+  completada: {
+    primary: '#888880', // Gris
+    secondary: '#d5c9b3',
+  },
 };
 
 @Component({
@@ -146,17 +150,21 @@ export class GestionarReservas implements OnInit, OnDestroy {
   // ==================== TRANSFORMACIÓN Y CLASIFICACIÓN ====================
 
   private actualizarEventosCalendario(): void {
-    const reservasActivas = this.todasLasReservas.filter(r =>
-      r.estado === ReservaEstado.PENDIENTE || r.estado === ReservaEstado.CONFIRMADA
+    const reservas = this.todasLasReservas.filter(r =>
+      r.estado === ReservaEstado.PENDIENTE || r.estado === ReservaEstado.CONFIRMADA || r.estado === ReservaEstado.COMPLETADA
     );
 
-    this.events = reservasActivas.map((reserva: ReservaDTO): CalendarEvent => {
+    this.events = reservas.map((reserva: ReservaDTO): CalendarEvent => {
       let color = CALENDAR_COLORS.confirmada;
       let cssClass = 'cal-event-confirmed';
 
       if (reserva.estado === ReservaEstado.PENDIENTE) {
         color = CALENDAR_COLORS.pendiente;
         cssClass = 'cal-event-pending';
+      }
+      else if (reserva.estado === ReservaEstado.COMPLETADA) {
+        color = CALENDAR_COLORS.completada;
+        cssClass = 'cal-event-completed';
       }
 
       return {

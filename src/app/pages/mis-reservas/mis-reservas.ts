@@ -145,6 +145,163 @@ export class MisReservas implements OnInit, OnDestroy {
       });
   }
 
+  dejarResena(idAlojamiento: number, tituloAlojamiento: string): void {
+    Swal.fire({
+      title: 'Deja tu reseña',
+      html: `
+        <div style="text-align: left;">
+          <p style="color: var(--text-color); margin-bottom: 1rem;">
+            <strong>${tituloAlojamiento}</strong>
+          </p>
+
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark-green);">
+            Calificación *
+          </label>
+          <div id="rating-stars" style="display: flex; gap: 8px; margin-bottom: 1rem; justify-content: center;">
+            <i class="fa-solid fa-star" data-rating="1" style="font-size: 2rem; color: #ddd; cursor: pointer;"></i>
+            <i class="fa-solid fa-star" data-rating="2" style="font-size: 2rem; color: #ddd; cursor: pointer;"></i>
+            <i class="fa-solid fa-star" data-rating="3" style="font-size: 2rem; color: #ddd; cursor: pointer;"></i>
+            <i class="fa-solid fa-star" data-rating="4" style="font-size: 2rem; color: #ddd; cursor: pointer;"></i>
+            <i class="fa-solid fa-star" data-rating="5" style="font-size: 2rem; color: #ddd; cursor: pointer;"></i>
+          </div>
+
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark-green);">
+            Comentario *
+          </label>
+          <textarea
+            id="review-comment"
+            placeholder="Cuéntanos sobre tu experiencia..."
+            style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-family); resize: vertical;"
+            maxlength="500"></textarea>
+          <p style="text-align: right; font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
+            <span id="char-count">0</span>/500
+          </p>
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Publicar Reseña',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#2e8b57',
+      cancelButtonColor: '#95a5a6',
+      width: '600px',
+      didOpen: () => {
+        let selectedRating = 0;
+
+        // Manejar selección de estrellas
+        const stars = document.querySelectorAll('#rating-stars i');
+        stars.forEach(star => {
+          star.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            selectedRating = parseInt(target.getAttribute('data-rating') || '0');
+
+            // Actualizar estrellas visualmente
+            stars.forEach((s, index) => {
+              if (index < selectedRating) {
+                (s as HTMLElement).style.color = '#F39C12';
+              } else {
+                (s as HTMLElement).style.color = '#ddd';
+              }
+            });
+          });
+
+          // Hover effect
+          star.addEventListener('mouseenter', (e) => {
+            const target = e.target as HTMLElement;
+            const rating = parseInt(target.getAttribute('data-rating') || '0');
+            stars.forEach((s, index) => {
+              if (index < rating) {
+                (s as HTMLElement).style.color = '#F39C12';
+              } else {
+                (s as HTMLElement).style.color = '#ddd';
+              }
+            });
+          });
+        });
+
+        // Restaurar selección al salir del hover
+        document.getElementById('rating-stars')?.addEventListener('mouseleave', () => {
+          stars.forEach((s, index) => {
+            if (index < selectedRating) {
+              (s as HTMLElement).style.color = '#F39C12';
+            } else {
+              (s as HTMLElement).style.color = '#ddd';
+            }
+          });
+        });
+
+        // Contador de caracteres
+        const textarea = document.getElementById('review-comment') as HTMLTextAreaElement;
+        const charCount = document.getElementById('char-count');
+
+        textarea?.addEventListener('input', () => {
+          if (charCount) {
+            charCount.textContent = textarea.value.length.toString();
+          }
+        });
+
+        // Guardar rating en el input oculto
+        (Swal.getPopup() as any).selectedRating = () => selectedRating;
+      },
+      preConfirm: () => {
+        const comment = (document.getElementById('review-comment') as HTMLTextAreaElement).value;
+        const rating = (Swal.getPopup() as any).selectedRating();
+
+        if (!rating || rating === 0) {
+          Swal.showValidationMessage('Por favor selecciona una calificación');
+          return false;
+        }
+
+        if (!comment || comment.trim().length < 10) {
+          Swal.showValidationMessage('El comentario debe tener al menos 10 caracteres');
+          return false;
+        }
+
+        if (comment.length > 500) {
+          Swal.showValidationMessage('El comentario no puede exceder 500 caracteres');
+          return false;
+        }
+
+        return { rating, comment: comment.trim() };
+      }
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        this.procesarResena(idAlojamiento, result.value.rating, result.value.comment);
+      }
+    });
+  }
+
+  private procesarResena(idAlojamiento: number, calificacion: number, comentario: string): void {
+    Swal.fire({
+      title: 'Publicando reseña...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    const resenaDTO = {
+      calificacion,
+      comentario
+    };
+
+    this.alojamientoService.crearResena(idAlojamiento, resenaDTO)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            title: '¡Reseña publicada!',
+            text: 'Tu reseña ha sido publicada exitosamente',
+            icon: 'success',
+            confirmButtonColor: '#2e8b57',
+            timer: 2000,
+            timerProgressBar: true
+          });
+        },
+        error: (error) => {
+          Swal.close();
+          this.mostrarError(error?.error?.data || 'Error al publicar la reseña');
+        }
+      });
+  }
+
   // ==================== NAVEGACIÓN ====================
 
   cambiarTab(tab: 'activas' | 'pasadas' | 'canceladas'): void {

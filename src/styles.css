@@ -1289,6 +1289,13 @@ hr {
   color: white !important;
 }
 
+/* Evento Completado (Gris) */
+:host ::ng-deep .cal-event-completed .cal-event {
+  background-color: #716d6a !important;
+  border-color: #535141 !important;
+  color: white !important;
+}
+
 
 /* --- Responsive Design (Simplificado sin media queries complejas) --- */
 /* Mantenemos solo los estilos base sin responsive como solicitaste */
