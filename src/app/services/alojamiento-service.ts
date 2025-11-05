@@ -65,10 +65,10 @@ export class AlojamientoService {
       params = params.set('ciudad', filtros.ciudad);
     }
     if (filtros.fechaEntrada) {
-      params = params.set('fechaEntrada', filtros.fechaEntrada.toISOString());
+      params = params.set('fechaEntrada', filtros.fechaEntrada);
     }
     if (filtros.fechaSalida) {
-      params = params.set('fechaSalida', filtros.fechaSalida.toISOString());
+      params = params.set('fechaSalida', filtros.fechaSalida);
     }
     if (filtros.huespedes) {
       params = params.set('huespedes', filtros.huespedes.toString());

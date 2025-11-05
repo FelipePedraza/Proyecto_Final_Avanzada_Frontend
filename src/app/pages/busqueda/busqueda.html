@@ -1,1 +1,205 @@
-<p>busqueda works!</p>
+<main class="container">
+
+  <!-- ==================== BARRA DE BÚSQUEDA REUTILIZADA ==================== -->
+  <section class="search-bar-section">
+    <h2 style="text-align: center; color: var(--dark-green); margin-bottom: 2rem; font-size: 2rem;">
+      Encuentra el lugar perfecto
+    </h2>
+    <app-barra-busqueda></app-barra-busqueda>
+  </section>
+
+  <!-- ==================== CONTENEDOR DE BÚSQUEDA ==================== -->
+  <div class="search-page-container">
+
+    <!-- ==================== SIDEBAR DE FILTROS ==================== -->
+    <aside class="filters-sidebar">
+      <h3>
+        <i class="fa-solid fa-sliders"></i> Filtros Adicionales
+      </h3>
+
+      <!-- Rango de Precios -->
+      <div class="filter-group">
+        <h4>
+          <i class="fa-solid fa-dollar-sign"></i> Rango de Precios
+        </h4>
+        <div class="price-range">
+          <input
+            type="number"
+            [(ngModel)]="precioMin"
+            placeholder="Mínimo"
+            min="0"
+            step="10000">
+          <span>-</span>
+          <input
+            type="number"
+            [(ngModel)]="precioMax"
+            placeholder="Máximo"
+            min="0"
+            step="10000">
+        </div>
+        <p style="font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
+          <i class="fa-solid fa-info-circle"></i> Precio por noche en COP
+        </p>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 1.5rem;">
+        <button
+          type="button"
+          class="btn btn-primary filter-btn"
+          (click)="aplicarFiltros()">
+          <i class="fa-solid fa-check"></i> Aplicar Filtros
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="limpiarFiltros()">
+          <i class="fa-solid fa-rotate-left"></i> Limpiar Filtros
+        </button>
+      </div>
+
+      <!-- Info de Filtros Activos -->
+      @if (precioMin > 0 || precioMax > 0 ) {
+        <div style="margin-top: 1rem; padding: 1rem; background-color: var(--light-green); border-radius: 12px;">
+          <p style="font-size: 0.9rem; color: var(--primary-color); font-weight: 600; margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-filter"></i> Filtros Activos:
+          </p>
+
+          @if (precioMin > 0 || precioMax > 0) {
+            <p style="font-size: 0.85rem; color: var(--text-color); margin: 0;">
+              💰 Precio:
+              @if (precioMin > 0) {
+                ${{ precioMin }}
+              } @else {
+                $0
+              }
+              -
+              @if (precioMax > 0) {
+                ${{ precioMax }}
+              } @else {
+                ∞
+              }
+            </p>
+          }
+        </div>
+      }
+    </aside>
+
+    <!-- ==================== RESULTADOS ==================== -->
+    <section class="results-section">
+
+      <!-- Header de Resultados -->
+      <div class="results-header">
+        <h2>
+          @if (filtrosBase.ciudad) {
+            <i class="fa-solid fa-location-dot"></i> Resultados en {{ filtrosBase.ciudad }}
+          } @else {
+            <i class="fa-solid fa-house"></i> Todos los alojamientos
+          }
+        </h2>
+        <p>
+          @if (cargando) {
+            <i class="fa-solid fa-spinner fa-spin"></i> Buscando alojamientos...
+          } @else {
+            <i class="fa-solid fa-check-circle"></i>
+            {{ totalResultados }} alojamiento{{ totalResultados !== 1 ? 's' : '' }} encontrado{{ totalResultados !== 1 ? 's' : '' }}
+          }
+        </p>
+      </div>
+
+      <!-- Estado de Carga -->
+      @if (cargando) {
+        <div class="loading-container" style="text-align: center; padding: 4rem 2rem;">
+          <div class="loading-spinner-large"></div>
+          <p style="color: var(--text-color); font-size: 1.1rem; margin-top: 1rem;">
+            Buscando los mejores alojamientos para ti...
+          </p>
+        </div>
+      }
+
+      <!-- Error de Carga -->
+      @if (errorCarga && !cargando) {
+        <div class="empty-state">
+          <i class="fa-solid fa-exclamation-triangle" style="color: var(--danger-color);"></i>
+          <h3>Error al cargar resultados</h3>
+          <p>Hubo un problema al buscar alojamientos. Por favor, intenta de nuevo.</p>
+          <p>{{error}}</p>
+          <button type="button" (click)="aplicarFiltros()" class="btn btn-primary">
+            <i class="fa-solid fa-rotate-right"></i> Reintentar Búsqueda
+          </button>
+        </div>
+      }
+
+      <!-- Grid de Resultados -->
+      @if (!cargando && !errorCarga && alojamientos.length > 0) {
+        <div class="accommodations-grid">
+          @for (alojamiento of alojamientos; track alojamiento.id) {
+            <app-alojamiento-item [alojamiento]="alojamiento"></app-alojamiento-item>
+          }
+        </div>
+
+        <!-- Paginación -->
+        @if (totalPaginas > 1) {
+          <nav class="pagination">
+            <ul>
+              <!-- Anterior -->
+              @if (paginaActual > 0) {
+                <li>
+                  <a (click)="irAPagina(paginaActual - 1)" style="cursor: pointer;" title="Página anterior">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </a>
+                </li>
+              }
+
+              <!-- Números de Página -->
+              @for (pagina of generarPaginas(); track pagina; let i = $index) {
+                <!-- Ellipsis -->
+                @if (mostrarEllipsis(i, generarPaginas())) {
+                  <li><span>...</span></li>
+                }
+
+                <!-- Página -->
+                <li>
+                  <a
+                    (click)="irAPagina(pagina)"
+                    [class.active]="pagina === paginaActual"
+                    style="cursor: pointer;"
+                    [title]="'Ir a página ' + (pagina + 1)">
+                    {{ pagina + 1 }}
+                  </a>
+                </li>
+              }
+
+              <!-- Siguiente -->
+              @if (paginaActual < totalPaginas - 1) {
+                <li>
+                  <a (click)="irAPagina(paginaActual + 1)" style="cursor: pointer;" title="Página siguiente">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </a>
+                </li>
+              }
+            </ul>
+          </nav>
+        }
+      }
+
+      <!-- Sin Resultados -->
+      @if (!cargando && !errorCarga && alojamientos.length === 0) {
+        <div class="empty-state">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <h3>No se encontraron resultados</h3>
+          <p>
+            No hay alojamientos que coincidan con tu búsqueda.
+            Intenta ajustar los filtros o cambiar los criterios.
+          </p>
+          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <button type="button" (click)="limpiarFiltros()" class="btn btn-primary">
+              <i class="fa-solid fa-rotate-left"></i> Limpiar Filtros
+            </button>
+          </div>
+        </div>
+      }
+
+    </section>
+  </div>
+</main>

@@ -41,8 +41,8 @@ export interface EdicionAlojamientoDTO {
 
 export interface AlojamientoFiltroDTO {
   ciudad: string;
-  fechaEntrada: Date;
-  fechaSalida: Date;
+  fechaEntrada: string;
+  fechaSalida: string;
   huespedes: number;
   precioMin: number;
   precioMax: number;

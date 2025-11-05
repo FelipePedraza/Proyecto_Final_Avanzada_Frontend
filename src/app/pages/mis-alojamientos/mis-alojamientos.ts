@@ -8,7 +8,6 @@ import { AlojamientoService } from '../../services/alojamiento-service';
 import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
 import Swal from 'sweetalert2';
 import { UsuarioService } from '../../services/usuario-service';
-import { AuthService } from '../../services/auth-service';
 import { TokenService } from '../../services/token-service';
 
 @Component({
@@ -32,7 +31,6 @@ export class MisAlojamientos implements OnDestroy, OnInit {
   constructor(
     public alojamientoService: AlojamientoService, // Cambiado a public para acceder desde el template
     private usuarioService: UsuarioService,
-    private authService: AuthService,
     private tokenService: TokenService
   ) { }
 

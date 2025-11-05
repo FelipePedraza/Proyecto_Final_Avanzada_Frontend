@@ -110,11 +110,11 @@ export class BarraBusqueda implements OnInit, OnDestroy {
     };
 
     if (this.fechaEntrada) {
-      filtros.fechaEntrada = new Date(this.fechaEntrada);
+      filtros.fechaEntrada = this.fechaEntrada;
     }
 
     if (this.fechaSalida) {
-      filtros.fechaSalida = new Date(this.fechaSalida);
+      filtros.fechaSalida = this.fechaSalida;
     }
 
     // Navegar a la página de búsqueda con query params
