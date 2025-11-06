@@ -9,6 +9,7 @@ import { CrearAlojamiento } from './pages/crear-alojamiento/crear-alojamiento';
 import { EditarPerfil } from './pages/editar-perfil/editar-perfil';
 import { MisReservas } from './pages/mis-reservas/mis-reservas';
 import { GestionarReservas } from './pages/gestionar-reservas/gestionar-reservas';
+import { DashboardAnfitrion } from './pages/dashboard-anfitrion/dashboard-anfitrion';
 import {LoginGuard} from './guards/login-service';
 import {RolGuard} from './guards/rol-service';
 
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'editar-perfil', component: EditarPerfil, canActivate: [RolGuard], data: { expectedRole: ["ROL_Huesped", "ROL_Anfitrion"] } },
   { path: 'mis-reservas', component: MisReservas, canActivate: [RolGuard], data: { expectedRole: ["ROL_Huesped", "ROL_Anfitrion"] } },
   { path: 'gestionar-reservas', component: GestionarReservas, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
+  { path: 'dashboard-anfitrion', component: DashboardAnfitrion, canActivate: [RolGuard], data: { expectedRole: ["ROL_Anfitrion"] } },
   { path: '**', pathMatch: "full", redirectTo: "" }
 ];
