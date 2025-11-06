@@ -1,0 +1,378 @@
+/* ==================== CONTENEDOR DE FOTO DE PERFIL ==================== */
+
+.profile-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--light-green) 0%, rgba(46, 139, 87, 0.05) 100%);
+  border-radius: 20px;
+}
+
+.current-image {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.profile-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 4px solid var(--primary-color);
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(46, 139, 87, 0.2);
+  transition: all 0.3s ease;
+}
+
+.profile-preview:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(46, 139, 87, 0.3);
+}
+
+.btn-icon-camera {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
+}
+
+.btn-icon-camera:hover {
+  background-color: var(--accent-color);
+  transform: scale(1.1);
+}
+
+.btn-icon-camera:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==================== MENSAJES DE ERROR ==================== */
+
+.error-message {
+  color: var(--danger-color);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: none;
+  animation: fadeInError 0.3s ease-in-out;
+}
+
+.error-message.show {
+  display: block;
+}
+
+@keyframes fadeInError {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== INPUTS CON ERROR ==================== */
+
+.form-group input.error,
+.form-group textarea.error,
+.form-group select.error {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ==================== REQUISITOS DE CONTRASEÑA ==================== */
+
+.password-requirements {
+  background-color: var(--light-green);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid rgba(46, 139, 87, 0.1);
+  transition: all 0.3s ease;
+}
+
+.password-requirements p {
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.password-requirements li {
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.password-requirements li:last-child {
+  margin-bottom: 0;
+}
+
+.password-requirements li.valid {
+  color: var(--success-color);
+  background-color: rgba(46, 139, 87, 0.1);
+  font-weight: 600;
+}
+
+.password-requirements li.valid i {
+  color: var(--success-color);
+  animation: checkmark 0.3s ease-in-out;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ==================== BOTÓN DE MOSTRAR/OCULTAR CONTRASEÑA ==================== */
+
+.password-input-container {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #7F8C8D;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: var(--primary-color);
+  background-color: var(--light-green);
+}
+
+.password-toggle:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* ==================== ZONA DE PELIGRO ==================== */
+
+.danger-zone {
+  border: 2px solid var(--danger-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  background-color: rgba(231, 76, 60, 0.02);
+  transition: all 0.3s ease;
+}
+
+.danger-zone:hover {
+  background-color: rgba(231, 76, 60, 0.05);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.1);
+}
+
+.danger-zone h3 {
+  color: var(--danger-color);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.danger-zone p {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.danger-zone .btn-danger {
+  transition: all 0.3s ease;
+}
+
+.danger-zone .btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.3);
+}
+
+/* ==================== ANIMACIÓN DEL CONTENEDOR ==================== */
+
+.dashboard-content {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== TABS PERSONALIZADAS ==================== */
+
+.tabs {
+  margin-bottom: 2.5rem;
+}
+
+.tab-link {
+  position: relative;
+  padding: 1.2rem 2rem;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-link:hover {
+  color: var(--primary-color);
+  background-color: var(--light-green);
+}
+
+/* ==================== LOADING SPINNER ==================== */
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+.loading-spinner-large {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--light-green);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== BOTONES DESHABILITADOS ==================== */
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn:disabled:hover {
+  transform: none !important;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-preview {
+    width: 120px;
+    height: 120px;
+  }
+
+  .btn-icon-camera {
+    width: 36px;
+    height: 36px;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .danger-zone {
+    padding: 1rem;
+  }
+}
+
+/* ==================== MEJORAS DE ACCESIBILIDAD ==================== */
+
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* ==================== TRANSICIONES SUAVES ==================== */
+
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== ESTADO DE CARGA ==================== */
+
+.loading-container {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
