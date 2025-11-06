@@ -86,6 +86,10 @@
                       <i class="fa-solid fa-users"></i>
                       <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
                     </p>
+                    <p>
+                      <i class="fa-solid fa-money-check-dollar"></i>
+                      <strong>Precio:</strong> {{ reserva.precio }}
+                    </p>
                   </div>
                   <div class="reservation-actions-compact">
                     <button type="button" (click)="aprobarReserva(reserva.id, reserva.alojamiento.titulo)" class="btn btn-primary btn-small">

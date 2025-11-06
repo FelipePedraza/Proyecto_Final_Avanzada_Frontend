@@ -1,23 +1,23 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject, takeUntil, finalize, forkJoin } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule, Location} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {finalize, forkJoin, Subject, takeUntil} from 'rxjs';
 import Swal from 'sweetalert2';
 
 // IMPORTACIONES DE ANGULAR-CALENDAR
-import { CalendarModule, CalendarEvent } from 'angular-calendar';
-import { addMonths, subMonths, startOfDay, endOfDay } from 'date-fns';
+import {CalendarEvent, CalendarModule} from 'angular-calendar';
+import {addMonths, endOfDay, startOfDay, subMonths} from 'date-fns';
 
 // Servicios
-import { AlojamientoService } from '../../services/alojamiento-service';
-import { ReservaService } from '../../services/reserva-service';
-import { TokenService } from '../../services/token-service';
-import { MapaService} from '../../services/mapa-service';
+import {AlojamientoService} from '../../services/alojamiento-service';
+import {ReservaService} from '../../services/reserva-service';
+import {TokenService} from '../../services/token-service';
+import {MapaService} from '../../services/mapa-service';
 
 // DTOs
-import { AlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
-import { ItemResenaDTO} from '../../models/resena-dto';
+import {AlojamientoDTO, MetricasDTO} from '../../models/alojamiento-dto';
+import {ItemResenaDTO} from '../../models/resena-dto';
 import {CreacionReservaDTO, ItemReservaDTO, ReservaEstado} from '../../models/reserva-dto';
 import {MarcadorDTO} from '../../models/marcador-dto';
 
@@ -347,12 +347,9 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
     if (fechaEntrada < fechaSalida) {
       this.numeroNoches = Math.ceil((fechaSalida.getTime() - fechaEntrada.getTime()) / (1000 * 60 * 60 * 24));
-      const subtotal = this.alojamiento.precioPorNoche * this.numeroNoches;
-      this.tarifaServicio = Math.round(subtotal * 0.1);
-      this.precioTotal = subtotal + this.tarifaServicio;
+      this.precioTotal = this.alojamiento.precioPorNoche * this.numeroNoches;
     } else {
       this.numeroNoches = 0;
-      this.tarifaServicio = 0;
       this.precioTotal = 0;
     }
   }
@@ -398,8 +395,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   }
 
   private toLocalDate(fecha: string | Date): Date {
-    const date = typeof fecha === 'string' ? new Date(fecha + 'T00:00:00') : fecha;
-    return date;
+    return typeof fecha === 'string' ? new Date(fecha + 'T00:00:00') : fecha;
   }
 
   // ==================== UTILIDADES ====================

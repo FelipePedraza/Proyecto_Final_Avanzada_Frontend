@@ -8,6 +8,7 @@ export interface ReservaDTO {
   fechaEntrada: Date;
   fechaSalida: Date;
   cantidadHuespedes: number;
+  precio: number;
   estado: ReservaEstado;
 }
 
@@ -16,6 +17,7 @@ export interface ItemReservaDTO {
   alojamiento: AlojamientoDTO;
   fechaEntrada: Date;
   fechaSalida: Date;
+  precio: number;
   estado: ReservaEstado;
 }
 
