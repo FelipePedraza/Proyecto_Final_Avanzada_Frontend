@@ -5,6 +5,8 @@ import { AlojamientoItem } from '../../components/alojamiento-item/alojamiento-i
 import { BarraBusqueda } from '../../components/barra-busqueda/barra-busqueda';
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { ItemAlojamientoDTO } from '../../models/alojamiento-dto';
+import { CiudadService} from '../../services/ciudad-service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-inicio',
@@ -20,6 +22,7 @@ export class Inicio implements OnInit, OnDestroy {
   // Alojamientos sugeridos por ciudad
   alojamientosSugeridos: ItemAlojamientoDTO[] = [];
   ciudadSugerida: string = '';
+  ciudades: string[] = [];
 
   // Estados de carga
   cargandoPopulares: boolean = false;
@@ -28,7 +31,7 @@ export class Inicio implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private alojamientoService: AlojamientoService) {}
+  constructor(private alojamientoService: AlojamientoService, private ciudadService: CiudadService) { }
 
   ngOnInit(): void {
     this.cargarAlojamientosPopulares();
@@ -96,19 +99,21 @@ export class Inicio implements OnInit, OnDestroy {
    * Carga alojamientos sugeridos basados en una ciudad predeterminada
    */
   private cargarAlojamientosSugeridos(): void {
-    // Ciudades principales de Colombia para sugerencias rotativas
-    const ciudadesPrincipales = [
-      'Bogotá',
-      'Medellín',
-      'Cartagena',
-      'Cali',
-      'Barranquilla',
-      'Santa Marta'
-    ];
+    // Cargar ciudades para sugerencias rotativas
+    this.ciudadService.obtenerCiudades()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (respuesta) => {
+          if (!respuesta.error) {
+            this.ciudades = respuesta.data;
+          }
+        },
+        error: (error) => console.error('Error al cargar ciudades:', error)
+      });
 
     // Seleccionar ciudad aleatoria
-    const ciudadAleatoria = ciudadesPrincipales[
-      Math.floor(Math.random() * ciudadesPrincipales.length)
+    const ciudadAleatoria = this.ciudades[
+      Math.floor(Math.random() * this.ciudades.length)
       ];
 
     this.ciudadSugerida = ciudadAleatoria;

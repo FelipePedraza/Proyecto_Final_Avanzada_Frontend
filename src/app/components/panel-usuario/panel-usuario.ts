@@ -70,7 +70,7 @@ export class PanelUsuario {
       if (result.isConfirmed) {
         this.tokenService.logout();
         this.usuario = null;
-        this.router.navigate(['/']);
+        this.router.navigate(['/']).then(r => window.location.reload());
       }
     });
   }

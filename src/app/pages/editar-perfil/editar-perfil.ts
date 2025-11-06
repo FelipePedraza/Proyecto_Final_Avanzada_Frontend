@@ -297,8 +297,8 @@ export class EditarPerfil implements OnInit, OnDestroy {
           });
           this.tokenService.logout();
           this.usuario = null;
-          this.router.navigate(['/']);
           this.seguridadForm.reset();
+          this.router.navigate(['/login']).then(r => window.location.reload());
         },
         error: (error) => {
           this.mostrarError(error?.error?.data || 'Error al cambiar la contraseña');
