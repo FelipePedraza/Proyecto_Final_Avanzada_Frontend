@@ -1,1 +1,187 @@
-<p>dashboard-anfitrion works!</p>
+<main class="container dashboard-container">
+  <div class="dashboard-layout">
+
+    <!-- Panel Lateral del Usuario -->
+    <app-panel-usuario></app-panel-usuario>
+
+    <!-- Contenido Principal -->
+    <section class="dashboard-content">
+
+      <div class="content-header">
+        <h1>Dashboard Anfitrión</h1>
+      </div>
+
+      <!-- Estado de Carga -->
+      @if (cargando) {
+        <div class="loading-container" style="text-align: center; padding: 4rem 2rem;">
+          <div class="loading-spinner-large"></div>
+          <p style="color: var(--text-color); font-size: 1.1rem; margin-top: 1rem;">
+            Cargando datos...
+          </p>
+        </div>
+      }
+
+      <!-- Contenido del Dashboard -->
+      @if (!cargando) {
+
+        <!-- Tabs de Navegación -->
+        <div class="tabs">
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'metricas'"
+            (click)="cambiarTab('metricas')">
+            <i class="fa-solid fa-chart-line"></i> Métricas
+          </button>
+
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'resenas'"
+            (click)="cambiarTab('resenas')">
+            <i class="fa-solid fa-comment"></i> Reseñas Pendientes
+            @if (resenasRecientes.length > 0) {
+              <span class="tab-badge" style="background-color: #F39C12;">
+                {{ resenasRecientes.length }}
+              </span>
+            }
+          </button>
+        </div>
+
+        <!-- ==================== TAB MÉTRICAS ==================== -->
+        @if (tabActiva === 'metricas') {
+          <div class="tab-content active">
+
+            <!-- Métricas Globales -->
+            <div class="dashboard-section">
+              <h2>Resumen General</h2>
+
+              <div class="stats-grid">
+
+                <!-- Total Alojamientos -->
+                <div class="stat-card">
+                  <div class="stat-icon" style="background-color: rgba(46, 139, 87, 0.1);">
+                    <i class="fa-solid fa-house" style="color: var(--primary-color);"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4>Alojamientos</h4>
+                    <p>{{ metricasGlobales.totalAlojamientos }}</p>
+                  </div>
+                </div>
+
+                <!-- Total Reservas -->
+                <div class="stat-card">
+                  <div class="stat-icon" style="background-color: rgba(52, 152, 219, 0.1);">
+                    <i class="fa-solid fa-calendar-check" style="color: #3498db;"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4>Reservas Totales</h4>
+                    <p>{{ metricasGlobales.totalReservas }}</p>
+                  </div>
+                </div>
+
+                <!-- Total Reseñas -->
+                <div class="stat-card">
+                  <div class="stat-icon" style="background-color: rgba(243, 156, 18, 0.1);">
+                    <i class="fa-solid fa-star" style="color: #F39C12;"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4>Reseñas Totales</h4>
+                    <p>{{ metricasGlobales.totalResenas }}</p>
+                  </div>
+                </div>
+
+                <!-- Promedio General -->
+                <div class="stat-card">
+                  <div class="stat-icon" style="background-color: rgba(46, 204, 113, 0.1);">
+                    <i class="fa-solid fa-chart-line" style="color: #2ecc71;"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4>Calificación Promedio</h4>
+                    <p>{{ metricasGlobales.promedioGeneral.toFixed(2) }}</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- ==================== TAB RESEÑAS PENDIENTES ==================== -->
+        @if (tabActiva === 'resenas') {
+          <div class="tab-content active">
+
+            <div class="dashboard-section">
+              <h2>Reseñas Sin Responder</h2>
+
+              @if (cargandoResenas) {
+                <div style="text-align: center; padding: 2rem;">
+                  <div class="loading-spinner-large"></div>
+                  <p style="color: var(--text-color); margin-top: 1rem;">Cargando reseñas...</p>
+                </div>
+              }
+
+              @if (!cargandoResenas && resenasRecientes.length > 0) {
+                <div class="resenas-pendientes-grid">
+                  @for (resena of resenasRecientes; track resena.id) {
+                    <div class="resena-pendiente-card">
+
+                      <!-- Header con info del alojamiento -->
+                      <div class="resena-alojamiento-info">
+                        <h4>{{ resena.alojamientoTitulo }}</h4>
+                        <a [routerLink]="['/alojamiento', resena.alojamientoId]" class="btn-link">
+                          <i class="fa-solid fa-external-link-alt"></i> Ver alojamiento
+                        </a>
+                      </div>
+
+                      <!-- Autor de la reseña -->
+                      <div class="review-author">
+                        <img
+                          [src]="resena.usuario.foto || 'https://placehold.co/40x40/3f51b5/fff?text=' + resena.usuario.nombre.charAt(0)"
+                          [alt]="'Avatar de ' + resena.usuario.nombre">
+                        <div>
+                          <strong>{{ resena.usuario.nombre }}</strong>
+                          <span>{{ formatearFecha(resena.creadoEn) }}</span>
+                        </div>
+                      </div>
+
+                      <!-- Calificación -->
+                      <div style="margin: 0.5rem 0;">
+                        @for (i of [1,2,3,4,5]; track i) {
+                          <i class="fa-solid fa-star" [style.color]="i <= resena.calificacion ? '#F39C12' : '#ddd'"></i>
+                        }
+                      </div>
+
+                      <!-- Comentario -->
+                      <p class="resena-comentario">{{ resena.comentario }}</p>
+
+                      <!-- Botón Responder -->
+                      <div style="margin-top: 1rem;">
+                        <button
+                          type="button"
+                          (click)="responderResena(resena)"
+                          class="btn btn-primary btn-small">
+                          <i class="fa-solid fa-reply"></i> Responder
+                        </button>
+                      </div>
+
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (!cargandoResenas && resenasRecientes.length === 0) {
+                <div class="empty-state-small">
+                  <i class="fa-solid fa-check-circle"></i>
+                  <p>¡Genial! No tienes reseñas pendientes de responder</p>
+                </div>
+              }
+
+            </div>
+
+          </div>
+        }
+
+      }
+
+    </section>
+  </div>
+</main>

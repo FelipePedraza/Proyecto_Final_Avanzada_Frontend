@@ -495,3 +495,97 @@ select:focus-visible {
   outline: 3px solid var(--primary-color);
   outline-offset: 2px;
 }
+
+/* AGREGAR AL FINAL DEL CSS EXISTENTE DE detalle-alojamiento.css */
+
+/* ==================== RESPUESTA DEL ANFITRIÓN ==================== */
+
+.host-response {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  background: linear-gradient(135deg, rgba(46, 139, 87, 0.08) 0%, rgba(46, 139, 87, 0.03) 100%);
+  border-left: 4px solid var(--primary-color);
+  border-radius: 12px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.host-response-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.8rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.host-response-header i {
+  font-size: 1rem;
+}
+
+.host-response-message {
+  color: var(--text-color);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.host-response-date {
+  color: #7F8C8D;
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: right;
+  font-style: italic;
+}
+
+/* Botón de responder en las reseñas */
+.review-card .btn-small {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  width: auto;
+}
+
+/* ==================== SPINNER DE CARGA (si no existe) ==================== */
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .host-response {
+    padding: 1rem;
+  }
+
+  .host-response-header {
+    font-size: 0.9rem;
+  }
+
+  .host-response-message {
+    font-size: 0.9rem;
+  }
+}
+
