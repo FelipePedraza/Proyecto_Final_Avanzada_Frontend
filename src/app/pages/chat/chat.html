@@ -1,1 +1,166 @@
-<p>chat works!</p>
+<main class="container chat-container">
+  <div class="chat-layout">
+
+    <!-- ==================== LISTA DE CONVERSACIONES ==================== -->
+    <aside class="conversations-sidebar" [class.hidden-mobile]="!mostrarListaConversaciones">
+
+      <!-- Header -->
+      <div class="sidebar-header">
+        <h2>
+          <i class="fa-solid fa-message"></i>
+          Mensajes
+        </h2>
+        @if (mensajesNoLeidos > 0) {
+          <span class="unread-badge">{{ mensajesNoLeidos }}</span>
+        }
+      </div>
+
+      <!-- Estado de conexión -->
+      <div class="connection-status" [class.connected]="conectado">
+        <i [class]="conectado ? 'fa-solid fa-circle' : 'fa-solid fa-circle-exclamation'"></i>
+        {{ conectado ? 'Conectado' : 'Desconectado' }}
+      </div>
+
+      <!-- Lista de conversaciones -->
+      @if (cargando) {
+        <div class="loading-container">
+          <div class="loading-spinner-large"></div>
+          <p>Cargando conversaciones...</p>
+        </div>
+      }
+
+      @if (!cargando && conversaciones.length > 0) {
+        <div class="conversations-list">
+          @for (conversacion of conversaciones; track conversacion.id) {
+            <div
+              class="conversation-item"
+              [class.active]="chatActual?.id === conversacion.id"
+              (click)="seleccionarChat(conversacion)">
+
+              <!-- Avatar -->
+              <img
+                [src]="obtenerOtroUsuario(conversacion).foto || 'https://placehold.co/50x50/2e8b57/fff?text=' + obtenerIniciales(obtenerOtroUsuario(conversacion).nombre)"
+                [alt]="obtenerOtroUsuario(conversacion).nombre"
+                class="conversation-avatar">
+
+              <!-- Info -->
+              <div class="conversation-info">
+                <div class="conversation-header">
+                  <strong>{{ obtenerOtroUsuario(conversacion).nombre }}</strong>
+                  @if (conversacion.ultimoMensaje) {
+                    <span class="conversation-time">
+                      {{ formatearHora(conversacion.ultimoMensaje.fechaEnvio) }}
+                    </span>
+                  }
+                </div>
+
+                <p class="conversation-preview">
+                  {{ obtenerUltimoMensajePreview(conversacion) }}
+                </p>
+              </div>
+
+              <!-- Indicador no leído -->
+              @if (conversacion.ultimoMensaje && !conversacion.ultimoMensaje.leido && conversacion.ultimoMensaje.remitenteId !== usuarioActualId) {
+                <div class="unread-indicator"></div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (!cargando && conversaciones.length === 0) {
+        <div class="empty-state-small">
+          <i class="fa-solid fa-comment-slash"></i>
+          <p>No tienes conversaciones aún</p>
+        </div>
+      }
+    </aside>
+
+    <!-- ==================== VENTANA DE CHAT ==================== -->
+    <section class="chat-window" [class.hidden-mobile]="mostrarListaConversaciones">
+
+      @if (!chatActual) {
+        <!-- Sin conversación seleccionada -->
+        <div class="empty-chat">
+          <i class="fa-solid fa-comments"></i>
+          <h3>Selecciona una conversación</h3>
+          <p>Elige un chat de la lista para comenzar a conversar</p>
+        </div>
+      }
+
+      @if (chatActual) {
+        <!-- Header del chat -->
+        <div class="chat-header">
+          <button
+            type="button"
+            class="btn-back-mobile"
+            (click)="volverALista()">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+
+          <img
+            [src]="obtenerDestinatario()?.foto || 'https://placehold.co/50x50/2e8b57/fff?text=' + obtenerIniciales(obtenerDestinatario()?.nombre || '')"
+            [alt]="obtenerDestinatario()?.nombre"
+            class="chat-header-avatar">
+
+          <div class="chat-header-info">
+            <strong>{{ obtenerDestinatario()?.nombre }}</strong>
+            <span>{{ obtenerDestinatario()?.email }}</span>
+          </div>
+        </div>
+
+        <!-- Mensajes -->
+        <div class="chat-messages" #messagesContainer>
+          @if (cargandoMensajes) {
+            <div class="loading-container">
+              <div class="loading-spinner-large"></div>
+              <p>Cargando mensajes...</p>
+            </div>
+          }
+
+          @if (!cargandoMensajes && mensajes.length === 0) {
+            <div class="empty-chat-messages">
+              <i class="fa-solid fa-comment-dots"></i>
+              <p>No hay mensajes aún</p>
+              <p class="text-muted">Envía el primer mensaje para comenzar la conversación</p>
+            </div>
+          }
+
+          @if (!cargandoMensajes && mensajes.length > 0) {
+            @for (mensaje of mensajes; track mensaje.id) {
+              <div
+                class="message-wrapper"
+                [class.own-message]="esMensajePropio(mensaje)">
+
+                <div class="message-bubble">
+                  <p class="message-content">{{ mensaje.contenido }}</p>
+                  <span class="message-time">{{ formatearHora(mensaje.fechaEnvio) }}</span>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Input de mensaje -->
+        <div class="chat-input">
+          <input
+            type="text"
+            [(ngModel)]="nuevoMensaje"
+            (keydown.enter)="enviarMensaje()"
+            placeholder="Escribe un mensaje..."
+            [disabled]="!conectado">
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="enviarMensaje()"
+            [disabled]="!nuevoMensaje.trim() || !conectado">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      }
+
+    </section>
+
+  </div>
+</main>

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { WebSocketService} from './websocket-service';
 
 const TOKEN_KEY = "AuthToken";
 

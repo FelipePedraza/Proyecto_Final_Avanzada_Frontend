@@ -80,10 +80,14 @@
                     <p>
                       <i class="fa-solid fa-user"></i>
                       <strong>Huésped:</strong>
-
-                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.huesped.nombre }}">
+                      <a
+                        [routerLink]="['/chat']"
+                        [queryParams]="{destinatarioId: reserva.huesped.id}"
+                        class="enlace-mensaje-huesped"
+                        title="Enviar mensaje a {{ reserva.huesped.nombre }}">
                         {{ reserva.huesped.nombre }}
-                        <i class="fa-solid fa-comment"></i> </a>
+                        <i class="fa-solid fa-comment"></i>
+                      </a>
                     </p>
                     <p><i class="fa-solid fa-calendar"></i> <strong>{{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
@@ -124,10 +128,14 @@
                     <p>
                       <i class="fa-solid fa-user"></i>
                       <strong>Huésped:</strong>
-
-                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.huesped.nombre }}">
+                      <a
+                        [routerLink]="['/chat']"
+                        [queryParams]="{destinatarioId: reserva.huesped.id}"
+                        class="enlace-mensaje-huesped"
+                        title="Enviar mensaje a {{ reserva.huesped.nombre }}">
                         {{ reserva.huesped.nombre }}
-                        <i class="fa-solid fa-comment"></i> </a>
+                        <i class="fa-solid fa-comment"></i>
+                      </a>
                     </p>
                     <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
@@ -165,10 +173,14 @@
                     <p>
                       <i class="fa-solid fa-user"></i>
                       <strong>Huésped:</strong>
-
-                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.huesped.nombre }}">
+                      <a
+                        [routerLink]="['/chat']"
+                        [queryParams]="{destinatarioId: reserva.huesped.id}"
+                        class="enlace-mensaje-huesped"
+                        title="Enviar mensaje a {{ reserva.huesped.nombre }}">
                         {{ reserva.huesped.nombre }}
-                        <i class="fa-solid fa-comment"></i> </a>
+                        <i class="fa-solid fa-comment"></i>
+                      </a>
                     </p>
                     <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>

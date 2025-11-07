@@ -1296,6 +1296,26 @@ hr {
   color: white !important;
 }
 
+/* ==================== ENLACE MENSAJE HUÉSPED ==================== */
+.enlace-mensaje-huesped {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.enlace-mensaje-huesped:hover {
+  color: var(--accent-color);
+  transform: translateX(2px);
+}
+
+.enlace-mensaje-huesped i {
+  font-size: 0.9rem;
+}
+
 
 /* --- Responsive Design (Simplificado sin media queries complejas) --- */
 /* Mantenemos solo los estilos base sin responsive como solicitaste */
