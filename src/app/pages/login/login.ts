@@ -5,13 +5,14 @@ import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../services/auth-service';
-import { LoginDTO, OlvidoContrasenaDTO } from '../../models/usuario-dto';
+import { LoginDTO, OlvidoContrasenaDTO, ReinicioContrasenaDTO } from '../../models/usuario-dto';
 import {TokenService} from '../../services/token-service';
 
 enum VistaLogin {
   LOGIN = 'login',
   RECUPERAR = 'recuperar',
-  EXITO = 'exito'
+  EXITO = 'exito',
+  RESTABLECER = 'restablecer'
 }
 
 @Component({
@@ -20,10 +21,11 @@ enum VistaLogin {
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
+export class Login implements OnDestroy, OnInit {
   // Formularios
   loginForm!: FormGroup;
   recuperarForm!: FormGroup;
+  restablecerForm!: FormGroup;
 
   // Control de vistas
   vistaActual: VistaLogin = VistaLogin.LOGIN;
@@ -31,6 +33,7 @@ export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
 
   // Estado de la UI
   mostrarContrasena = false;
+  mostrarNuevaContrasena = false;
   cargando = false;
   emailRecuperacion = '';
 
@@ -45,7 +48,6 @@ export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
   ) {
   }
 
-  // --- CORRECCIÓN: Añadido ngOnInit ---
   ngOnInit(): void {
     this.crearFormularios();
   }
@@ -61,10 +63,20 @@ export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
     this.recuperarForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]]
     });
+
+    // Formulario de restablecimiento de contraseña
+    this.restablecerForm = this.formBuilder.group({
+      codigoVerificacion: ['', [Validators.required, Validators.minLength(6)]],
+      nuevaContrasena: ['', [Validators.required, Validators.minLength(8)]]
+    });
   }
 
   toggleContrasena(): void {
     this.mostrarContrasena = !this.mostrarContrasena;
+  }
+
+  toggleNuevaContrasena(): void {
+    this.mostrarNuevaContrasena = !this.mostrarNuevaContrasena;
   }
 
   cambiarVista(vista: VistaLogin): void {
@@ -75,6 +87,9 @@ export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
       this.cargando = false;
     } else if (vista === VistaLogin.RECUPERAR) {
       this.recuperarForm.reset();
+      this.cargando = false;
+    } else if (vista === VistaLogin.RESTABLECER) {
+      this.restablecerForm.reset();
       this.cargando = false;
     }
   }
@@ -119,6 +134,7 @@ export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
     this.cargando = true;
 
     const olvidoContrasenaDTO = this.recuperarForm.value as OlvidoContrasenaDTO;
+    this.emailRecuperacion = olvidoContrasenaDTO.email;
 
     this.authService.solicitarRecuperacion(olvidoContrasenaDTO)
       .pipe(
@@ -140,7 +156,9 @@ export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
 
     this.cargando = true;
 
-    const olvidoContrasenaDTO = this.recuperarForm.value as OlvidoContrasenaDTO;
+    const olvidoContrasenaDTO: OlvidoContrasenaDTO = {
+      email: this.emailRecuperacion
+    };
 
     this.authService.solicitarRecuperacion(olvidoContrasenaDTO)
       .pipe(
@@ -162,6 +180,50 @@ export class Login implements OnDestroy, OnInit  { // <--- Añadido OnInit
           this.mostrarError(error);
         }
       });
+  }
+
+  restablecerContrasena(): void {
+    if (this.restablecerForm.invalid) {
+      Object.keys(this.restablecerForm.controls).forEach(key => {
+        this.restablecerForm.get(key)?.markAsTouched();
+      });
+      return;
+    }
+
+    this.cargando = true;
+
+    const ReinicioContrasenaDTO: ReinicioContrasenaDTO = {
+      email: this.emailRecuperacion,
+      codigoVerificacion: this.restablecerForm.value.codigoVerificacion,
+      nuevaContrasena: this.restablecerForm.value.nuevaContrasena
+    };
+
+    this.authService.reiniciarContrasena(ReinicioContrasenaDTO)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: (respuesta) => {
+          Swal.fire({
+            title: '¡Contraseña restablecida!',
+            text: 'Tu contraseña ha sido cambiada exitosamente. Ahora puedes iniciar sesión.',
+            icon: 'success',
+            confirmButtonColor: '#2e8b57',
+            timer: 3000,
+            timerProgressBar: true
+          }).then(() => {
+            this.cambiarVista(VistaLogin.LOGIN);
+          });
+        },
+        error: (error) => {
+          this.mostrarError(error);
+        }
+      });
+  }
+
+  irAFormularioRestablecer(): void {
+    this.cambiarVista(VistaLogin.RESTABLECER);
   }
 
   obtenerErrorCampo(formulario: FormGroup, campo: string): string {

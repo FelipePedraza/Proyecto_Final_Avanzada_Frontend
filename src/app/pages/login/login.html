@@ -218,8 +218,116 @@
             }
           </button>
 
+          <!-- Botón para ir al formulario de reinicio -->
+          <button
+            type="button"
+            (click)="cambiarVista(VistaLogin.RESTABLECER)"
+            class="btn btn-primary"
+            style="margin-top: 1rem;">
+            <i class="fa-solid fa-key"></i>
+            Ya tengo el código
+          </button>
+
           <!-- Volver al login -->
           <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-green);">
+            <a
+              (click)="cambiarVista(VistaLogin.LOGIN)"
+              style="color: var(--primary-color); font-weight: 600; font-size: 1.1rem; cursor: pointer;">
+              <i class="fa-solid fa-arrow-left"></i> Volver al inicio de sesión
+            </a>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- ==================== SECCIÓN RESTABLECER ==================== -->
+    @if (vistaActual === VistaLogin.RESTABLECER) {
+      <section
+        class="dashboard-content"
+        style="width: 100%; max-width: 800px; margin: 0;">
+
+        <div class="content-header" style="text-align: center; margin-bottom: 3rem;">
+          <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Restablecer Contraseña</h1>
+          <p style="font-size: 1.2rem; color: #7F8C8D;">
+            Ingresa el código que recibiste y tu nueva contraseña.
+          </p>
+          <p style="font-size: 1rem; color: #7F8C8D; margin-top: 1rem;">
+            Estás restableciendo la contraseña para:
+            <strong style="color: var(--primary-color);">{{ emailRecuperacion }}</strong>
+          </p>
+        </div>
+
+        <div class="form-container">
+          <form [formGroup]="restablecerForm" (ngSubmit)="restablecerContrasena()" novalidate>
+            <div class="form-grid" style="max-width: 700px; margin: 0 auto;">
+
+              <div class="form-group full-width">
+                <label for="codigoVerificacion">Código de Verificación *</label>
+                <input
+                  type="text"
+                  id="codigoVerificacion"
+                  formControlName="codigoVerificacion"
+                  placeholder="Ingresa el código de 6 dígitos"
+                  autocomplete="one-time-code"
+                  [class.error]="campoInvalido(restablecerForm, 'codigoVerificacion')">
+
+                @if (campoInvalido(restablecerForm, 'codigoVerificacion')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo(restablecerForm, 'codigoVerificacion') }}
+                  </div>
+                }
+              </div>
+
+              <div class="form-group full-width">
+                <label for="nuevaContrasena">Nueva Contraseña *</label>
+                <div class="password-input-container" style="position: relative;">
+                  <input
+                    [type]="mostrarNuevaContrasena ? 'text' : 'password'"
+                    id="nuevaContrasena"
+                    formControlName="nuevaContrasena"
+                    placeholder="Tu nueva contraseña"
+                    autocomplete="new-password"
+                    [class.error]="campoInvalido(restablecerForm, 'nuevaContrasena')">
+
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    (click)="toggleNuevaContrasena()"
+                    [attr.aria-label]="mostrarNuevaContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                    style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #7F8C8D; cursor: pointer;">
+                    <i [class]="mostrarNuevaContrasena ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                  </button>
+                </div>
+
+                @if (campoInvalido(restablecerForm, 'nuevaContrasena')) {
+                  <div class="error-message show">
+                    {{ obtenerErrorCampo(restablecerForm, 'nuevaContrasena') }}
+                  </div>
+                }
+              </div>
+
+              <div class="form-group full-width">
+                <div style="display: flex; justify-content: center;">
+                  <button
+                    type="submit"
+                    [disabled]="cargando || restablecerForm.invalid"
+                    class="btn btn-primary"
+                    style="width: 300px; padding: 16px 24px; font-size: 1.1rem;">
+
+                    @if (cargando) {
+                      <span class="loading-spinner"></span>
+                      Restableciendo...
+                    } @else {
+                      <i class="fa-solid fa-key"></i>
+                      Restablecer Contraseña
+                    }
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--light-green); max-width: 700px; margin-left: auto; margin-right: auto;">
             <a
               (click)="cambiarVista(VistaLogin.LOGIN)"
               style="color: var(--primary-color); font-weight: 600; font-size: 1.1rem; cursor: pointer;">
