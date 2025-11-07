@@ -66,10 +66,8 @@ export class MisReservas implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          if (!respuesta.error && respuesta.data) {
-            const reservas = respuesta.data as ItemReservaDTO[];
-            this.clasificarReservas(reservas);
-          }
+          const reservas = respuesta.data as ItemReservaDTO[];
+          this.clasificarReservas(reservas);
         },
         error: (error) => {
           this.mostrarError('Error al cargar las reservas');
@@ -171,7 +169,7 @@ export class MisReservas implements OnInit, OnDestroy {
           <textarea
             id="review-comment"
             placeholder="Cuéntanos sobre tu experiencia..."
-            style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-family); resize: vertical;"
+            style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px;); resize: vertical;"
             maxlength="500"></textarea>
           <p style="text-align: right; font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
             <span id="char-count">0</span>/500

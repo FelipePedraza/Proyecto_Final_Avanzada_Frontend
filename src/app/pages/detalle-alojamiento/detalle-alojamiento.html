@@ -153,7 +153,7 @@
           <h3>Calendario</h3>
           <div class="calendar-header-new">
             <div class="header-left">
-              <button type="button" class="btn btn-secondary" (click)="mesAnterior()">
+              <button type="button" class="btn btn-secondary" (click)="mesAnterior()" [disabled]="mesActual">
                 <i class="fa-solid fa-chevron-left"></i>
               </button>
               <button type="button" class="btn btn-secondary" (click)="hoy()">
@@ -173,7 +173,8 @@
               [viewDate]="viewDate"
               [events]="events"
               [locale]="locale"
-              [weekStartsOn]="1"> </mwl-calendar-month-view>
+              [weekStartsOn]="1"
+              (dayClicked)="seleccionarDiaCalendario($event.day)"></mwl-calendar-month-view>
           </div>
         </div>
 

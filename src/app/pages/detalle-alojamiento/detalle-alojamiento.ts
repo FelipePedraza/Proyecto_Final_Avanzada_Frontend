@@ -1,27 +1,27 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { finalize, forkJoin, Subject, takeUntil } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule, Location} from '@angular/common';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {finalize, forkJoin, Subject, takeUntil} from 'rxjs';
 import Swal from 'sweetalert2';
 
 // IMPORTACIONES DE ANGULAR-CALENDAR
-import { CalendarEvent, CalendarModule } from 'angular-calendar';
-import { addMonths, endOfDay, startOfDay, subMonths } from 'date-fns';
+import {CalendarEvent, CalendarModule, CalendarMonthViewDay} from 'angular-calendar';
+import {addMonths, endOfDay, startOfDay, subMonths} from 'date-fns';
 
 // Servicios
-import { AlojamientoService } from '../../services/alojamiento-service';
-import { ReservaService } from '../../services/reserva-service';
-import { TokenService } from '../../services/token-service';
-import { MapaService } from '../../services/mapa-service';
-import { UsuarioService } from '../../services/usuario-service';
+import {AlojamientoService} from '../../services/alojamiento-service';
+import {ReservaService} from '../../services/reserva-service';
+import {TokenService} from '../../services/token-service';
+import {MapaService} from '../../services/mapa-service';
+import {UsuarioService} from '../../services/usuario-service';
 
 // DTOs
-import { AlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
-import { ItemResenaDTO, CreacionRespuestaDTO } from '../../models/resena-dto';
-import { CreacionReservaDTO, ItemReservaDTO, ReservaEstado } from '../../models/reserva-dto';
-import { MarcadorDTO } from '../../models/marcador-dto';
-import { UsuarioDTO } from '../../models/usuario-dto';
+import {AlojamientoDTO, MetricasDTO} from '../../models/alojamiento-dto';
+import {CreacionRespuestaDTO, ItemResenaDTO} from '../../models/resena-dto';
+import {CreacionReservaDTO, ItemReservaDTO, ReservaEstado} from '../../models/reserva-dto';
+import {MarcadorDTO} from '../../models/marcador-dto';
+import {UsuarioDTO} from '../../models/usuario-dto';
 
 const CALENDAR_COLORS = {
   confirmada: {
@@ -65,10 +65,12 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
   // Calendario
   viewDate: Date = new Date();
+  private seleccionandoEntrada: boolean = true;
+  mesActual: boolean = true;
   events: CalendarEvent[] = [];
   locale: string = 'es';
 
-  todasLasReservas: ItemReservaDTO[] = [];
+  reservasConfirmadas: ItemReservaDTO[] = [];
 
   // Verificación de anfitrión propietario
   esAnfitrionPropietario: boolean = false;
@@ -104,6 +106,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         if (this.idAlojamiento && !isNaN(this.idAlojamiento)) {
           this.crearFormularios();
           this.cargarDatosAlojamiento();
+          this.confirmarMesActual();
         } else {
           this.mostrarError('ID de alojamiento no válido', () => {
             this.router.navigate(['/']);
@@ -148,7 +151,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       alojamiento: this.alojamientoService.obtenerPorId(this.idAlojamiento),
       metricas: this.alojamientoService.obtenerMetricas(this.idAlojamiento),
       resenas: this.alojamientoService.obtenerResenasAlojamiento(this.idAlojamiento, 0),
-      todasLasReservas: this.alojamientoService.obtenerReservasAlojamiento(this.idAlojamiento)
+      reservasConfirmadas: this.alojamientoService.obtenerReservasAlojamiento(this.idAlojamiento, ReservaEstado.CONFIRMADA)
     })
       .pipe(
         takeUntil(this.destroy$),
@@ -160,7 +163,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.metricas = respuesta.metricas.data;
           this.resenas = respuesta.resenas.data;
           this.hayMasResenas = respuesta.resenas.data.length > 0;
-          this.todasLasReservas = respuesta.todasLasReservas.data;
+          this.reservasConfirmadas = respuesta.reservasConfirmadas.data;
 
           // Verificar si el usuario es el anfitrión propietario
           this.verificarPropietario();
@@ -180,7 +183,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.errorCarga = true;
-          const mensajeError = error?.error?.respuesta || 'No se pudo cargar el alojamiento. Intenta de nuevo.';
+          const mensajeError = error.error.data || 'No se pudo cargar el alojamiento. Intenta de nuevo.';
           this.mostrarError(mensajeError, () => {
             this.router.navigate(['/']);
           });
@@ -260,7 +263,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.hayMasResenas = false;
-          this.mostrarError('Error al cargar más reseñas');
+          this.mostrarError(error.error.data);
           this.paginaResenas--;
         }
       });
@@ -289,7 +292,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         <textarea
           id="respuesta-mensaje"
           placeholder="Escribe tu respuesta al huésped..."
-          style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-family); resize: vertical;"
+          style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px;); resize: vertical;"
           maxlength="500"></textarea>
         <p style="text-align: right; font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
           <span id="char-count">0</span>/500
@@ -459,7 +462,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           Swal.close();
           Swal.fire({
             title: '¡Reserva exitosa!',
-            text: 'Tu reserva ha sido confirmada.',
+            text: respuesta.data,
             icon: 'success',
             confirmButtonColor: '#2e8b57'
           }).then(() => {
@@ -468,7 +471,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         },
         error: (error) => {
           Swal.close();
-          const mensajeError = error?.data || 'No se pudo procesar tu reserva. Intenta de nuevo.';
+          const mensajeError = error.error.data || 'No se pudo procesar tu reserva. Intenta de nuevo.';
           this.mostrarError(mensajeError);
         }
       });
@@ -499,22 +502,88 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
   mesAnterior(): void {
     this.viewDate = subMonths(this.viewDate, 1);
+    this.confirmarMesActual()
   }
 
   mesSiguiente(): void {
     this.viewDate = addMonths(this.viewDate, 1);
+    this.confirmarMesActual()
   }
 
   hoy(): void {
     this.viewDate = new Date();
+    this.confirmarMesActual()
+  }
+
+  seleccionarDiaCalendario(day: CalendarMonthViewDay): void {
+    const clickedDate = day.date;
+    // normalizo la fecha para comparar (sin horas)
+    const clicked = new Date(clickedDate.getFullYear(), clickedDate.getMonth(), clickedDate.getDate());
+
+    const entradaVal = this.reservaForm.get('fechaEntrada')?.value;
+    const salidaVal = this.reservaForm.get('fechaSalida')?.value;
+
+    // Si el usuario nunca seleccionó manualmente (bandera true), fijamos entrada
+    if (this.seleccionandoEntrada || !entradaVal) {
+      const nuevaEntradaStr = this.formatDateForInput(clicked);
+      // Si la nueva entrada es igual o posterior a la salida actual, la dejamos (o reseteamos la salida)
+      if (salidaVal) {
+        const salidaDate = new Date(salidaVal + 'T00:00:00');
+        if (clicked >= new Date(salidaDate.getFullYear(), salidaDate.getMonth(), salidaDate.getDate())) {
+          // Si el usuario selecciona entrada >= salida actual, reseteamos la salida (para obligar a elegir otra)
+          this.reservaForm.patchValue({ fechaEntrada: nuevaEntradaStr, fechaSalida: null });
+        } else {
+          this.reservaForm.patchValue({ fechaEntrada: nuevaEntradaStr });
+        }
+      } else {
+        this.reservaForm.patchValue({ fechaEntrada: nuevaEntradaStr, fechaSalida: null });
+      }
+
+      // ahora el siguiente click será para la salida
+      this.seleccionandoEntrada = false;
+    } else {
+      // estamos seleccionando salida
+      const nuevaSalidaStr = this.formatDateForInput(clicked);
+
+      // Asegurarnos que la salida sea posterior a la entrada
+      const entradaDate = new Date((this.reservaForm.get('fechaEntrada')?.value || '') + 'T00:00:00');
+      const entradaNormal = new Date(entradaDate.getFullYear(), entradaDate.getMonth(), entradaDate.getDate());
+
+      if (!entradaVal) {
+        // si por alguna razón no hay entrada, tratar este click como entrada
+        this.reservaForm.patchValue({ fechaEntrada: nuevaSalidaStr, fechaSalida: null });
+        this.seleccionandoEntrada = false;
+      } else if (clicked <= entradaNormal) {
+        // Si el usuario hizo click en una fecha anterior o igual a la entrada -> reemplazamos la entrada y seguimos seleccionando salida
+        this.reservaForm.patchValue({ fechaEntrada: nuevaSalidaStr, fechaSalida: null });
+        this.seleccionandoEntrada = false; // seguirá seleccionando salida en siguiente click
+      } else {
+        // click válido para salida
+        this.reservaForm.patchValue({ fechaSalida: nuevaSalidaStr });
+        // opcional: resetear para que el siguiente click vuelva a fijar la entrada
+        this.seleccionandoEntrada = true;
+      }
+    }
+
+    // marcar y recalcular
+    this.reservaForm.get('fechaEntrada')?.markAsTouched();
+    this.reservaForm.get('fechaSalida')?.markAsTouched();
+    this.reservaForm.updateValueAndValidity();
+    this.calcularPrecioTotal();
+  }
+
+  private confirmarMesActual() {
+    const hoy = new Date();
+    // Comparamos año y mes. Si son iguales, no debe retroceder.
+    const mismoMes = this.viewDate.getMonth() === hoy.getMonth();
+    const mismoAnio = this.viewDate.getFullYear() === hoy.getFullYear();
+
+    this.mesActual = mismoMes && mismoAnio;
   }
 
   private actualizarEventosCalendario(): void {
-    const reservasActivas = this.todasLasReservas.filter(r =>
-      r.estado === ReservaEstado.CONFIRMADA
-    );
 
-    this.events = reservasActivas.map((reserva: ItemReservaDTO): CalendarEvent => {
+    this.events = this.reservasConfirmadas.map((reserva: ItemReservaDTO): CalendarEvent => {
       let color = CALENDAR_COLORS.confirmada;
       let cssClass = 'cal-event-confirmed';
 
@@ -547,6 +616,13 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
   formatearPrecio(precio: number): string {
     return this.alojamientoService.formatearPrecio(precio);
+  }
+
+  private formatDateForInput(d: Date): string {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
   }
 
   formatearFecha(fecha: Date): string {

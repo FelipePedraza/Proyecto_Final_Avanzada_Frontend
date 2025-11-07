@@ -168,23 +168,6 @@ export class AlojamientoService {
   // ==================== MÉTODOS AUXILIARES (SOLO FRONTEND) ====================
 
   /**
-   * Busca alojamientos localmente (cliente)
-   * NOTA: Este método NO existe en el backend, es solo para búsqueda local
-   */
-  buscarAlojamientosLocal(alojamientos: ItemAlojamientoDTO[], termino: string): ItemAlojamientoDTO[] {
-    if (!termino || termino.trim() === '') {
-      return alojamientos;
-    }
-
-    const terminoLower = termino.toLowerCase().trim();
-
-    return alojamientos.filter(alojamiento =>
-      alojamiento.titulo.toLowerCase().includes(terminoLower) ||
-      alojamiento.direccion.ciudad.toLowerCase().includes(terminoLower)
-    );
-  }
-
-  /**
    * Formatea precio con formato de moneda colombiana
    */
   formatearPrecio(precio: number): string {

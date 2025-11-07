@@ -16,6 +16,7 @@ import { UsuarioService } from '../../services/usuario-service';
 import { ReservaDTO, ReservaEstado } from '../../models/reserva-dto';
 import { AlojamientoDTO } from '../../models/alojamiento-dto';
 import { RespuestaDTO } from '../../models/respuesta-dto';
+import {RouterLink} from '@angular/router';
 
 // (No es necesario registrar 'localeEs' aquí si ya está en app.config.ts)
 
@@ -40,7 +41,8 @@ const CALENDAR_COLORS = {
   imports: [
     CommonModule,
     PanelUsuario,
-    CalendarModule
+    CalendarModule,
+    RouterLink
   ],
   templateUrl: './gestionar-reservas.html',
   styleUrl: './gestionar-reservas.css'
@@ -62,7 +64,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
 
   // ==================== CONSTRUCTOR ====================
   constructor(
-    private alojamientoService: AlojamientoService,
+    public alojamientoService: AlojamientoService,
     private reservaService: ReservaService,
     private tokenService: TokenService,
     private usuarioService: UsuarioService

@@ -79,7 +79,11 @@
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
                     <p>
                       <i class="fa-solid fa-user"></i>
-                      <strong>Huésped:</strong> {{ reserva.huesped.nombre }}
+                      <strong>Huésped:</strong>
+
+                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.huesped.nombre }}">
+                        {{ reserva.huesped.nombre }}
+                        <i class="fa-solid fa-comment"></i> </a>
                     </p>
                     <p><i class="fa-solid fa-calendar"></i> <strong>{{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
@@ -87,8 +91,8 @@
                       <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
                     </p>
                     <p>
-                      <i class="fa-solid fa-money-check-dollar"></i>
-                      <strong>Precio:</strong> {{ reserva.precio }}
+                      <i class="fa-solid fa-dollar-sign"></i>
+                      <strong>Precio:</strong> {{ alojamientoService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
                   <div class="reservation-actions-compact">
@@ -119,12 +123,20 @@
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
                     <p>
                       <i class="fa-solid fa-user"></i>
-                      <strong>Huésped:</strong> {{ reserva.huesped.nombre }}
+                      <strong>Huésped:</strong>
+
+                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.huesped.nombre }}">
+                        {{ reserva.huesped.nombre }}
+                        <i class="fa-solid fa-comment"></i> </a>
                     </p>
                     <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
                       <i class="fa-solid fa-users"></i>
                       <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
+                    </p>
+                    <p>
+                      <i class="fa-solid fa-dollar-sign"></i>
+                      <strong>Precio:</strong> {{ alojamientoService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
                   <div class="reservation-actions-compact">
@@ -152,12 +164,20 @@
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
                     <p>
                       <i class="fa-solid fa-user"></i>
-                      <strong>Huésped:</strong> {{ reserva.huesped.nombre }}
+                      <strong>Huésped:</strong>
+
+                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.huesped.nombre }}">
+                        {{ reserva.huesped.nombre }}
+                        <i class="fa-solid fa-comment"></i> </a>
                     </p>
                     <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
                       <i class="fa-solid fa-users"></i>
                       <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
+                    </p>
+                    <p>
+                      <i class="fa-solid fa-dollar-sign"></i>
+                      <strong>Precio:</strong> {{ alojamientoService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
                   <div class="reservation-actions-compact">

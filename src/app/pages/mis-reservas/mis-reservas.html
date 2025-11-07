@@ -70,6 +70,15 @@
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
 
                     <p>
+                      <i class="fa-solid fa-user"></i>
+                      <strong>Anfitrión:</strong>
+
+                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.alojamiento.nombreAnfitrion }}">
+                        {{ reserva.alojamiento.nombreAnfitrion }}
+                        <i class="fa-solid fa-comment"></i> </a>
+                    </p>
+
+                    <p>
                       <i class="fa-solid fa-calendar"></i>
                       {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
                     </p>
@@ -82,7 +91,7 @@
 
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      {{ alojamientoService.formatearPrecio(reserva.alojamiento.precioPorNoche) }} / noche
+                      {{ alojamientoService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
 
@@ -148,6 +157,15 @@
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
 
                     <p>
+                      <i class="fa-solid fa-user"></i>
+                      <strong>Anfitrión:</strong>
+
+                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.alojamiento.nombreAnfitrion }}">
+                        {{ reserva.alojamiento.nombreAnfitrion }}
+                        <i class="fa-solid fa-comment"></i> </a>
+                    </p>
+
+                    <p>
                       <i class="fa-solid fa-calendar"></i>
                       {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
                     </p>
@@ -160,7 +178,7 @@
 
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      {{ alojamientoService.formatearPrecio(reserva.alojamiento.precioPorNoche) }} / noche
+                      {{ alojamientoService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
 
@@ -216,6 +234,14 @@
                     <h4>{{ reserva.alojamiento.titulo }}</h4>
 
                     <p>
+                      <i class="fa-solid fa-user"></i>
+                      <strong>Anfitrión:</strong>
+
+                      <a routerLink="/chat" class="enlace-mensaje-huesped" title="Enviar mensaje a {{ reserva.alojamiento.nombreAnfitrion }}">
+                        {{ reserva.alojamiento.nombreAnfitrion }}
+                        <i class="fa-solid fa-comment"></i> </a>
+                    </p>
+                    <p>
                       <i class="fa-solid fa-calendar"></i>
                       {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
                     </p>
@@ -228,7 +254,7 @@
 
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      {{ alojamientoService.formatearPrecio(reserva.alojamiento.precioPorNoche) }} / noche
+                      {{ alojamientoService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
 
