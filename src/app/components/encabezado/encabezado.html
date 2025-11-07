@@ -62,6 +62,10 @@
                   <i class="fa-solid fa-briefcase"></i> Mis Reservas
                 </a>
 
+                <a routerLink="/chat" class="dropdown-item" (click)="cerrarMenuUsuario()">
+                  <i class="fa-solid fa-message"></i> Chats
+                </a>
+
                 @if (usuario.esAnfitrion) {
                   <a routerLink="/mis-alojamientos" class="dropdown-item" (click)="cerrarMenuUsuario()">
                     <i class="fa-solid fa-house-user"></i> Mis Alojamientos
