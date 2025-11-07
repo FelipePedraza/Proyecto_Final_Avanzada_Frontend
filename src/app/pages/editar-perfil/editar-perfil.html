@@ -1,10 +1,8 @@
 <main class="container dashboard-container">
   <div class="dashboard-layout">
 
-    <!-- Panel Lateral del Usuario -->
     <app-panel-usuario></app-panel-usuario>
 
-    <!-- Contenido Principal -->
     <section class="dashboard-content">
 
       <div class="content-header">
@@ -14,7 +12,6 @@
         </div>
       </div>
 
-      <!-- Estado de Carga -->
       @if (cargandoUsuario) {
         <div class="loading-container" style="text-align: center; padding: 4rem 2rem;">
           <div class="loading-spinner-large"></div>
@@ -24,10 +21,8 @@
         </div>
       }
 
-      <!-- Contenido del Perfil -->
       @if (!cargandoUsuario && usuario) {
 
-        <!-- Tabs de Navegación -->
         <div class="tabs">
           <button
             class="tab-link"
@@ -42,15 +37,24 @@
             (click)="cambiarTab('seguridad')">
             <i class="fa-solid fa-shield-halved"></i> Seguridad
           </button>
+
+          <button
+            class="tab-link"
+            [class.active]="tabActiva === 'anfitrion'"
+            (click)="cambiarTab('anfitrion')">
+            @if (usuario.esAnfitrion) {
+              <i class="fa-solid fa-star"></i> Información Anfitrión
+            } @else {
+              <i class="fa-solid fa-house-user"></i> Convertirse en Anfitrión
+            }
+          </button>
         </div>
 
-        <!-- ==================== TAB INFORMACIÓN PERSONAL ==================== -->
         @if (tabActiva === 'personal') {
           <div class="tab-content active">
             <form [formGroup]="perfilForm" (ngSubmit)="guardarPerfil()">
               <div class="form-grid">
 
-                <!-- Foto de Perfil -->
                 <div class="form-group full-width" style="text-align: center; margin-bottom: 2rem;">
                   <label>Foto de Perfil</label>
                   <div class="profile-image-container">
@@ -93,7 +97,6 @@
                   </div>
                 </div>
 
-                <!-- Nombre Completo -->
                 <div class="form-group full-width">
                   <label for="nombre">Nombre Completo *</label>
                   <input
@@ -110,7 +113,6 @@
                   }
                 </div>
 
-                <!-- Email (solo lectura) -->
                 <div class="form-group full-width">
                   <label for="email">Correo Electrónico</label>
                   <input
@@ -124,7 +126,6 @@
                   </small>
                 </div>
 
-                <!-- Teléfono -->
                 <div class="form-group">
                   <label for="telefono">Teléfono *</label>
                   <input
@@ -142,7 +143,6 @@
                   }
                 </div>
 
-                <!-- Fecha de Nacimiento -->
                 <div class="form-group">
                   <label for="fechaNacimiento">Fecha de Nacimiento *</label>
                   <input
@@ -161,7 +161,6 @@
                   }
                 </div>
 
-                <!-- Rol del usuario -->
                 <div class="form-group full-width">
                   <label>Tipo de Cuenta</label>
                   <div style="padding: 1rem; background-color: var(--light-green); border-radius: 12px;">
@@ -179,7 +178,6 @@
 
               </div>
 
-              <!-- Botón Guardar -->
               <div class="form-navigation" style="justify-content: flex-end; border-top: 2px solid var(--light-green); padding-top: 2rem; margin-top: 2rem;">
                 <button
                   type="submit"
@@ -199,7 +197,6 @@
           </div>
         }
 
-        <!-- ==================== TAB SEGURIDAD ==================== -->
         @if (tabActiva === 'seguridad') {
           <div class="tab-content active">
             <form [formGroup]="seguridadForm" (ngSubmit)="cambiarContrasena()">
@@ -211,7 +208,6 @@
                   </h3>
                 </div>
 
-                <!-- Contraseña Actual -->
                 <div class="form-group full-width">
                   <label for="contrasenaActual">Contraseña Actual *</label>
                   <div class="password-input-container">
@@ -237,7 +233,6 @@
                   }
                 </div>
 
-                <!-- Nueva Contraseña -->
                 <div class="form-group">
                   <label for="contrasenaNueva">Nueva Contraseña *</label>
                   <div class="password-input-container">
@@ -256,7 +251,6 @@
                     </button>
                   </div>
 
-                  <!-- Requisitos de contraseña -->
                   <div class="password-requirements">
                     <p><i class="fa-solid fa-info-circle"></i> Debe contener al menos:</p>
                     <ul>
@@ -288,7 +282,6 @@
                   }
                 </div>
 
-                <!-- Confirmar Nueva Contraseña -->
                 <div class="form-group">
                   <label for="confirmarContrasena">Confirmar Nueva Contraseña *</label>
                   <div class="password-input-container">
@@ -314,7 +307,6 @@
                   }
                 </div>
 
-                <!-- Zona de Peligro -->
                 <div class="form-group full-width">
                   <div class="danger-zone">
                     <h3>
@@ -334,7 +326,6 @@
 
               </div>
 
-              <!-- Botón Actualizar -->
               <div class="form-navigation" style="justify-content: flex-end; border-top: 2px solid var(--light-green); padding-top: 2rem; margin-top: 2rem;">
                 <button
                   type="submit"
@@ -351,6 +342,142 @@
                 </button>
               </div>
             </form>
+          </div>
+        }
+
+        @if (tabActiva === 'anfitrion') {
+          <div class="tab-content active">
+
+            @if (usuario.esAnfitrion) {
+
+              @if (cargandoAnfitrion) {
+                <div class="loading-container" style="text-align: center; padding: 4rem 2rem;">
+                  <div class="loading-spinner-large"></div>
+                  <p style="color: var(--text-color); font-size: 1.1rem; margin-top: 1rem;">
+                    Cargando información de anfitrión...
+                  </p>
+                </div>
+              }
+
+              @if (!cargandoAnfitrion && anfitrionInfo) {
+                <div class="form-grid">
+                  <div class="form-group full-width">
+                    <h3 style="color: var(--dark-green); margin-bottom: 1.5rem;">
+                      <i class="fa-solid fa-star" style="color: var(--primary-color);"></i> Perfil de Anfitrión
+                    </h3>
+                    <p>Esta es la información que ven los huéspedes sobre ti.</p>
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label>Sobre Mí</label>
+                    <textarea rows="6" [value]="anfitrionInfo.sobreMi" disabled style="background-color: var(--light-green); cursor: not-allowed;"></textarea>
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label>Documento Legal Registrado</label>
+                    @if (anfitrionInfo.documentoLegal) {
+                    <div style="padding: 1rem; background: var(--light-green); border-radius: 12px; display: flex; align-items: center; gap: 10px;">
+                      <i class="fa-solid fa-file-pdf" style="color: var(--primary-color);"></i>
+                      <strong>Documento Verificado</strong>
+                    </div>
+                  } @else {
+                    <p style="color: var(--text-color); margin-top: 0.5rem;">
+                      No se encontró ningún documento verificado.
+                    </p>
+                  }
+                  </div>
+                </div>
+              } @else if (!cargandoAnfitrion && !anfitrionInfo) {
+                <p>No se pudo cargar la información de anfitrión.</p>
+              }
+            }
+
+            @else {
+              <form [formGroup]="anfitrionForm" (ngSubmit)="convertirseEnAnfitrion()">
+                <div class="form-grid">
+
+                  <div class="form-group full-width">
+                    <h3 style="color: var(--dark-green); margin-bottom: 1.5rem;">
+                      <i class="fa-solid fa-house-user"></i> Conviértete en Anfitrión
+                    </h3>
+                    <p>Completa tu perfil para empezar a publicar tus alojamientos. Deberás proporcionar una breve descripción sobre ti y un documento legal (PDF) para verificación.</p>
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label for="sobreMi">Sobre Mí *</label>
+                    <textarea
+                      id="sobreMi"
+                      formControlName="sobreMi"
+                      rows="6"
+                      placeholder="Cuéntales a los huéspedes un poco sobre ti, tus hobbies, por qué te gusta ser anfitrión, etc. (Mínimo 50 caracteres)"
+                      [class.error]="campoInvalido(anfitrionForm, 'sobreMi')">
+                    </textarea>
+                    @if (campoInvalido(anfitrionForm, 'sobreMi')) {
+                      <div class="error-message show">
+                        {{ obtenerErrorCampo(anfitrionForm, 'sobreMi') }}
+                      </div>
+                    }
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label for="documentoLegal">Documento Legal (PDF) *</label>
+                    <p style="color: #7F8C8D; font-size: 0.85rem; margin-top: 0; margin-bottom: 1rem;">
+                      Necesitamos un documento (Ej: RUT, Cédula) para verificar tu identidad. Máx 5MB.
+                    </p>
+
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      (click)="docInput.click()"
+                      [disabled]="subiendoDocumento">
+                      @if (subiendoDocumento) {
+                        <span class="loading-spinner"></span> Subiendo...
+                      } @else {
+                        <i class="fa-solid fa-upload"></i> Seleccionar Documento (PDF)
+                      }
+                    </button>
+
+                    <input
+                      #docInput
+                      type="file"
+                      accept="application/pdf"
+                      (change)="seleccionarDocumento($event)"
+                      style="display: none;">
+
+                    @if (nombreDocumentoSubido && !subiendoDocumento && !campoInvalido(anfitrionForm, 'documentoLegal')) {
+                      <div style="margin-top: 1rem; color: var(--success-color); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-check-circle"></i> {{ nombreDocumentoSubido }} cargado exitosamente.
+                      </div>
+                    }
+
+                    <input type="hidden" formControlName="documentoLegal">
+
+                    @if (campoInvalido(anfitrionForm, 'documentoLegal')) {
+                      <div class="error-message show">
+                        {{ obtenerErrorCampo(anfitrionForm, 'documentoLegal') }}
+                      </div>
+                    }
+                  </div>
+
+                </div>
+
+                <div class="form-navigation" style="justify-content: flex-end; border-top: 2px solid var(--light-green); padding-top: 2rem; margin-top: 2rem;">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="cargando || anfitrionForm.invalid || subiendoDocumento">
+
+                    @if (cargando) {
+                      <span class="loading-spinner"></span>
+                      Enviando Solicitud...
+                    } @else {
+                      <i class="fa-solid fa-paper-plane"></i>
+                      Enviar Solicitud
+                    }
+                  </button>
+                </div>
+              </form>
+            }
           </div>
         }
 

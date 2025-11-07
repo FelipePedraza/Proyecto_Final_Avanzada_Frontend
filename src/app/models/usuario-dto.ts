@@ -55,8 +55,8 @@ export interface CreacionAnfitrionDTO {
 }
 
 export interface AnfitrionPerfilDTO {
-  descripcion: string;
-  documentos: string[];
+  sobreMi: string;
+  documentoLegal: string;
 }
 
 export enum Rol {

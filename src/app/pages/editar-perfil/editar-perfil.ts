@@ -12,7 +12,7 @@ import { ImagenService } from '../../services/imagen-service';
 import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
 
 // DTOs
-import { UsuarioDTO, EdicionUsuarioDTO, CambioContrasenaDTO } from '../../models/usuario-dto';
+import { UsuarioDTO, EdicionUsuarioDTO, CambioContrasenaDTO, CreacionAnfitrionDTO, AnfitrionPerfilDTO } from '../../models/usuario-dto';
 
 @Component({
   selector: 'app-editar-perfil',
@@ -26,21 +26,30 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
   perfilForm!: FormGroup;
   seguridadForm!: FormGroup;
+  anfitrionForm!: FormGroup;
 
   usuario: UsuarioDTO | null = null;
-  tabActiva: 'personal' | 'seguridad' = 'personal';
+  anfitrionInfo: AnfitrionPerfilDTO | null = null;
+  tabActiva: 'personal' | 'seguridad' | 'anfitrion' = 'personal';
 
   // Estados
   cargando = false;
   cargandoUsuario = false;
+  cargandoAnfitrion = false;
   subiendoImagen = false;
+  subiendoDocumento = false;
   mostrarContrasenaActual = false;
   mostrarNuevaContrasena = false;
   mostrarConfirmarContrasena = false;
 
+
   // Foto de perfil
   fotoPreview: string = '';
   fotoSubida: string = '';
+
+  // Documento legal
+  documentoSubido: string = '';
+  nombreDocumentoSubido: string = '';
 
   // Validación de contraseña
   validacionContrasena = {
@@ -100,6 +109,12 @@ export class EditarPerfil implements OnInit, OnDestroy {
       ]],
       confirmarContrasena: ['', [Validators.required]]
     }, { validators: this.contrasenasMatchValidador });
+
+    // Formulario de anfitrion
+    this.anfitrionForm = this.formBuilder.group({
+      sobreMi: ['', [Validators.required, Validators.minLength(50), Validators.maxLength(1000)]],
+      documentoLegal: [null, [Validators.required]] // Para validar que el archivo fue seleccionado
+    });
   }
 
   private cargarDatosUsuario(): void {
@@ -131,10 +146,35 @@ export class EditarPerfil implements OnInit, OnDestroy {
               foto: this.usuario!.foto,
               fechaNacimiento: this.usuario!.fechaNacimiento
             });
+
+            // Si es anfitrión, cargar su información
+            if (this.usuario!.esAnfitrion) {
+              this.cargarDatosAnfitrion(usuarioId);
+            }
           }
         },
         error: (error) => {
           this.mostrarError('Error al cargar los datos del usuario');
+          console.error(error);
+        }
+      });
+  }
+
+  private cargarDatosAnfitrion(usuarioId: string): void {
+    this.cargandoAnfitrion = true;
+    this.usuarioService.obtenerAnfitrion(usuarioId)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargandoAnfitrion = false)
+      )
+      .subscribe({
+        next: (respuesta) => {
+          if (!respuesta.error) {
+            this.anfitrionInfo = respuesta.data;
+          }
+        },
+        error: (error) => {
+          this.mostrarError('Error al cargar la información de anfitrión');
           console.error(error);
         }
       });
@@ -152,7 +192,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
   // ==================== NAVEGACIÓN DE TABS ====================
 
-  cambiarTab(tab: 'personal' | 'seguridad'): void {
+  cambiarTab(tab: 'personal' | 'seguridad' | 'anfitrion'): void {
     this.tabActiva = tab;
 
     // Resetear formulario de seguridad al cambiar de tab
@@ -302,6 +342,99 @@ export class EditarPerfil implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.mostrarError(error?.error?.data || 'Error al cambiar la contraseña');
+        }
+      });
+  }
+
+// ==================== Convertirse en anfitrion ====================
+
+  convertirseEnAnfitrion(): void {
+    if (this.anfitrionForm.invalid) {
+      this.marcarCamposComoTocados(this.anfitrionForm);
+      return;
+    }
+
+    const usuarioId = this.tokenService.getUserId();
+    if (!usuarioId) {
+      this.mostrarError('Sesión expirada.');
+      return;
+    }
+
+    this.cargando = true;
+
+    const dto: CreacionAnfitrionDTO = {
+      usuarioId: usuarioId,
+      sobreMi: this.anfitrionForm.value.sobreMi,
+      documentoLegal: this.anfitrionForm.value.documentoLegal
+    };
+
+    this.usuarioService.crearAnfitrion(dto)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.cargando = false)
+      )
+      .subscribe({
+        next: (respuesta) => {
+          Swal.fire({
+            title: '¡Solicitud Enviada!',
+            text: 'Tu solicitud para ser anfitrión ha sido enviada. Ahora eres anfitrión.',
+            icon: 'success',
+            confirmButtonColor: '#2e8b57',
+            timer: 3000,
+            timerProgressBar: true
+          }).then(() => {
+            this.tokenService.logout();
+            this.usuario = null;
+            this.seguridadForm.reset();
+            this.router.navigate(['/login']).then(r => window.location.reload());
+          });
+        },
+        error: (error) => {
+          this.mostrarError(error?.error?.data || 'Error al enviar la solicitud');
+        }
+      });
+  }
+
+  seleccionarDocumento(event: any): void {
+    const file: File = event.target.files[0];
+
+    if (!file) return;
+
+    // Validar tamaño (máx 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      this.mostrarError('El documento no puede pesar más de 5MB');
+      return;
+    }
+
+    // Validar tipo (PDF)
+    if (file.type !== 'application/pdf') {
+      this.mostrarError('Solo se permiten archivos PDF');
+      return;
+    }
+
+    this.nombreDocumentoSubido = file.name;
+    this.subirDocumento(file);
+  }
+
+  private subirDocumento(file: File): void {
+    this.subiendoDocumento = true;
+
+    // Reutilizamos el imagenService asumiendo que sube cualquier archivo
+    this.imagenService.subirImagen(file)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.subiendoDocumento = false)
+      )
+      .subscribe({
+        next: (respuesta) => {
+          if (!respuesta.error) {
+            this.documentoSubido = respuesta.data.url;
+            this.anfitrionForm.patchValue({ documentoLegal: respuesta.data.url });
+          }
+        },
+        error: (error) => {
+          this.mostrarError('Error al subir el documento');
+          this.nombreDocumentoSubido = ''; // Limpiar en caso de error
         }
       });
   }

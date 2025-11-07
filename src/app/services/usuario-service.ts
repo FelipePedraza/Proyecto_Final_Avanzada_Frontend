@@ -46,6 +46,16 @@ export class UsuarioService {
   }
 
   /**
+   * GET /api/usuarios/{id}/anfitrion
+   * Obtiene la información del perfil anfitrion
+   */
+  obtenerAnfitrion(id: string): Observable<RespuestaDTO> {
+    return this.http.get<RespuestaDTO>(
+      `${this.API_URL}/${id}/anfitrion`
+    );
+  }
+
+  /**
    * DELETE /api/usuarios/{id}
    * Elimina un usuario
    */
