@@ -42,11 +42,6 @@ export class MensajehandlerService {
         // Bad Request - El backend debe enviar mensaje específico
         return this.extractBackendMessage(error) || 'Solicitud inválida. Verifica los datos enviados.';
 
-      case 401:
-        // Unauthorized - Sesión expirada o credenciales inválidas
-        this.handleUnauthorized();
-        return this.extractBackendMessage(error) || 'Sesión expirada. Por favor, inicia sesión nuevamente.';
-
       case 403:
         // Forbidden - Sin permisos
         return this.extractBackendMessage(error) || 'No tienes permisos para realizar esta acción.';
@@ -58,10 +53,6 @@ export class MensajehandlerService {
       case 409:
         // Conflict - Por ejemplo, email duplicado
         return this.extractBackendMessage(error) || 'Conflicto con los datos existentes.';
-
-      case 422:
-        // Unprocessable Entity - Validación fallida
-        return this.extractBackendMessage(error) || 'Error de validación. Verifica los datos.';
 
       case 500:
         // Internal Server Error
@@ -135,16 +126,6 @@ export class MensajehandlerService {
     } catch (e) {
       console.error('Error al parsear mensaje del backend:', e);
       return null;
-    }
-  }
-
-  /**
-   * Maneja errores 401 - Cierra sesión y redirige
-   */
-  private handleUnauthorized(): void {
-    if (this.tokenService.isLogged()) {
-      this.tokenService.logout();
-      this.router.navigate(['/login']);
     }
   }
 

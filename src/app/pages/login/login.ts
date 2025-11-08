@@ -115,7 +115,7 @@ export class Login implements OnDestroy, OnInit {
       )
       .subscribe({
         next: (respuesta) => {
-          this.tokenService.login(respuesta.data.token)
+          this.tokenService.login(respuesta.data.token, respuesta.data.refreshToken);
           this.router.navigate(['/']).then(() => window.location.reload());
         },
         error: (error) => {

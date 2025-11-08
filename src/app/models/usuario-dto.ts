@@ -29,10 +29,6 @@ export interface LoginDTO {
   contrasena: string;
 }
 
-export interface TokenDTO {
-  token: string;
-}
-
 export interface OlvidoContrasenaDTO {
   email: string;
 }
