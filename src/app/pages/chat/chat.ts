@@ -162,6 +162,7 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
       // Mensaje de otro chat - recargar lista de conversaciones
       this.cargarConversaciones();
     }
+    this.actualizarListaConversaciones();
   }
 
   // ==================== CARGA DE DATOS ====================
@@ -212,6 +213,39 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
       });
 
     // Cargar mensajes no leídos
+    this.chatService.obtenerMensajesNoLeidos(this.usuarioActualId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (respuesta) => {
+          if (!respuesta.error) {
+            this.mensajesNoLeidos = respuesta.data;
+          }
+        },
+        error: (error) => console.error('Error al cargar mensajes no leídos:', error)
+      });
+  }
+
+  private actualizarListaConversaciones(): void {
+    this.chatService.listarConversaciones(this.usuarioActualId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (respuesta) => {
+          if (!respuesta.error) {
+            this.conversaciones = respuesta.data;
+            this.actualizarContadorNoLeidos();
+          }
+        },
+        error: (error) => {
+          console.error('Error al actualizar conversaciones:', error);
+        }
+      });
+  }
+
+
+  /**
+   * Actualiza el contador de mensajes no leídos
+   */
+  private actualizarContadorNoLeidos(): void {
     this.chatService.obtenerMensajesNoLeidos(this.usuarioActualId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
