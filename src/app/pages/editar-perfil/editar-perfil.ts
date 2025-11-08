@@ -134,23 +134,21 @@ export class EditarPerfil implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          if (!respuesta.error) {
-            this.usuario = respuesta.data;
-            this.fotoPreview = this.usuario!.foto || '';
-            this.fotoSubida = this.usuario!.foto || '';
+          this.usuario = respuesta.data;
+          this.fotoPreview = this.usuario!.foto || '';
+          this.fotoSubida = this.usuario!.foto || '';
 
-            // Llenar el formulario con los datos del usuario
-            this.perfilForm.patchValue({
-              nombre: this.usuario!.nombre,
-              telefono: this.usuario!.telefono,
-              foto: this.usuario!.foto,
-              fechaNacimiento: this.usuario!.fechaNacimiento
-            });
+          // Llenar el formulario con los datos del usuario
+          this.perfilForm.patchValue({
+            nombre: this.usuario!.nombre,
+            telefono: this.usuario!.telefono,
+            foto: this.usuario!.foto,
+            fechaNacimiento: this.usuario!.fechaNacimiento
+          });
 
-            // Si es anfitrión, cargar su información
-            if (this.usuario!.esAnfitrion) {
-              this.cargarDatosAnfitrion(usuarioId);
-            }
+          // Si es anfitrión, cargar su información
+          if (this.usuario!.esAnfitrion) {
+            this.cargarDatosAnfitrion(usuarioId);
           }
         },
         error: (error) => {
@@ -247,7 +245,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.mostrarError('Error al subir la imagen');
+          this.mostrarError(error.error.data);
           this.fotoPreview = this.fotoSubida; // Restaurar preview anterior
         }
       });
@@ -282,7 +280,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
         next: (respuesta) => {
           Swal.fire({
             title: '¡Perfil actualizado!',
-            text: 'Tus datos han sido guardados correctamente',
+            text: respuesta.data,
             icon: 'success',
             confirmButtonColor: '#2e8b57',
             timer: 2000,
@@ -329,7 +327,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
         next: (respuesta) => {
           Swal.fire({
             title: '¡Contraseña actualizada!',
-            text: 'Tu contraseña ha sido cambiada correctamente',
+            text: respuesta.data,
             icon: 'success',
             confirmButtonColor: '#2e8b57',
             timer: 2000,
@@ -377,7 +375,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
         next: (respuesta) => {
           Swal.fire({
             title: '¡Solicitud Enviada!',
-            text: 'Tu solicitud para ser anfitrión ha sido enviada. Ahora eres anfitrión.',
+            text: respuesta.data,
             icon: 'success',
             confirmButtonColor: '#2e8b57',
             timer: 3000,
@@ -390,7 +388,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
           });
         },
         error: (error) => {
-          this.mostrarError(error?.error?.data || 'Error al enviar la solicitud');
+          this.mostrarError(error.error.data);
         }
       });
   }
@@ -433,7 +431,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.mostrarError('Error al subir el documento');
+          this.mostrarError(error.error.data);
           this.nombreDocumentoSubido = ''; // Limpiar en caso de error
         }
       });
@@ -623,15 +621,6 @@ export class EditarPerfil implements OnInit, OnDestroy {
   obtenerIniciales(): string {
     if (!this.usuario) return 'U';
     return this.usuario.nombre.charAt(0).toUpperCase();
-  }
-
-  formatearFecha(fecha: Date): string {
-    const f = new Date(fecha);
-    return f.toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
   }
 
   private marcarCamposComoTocados(formulario: FormGroup): void {

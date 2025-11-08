@@ -8,6 +8,7 @@ export interface AlojamientoDTO {
   servicios: string[];
   imagenes: string[];
   nombreAnfitrion: string;
+  anfitrionId: string;
 }
 
 export interface ItemAlojamientoDTO {

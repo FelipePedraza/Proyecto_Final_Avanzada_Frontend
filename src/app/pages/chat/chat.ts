@@ -65,7 +65,7 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
     this.usuarioActualId = this.tokenService.getUserId();
 
     if (!this.tokenService.isLogged()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'])
       return;
     }
 

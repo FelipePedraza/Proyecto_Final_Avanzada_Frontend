@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule, Location} from '@angular/common';
-import {ActivatedRoute, Router} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {finalize, forkJoin, Subject, takeUntil} from 'rxjs';
 import Swal from 'sweetalert2';
@@ -32,13 +32,13 @@ const CALENDAR_COLORS = {
 
 @Component({
   selector: 'app-detalle-alojamiento',
-  imports: [CommonModule, ReactiveFormsModule, CalendarModule],
+  imports: [CommonModule, ReactiveFormsModule, CalendarModule, RouterLink],
   templateUrl: './detalle-alojamiento.html',
   styleUrl: './detalle-alojamiento.css'
 })
 export class DetalleAlojamiento implements OnInit, OnDestroy {
   // ==================== PROPIEDADES ====================
-  usuario: UsuarioDTO | undefined;
+  anfitiron: UsuarioDTO | undefined;
   alojamiento: AlojamientoDTO | undefined;
   metricas: MetricasDTO | undefined;
   resenas: ItemResenaDTO[] = [];
@@ -109,7 +109,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.confirmarMesActual();
         } else {
           this.mostrarError('ID de alojamiento no válido', () => {
-            this.router.navigate(['/']);
+            this.router.navigate(['/']).then(r => window.location.reload());
           });
         }
       });
@@ -164,7 +164,17 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.resenas = respuesta.resenas.data;
           this.hayMasResenas = respuesta.resenas.data.length > 0;
           this.reservasConfirmadas = respuesta.reservasConfirmadas.data;
-
+          this.usuarioService.obtener(respuesta.alojamiento.data.anfitrionId).pipe(
+            takeUntil(this.destroy$),
+            finalize(() => this.cargando = false)).subscribe({
+              next: (respuesta) => {
+                  this.anfitiron = respuesta.data;
+              },
+              error: (error) => {
+                this.mostrarError('Error al cargar los datos del anfitrion');
+                console.error(error);
+              }
+            });
           // Verificar si el usuario es el anfitrión propietario
           this.verificarPropietario();
 
@@ -185,7 +195,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.errorCarga = true;
           const mensajeError = error.error.data || 'No se pudo cargar el alojamiento. Intenta de nuevo.';
           this.mostrarError(mensajeError, () => {
-            this.router.navigate(['/']);
+            this.router.navigate(['/']).then(r => window.location.reload());
           });
         }
       });
@@ -197,18 +207,14 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       this.esAnfitrionPropietario = false;
       return;
     }
-
-    const usuarioId = this.tokenService.getUserId();
-
-    this.usuarioService.obtener(usuarioId).pipe(takeUntil(this.destroy$)).subscribe({
-      next: (respuesta) => {
-        this.usuario = respuesta.data;
-        if(this.alojamiento?.nombreAnfitrion === (this.usuario?.nombre)){
-          this.esAnfitrionPropietario = true;
-          return;
-        }
-      }
-    })
+    if(this.anfitiron?.id === this.tokenService.getUserId()) {
+      this.esAnfitrionPropietario = true;
+      return;
+    }
+    else {
+      this.esAnfitrionPropietario = false;
+      return;
+    }
   }
 
   private inicializarLogicaMapa(): void {
@@ -391,7 +397,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
     if (!this.tokenService.isLogged()) {
       this.mostrarError('Debes iniciar sesión para poder reservar.', () => {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login']).then(r => window.location.reload());
       });
       return;
     }
@@ -466,7 +472,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
             icon: 'success',
             confirmButtonColor: '#2e8b57'
           }).then(() => {
-            this.router.navigate(['/mis-reservas']);
+            this.router.navigate(['/mis-reservas']).then(r => window.location.reload());
           });
         },
         error: (error) => {
@@ -603,6 +609,11 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   }
 
   // ==================== UTILIDADES ====================
+
+  obtenerIniciales(): string {
+    if (!this.anfitiron) return 'U';
+    return this.anfitiron.nombre.charAt(0).toUpperCase();
+  }
 
   cambiarImagenPrincipal(imagen: string): void {
     const imagenAnterior = this.imagenPrincipal;
