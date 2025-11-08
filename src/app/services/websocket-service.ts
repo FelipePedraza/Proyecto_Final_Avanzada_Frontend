@@ -1,152 +1,104 @@
-import {Injectable, NgZone} from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Client, Message, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { BehaviorSubject, Subject } from 'rxjs';
-
-// Servicios
+import { BehaviorSubject, Observable } from 'rxjs';
 import { TokenService } from './token-service';
-// Modelos
-import { MensajeDTO} from '../models/chat-dto';
+import { MensajeDTO } from '../models/chat-dto';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WebSocketService {
-
+export class WebSocketService implements OnDestroy {
   // ==================== PROPIEDADES ====================
   private stompClient?: Client;
   private subscription?: StompSubscription;
+  private errorSubscription?: StompSubscription;
 
-  // Subjects para exponer datos y estado
-  private mensajesSubject = new Subject<MensajeDTO>();
+  // Estado de conexión reactivo
   private estadoConexionSubject = new BehaviorSubject<boolean>(false);
-
-  // Observables públicos para que los componentes se suscriban
-  public mensajesRecibidos$ = this.mensajesSubject.asObservable();
   public estadoConexion$ = this.estadoConexionSubject.asObservable();
 
+  // Mensajes entrantes reactivos
+  private mensajesSubject = new BehaviorSubject<MensajeDTO | null>(null);
+  public mensajesRecibidos$ = this.mensajesSubject.asObservable();
+
   // ==================== CONSTRUCTOR ====================
-  constructor(
-    private tokenService: TokenService,
-    private zone: NgZone
-  ) { }
+  constructor(private tokenService: TokenService) {}
 
   // ==================== GESTIÓN DE CONEXIÓN ====================
 
   /**
-   * Se conecta al WebSocket usando el ID de usuario y un destinatarioId opcional (para el .join)
+   * Conecta al WebSocket. Solo conecta si no está ya conectado.
    */
-  conectar(usuarioId: string, destinatarioIdUrl: string | null = null): void {
-
-    // Evitar reconexiones si ya está conectado
-    if (this.estadoConexionSubject.value && this.stompClient) {
-      console.log('STOMP: Ya conectado');
+  conectar( destinatarioIdUrl: string | null = null): void {
+    // Evitar reconexiones
+    if (this.isConnected()) {
+      console.log('WebSocket ya conectado');
       return;
     }
 
     const token = this.tokenService.getToken();
-
     if (!token) {
       console.error('No hay token disponible para WebSocket');
       return;
     }
+
+    console.log('Iniciando conexión WebSocket...');
 
     this.stompClient = new Client({
       webSocketFactory: () => new SockJS(`http://localhost:8080/ws?token=${token}`),
       connectHeaders: {
         Authorization: `Bearer ${token}`
       },
-      debug: (str) => {
-        console.log('STOMP Debug:', str);
-      },
+      debug: (str) => console.log('STOMP:', str),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
 
-    this.stompClient.onConnect = () => {
-      this.zone.run(() => {
-        console.log('Conectado a WebSocket');
-        this.estadoConexionSubject.next(true);
-      });
-      // Suscribirse a mensajes privados
-      // Coincide con /user/{id}/queue/private
-      this.subscription = this.stompClient!.subscribe(
-        `/user/${usuarioId}/queue/private`,
-        (message: Message) => {
-          this.zone.run(() => {
-            this.onMensajeRecibido(message);
-          });
-        }
-      );
+    // Configurar callbacks
+    this.stompClient.onConnect = () => this.onConectado(destinatarioIdUrl);
+    this.stompClient.onStompError = (frame) => this.onError(frame);
+    this.stompClient.onWebSocketClose = () => this.onDesconectado();
 
-      // Suscribirse a errores
-      // Coincide con /user/{id}/queue/errors
-      this.stompClient!.subscribe(
-        `/user/${usuarioId}/queue/errors`,
-        (message: Message) => {
-          this.zone.run(() => {
-            console.error('Error del servidor (WS):', message.body);
-          });
-        }
-      );
-
-      // Notificar conexión al servidor
-      // Coincide con /app/chat.join
-      this.stompClient!.publish({
-        destination: '/app/chat.join',
-        body: JSON.stringify({
-          destinatarioId: destinatarioIdUrl || ''
-        })
-      });
-    };
-
-    this.stompClient.onStompError = (frame) => {
-      this.zone.run(() => {
-        console.error('Error STOMP:', frame);
-        this.estadoConexionSubject.next(false);
-      });
-    };
-
-    this.stompClient.onWebSocketClose = () => {
-      this.zone.run(() => {
-        console.log('WebSocket cerrado');
-        this.estadoConexionSubject.next(false);
-      });
-    };
-
+    // Activar conexión
     this.stompClient.activate();
   }
 
-  /**s
-   * Desconecta el cliente STOMP.
+  /**
+   * Callback cuando se establece la conexión
    */
-  desconectar(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+  private onConectado( destinatarioIdUrl: string | null): void {
+    console.log('WebSocket conectado');
+    this.estadoConexionSubject.next(true);
 
-    if (this.stompClient && this.stompClient.connected) {
-      // Coincide con /app/chat.leave
-      this.stompClient.publish({
-        destination: '/app/chat.leave'
-      });
-      this.stompClient.deactivate();
-    }
+    // Suscribirse a mensajes privados
+    this.subscription = this.stompClient!.subscribe(
+      `/user/queue/private`,
+      (message: Message) => this.procesarMensaje(message)
+    );
 
-    this.estadoConexionSubject.next(false);
-    console.log('WebSocket desconectado');
+    // Suscribirse a errores
+    this.errorSubscription = this.stompClient!.subscribe(
+      `/user/queue/errors`,
+      (message: Message) => {
+        console.error('Error del servidor:', message.body);
+      }
+    );
+
+    // Notificar al servidor que el usuario está conectado
+    this.enviarNotificacionConexion(destinatarioIdUrl);
   }
 
-  // ==================== INTERACCIÓN ====================
-
   /**
-   * Procesa un mensaje crudo de STOMP y lo emite a los suscriptores.
+   * Procesa un mensaje recibido del WebSocket
    */
-  private onMensajeRecibido(message: Message): void {
+  private procesarMensaje(message: Message): void {
     try {
       const mensajeDTO: MensajeDTO = JSON.parse(message.body);
-      // Emitir el mensaje parseado
+      console.log('Mensaje recibido:', mensajeDTO);
+
+      // Emitir el mensaje a todos los suscriptores
       this.mensajesSubject.next(mensajeDTO);
     } catch (error) {
       console.error('Error al procesar mensaje:', error);
@@ -154,19 +106,110 @@ export class WebSocketService {
   }
 
   /**
-   * Envía un payload de mensaje al destino /app/chat.sendMessage
+   * Callback cuando hay un error STOMP
    */
-  enviarMensaje(payload: any): void {
-    if (!this.stompClient || !this.stompClient.connected) {
-      console.error('No se puede enviar mensaje, no conectado a WebSocket');
-      return;
+  private onError(frame: any): void {
+    console.error('Error STOMP:', frame);
+    this.estadoConexionSubject.next(false);
+  }
+
+  /**
+   * Callback cuando se cierra la conexión
+   */
+  private onDesconectado(): void {
+    console.log('WebSocket desconectado');
+    this.estadoConexionSubject.next(false);
+  }
+
+  /**
+   * Notifica al servidor que el usuario se ha conectado
+   */
+  private enviarNotificacionConexion(destinatarioIdUrl: string | null): void {
+    if (!this.stompClient?.connected) return;
+
+    this.stompClient.publish({
+      destination: '/app/chat.join',
+      body: JSON.stringify({
+        destinatarioId: destinatarioIdUrl || ''
+      })
+    });
+  }
+
+  // ==================== ENVÍO DE MENSAJES ====================
+
+  /**
+   * Envía un mensaje a través del WebSocket
+   */
+  enviarMensaje(payload: {
+    destinatarioId: string;
+    contenido: string;
+    chatId: number;
+  }): Observable<boolean> {
+    return new Observable((observer) => {
+      if (!this.stompClient?.connected) {
+        console.error('No conectado a WebSocket');
+        observer.error('No conectado');
+        observer.complete();
+        return;
+      }
+
+      try {
+        this.stompClient.publish({
+          destination: '/app/chat.sendMessage',
+          body: JSON.stringify(payload)
+        });
+
+        console.log('Mensaje enviado:', payload);
+        observer.next(true);
+        observer.complete();
+      } catch (error) {
+        console.error('Error al enviar mensaje:', error);
+        observer.error(error);
+        observer.complete();
+      }
+    });
+  }
+
+  // ==================== UTILIDADES ====================
+
+  /**
+   * Verifica si el WebSocket está conectado
+   */
+  isConnected(): boolean {
+    return this.stompClient?.connected || false;
+  }
+
+  /**
+   * Desconecta el WebSocket
+   */
+  desconectar(): void {
+    if (!this.stompClient) return;
+
+    console.log('Desconectando WebSocket...');
+
+    // Desuscribirse
+    this.subscription?.unsubscribe();
+    this.errorSubscription?.unsubscribe();
+
+    // Notificar al servidor
+    if (this.stompClient.connected) {
+      try {
+        this.stompClient.publish({
+          destination: '/app/chat.leave'
+        });
+      } catch (error) {
+        console.error('Error al notificar desconexión:', error);
+      }
     }
 
-    // Enviar mensaje por WebSocket
-    // Coincide con /app/chat.sendMessage
-    this.stompClient.publish({
-      destination: '/app/chat.sendMessage',
-      body: JSON.stringify(payload)
-    });
+    // Desactivar cliente
+    this.stompClient.deactivate();
+    this.estadoConexionSubject.next(false);
+  }
+
+  // ==================== LIFECYCLE ====================
+
+  ngOnDestroy(): void {
+    this.desconectar();
   }
 }
