@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
+import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
 import Swal from 'sweetalert2';
 
 // Servicios
 import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
 import { ImagenService } from '../../services/imagen-service';
-import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
 
 // DTOs
 import { UsuarioDTO, EdicionUsuarioDTO, CambioContrasenaDTO, CreacionAnfitrionDTO, AnfitrionPerfilDTO } from '../../models/usuario-dto';
@@ -67,6 +68,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private tokenService: TokenService,
     private imagenService: ImagenService,
+    private mensajeHandlerService: MensajehandlerService,
     private router: Router
   ) {}
 
@@ -152,8 +154,8 @@ export class EditarPerfil implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.mostrarError('Error al cargar los datos del usuario');
-          console.error(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -167,13 +169,11 @@ export class EditarPerfil implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          if (!respuesta.error) {
             this.anfitrionInfo = respuesta.data;
-          }
         },
         error: (error) => {
-          this.mostrarError('Error al cargar la información de anfitrión');
-          console.error(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -208,13 +208,13 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
     // Validar tamaño (máx 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      this.mostrarError('La imagen no puede pesar más de 5MB');
+      this.mensajeHandlerService.showError('La imagen no puede pesar más de 5MB');
       return;
     }
 
     // Validar tipo
     if (!file.type.startsWith('image/')) {
-      this.mostrarError('Solo se permiten archivos de imagen');
+      this.mensajeHandlerService.showError('Solo se permiten archivos de imagen');
       return;
     }
 
@@ -245,7 +245,8 @@ export class EditarPerfil implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.mostrarError(error.error.data);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
           this.fotoPreview = this.fotoSubida; // Restaurar preview anterior
         }
       });
@@ -262,7 +263,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
     const usuarioId = this.tokenService.getUserId();
 
     if (!usuarioId) {
-      this.mostrarError('Sesión expirada. Por favor, inicia sesión de nuevo.');
+      this.mensajeHandlerService.showError('Sesión expirada. Por favor, inicia sesión de nuevo.');
       this.router.navigate(['/login']);
       return;
     }
@@ -278,19 +279,16 @@ export class EditarPerfil implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Perfil actualizado!',
-            text: respuesta.data,
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 2000,
-            timerProgressBar: true
-          }).then(() => {
-            this.cargarDatosUsuario();
-          });
+          this.mensajeHandlerService.showSuccessWithCallback(
+            respuesta.data, '¡Perfil actualizado!',
+            () => {
+              this.cargarDatosUsuario();
+            }
+          );
         },
         error: (error) => {
-          this.mostrarError(error?.error?.data || 'Error al actualizar el perfil');
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -306,7 +304,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
     const usuarioId = this.tokenService.getUserId();
 
     if (!usuarioId) {
-      this.mostrarError('Sesión expirada. Por favor, inicia sesión de nuevo.');
+      this.mensajeHandlerService.showError('Sesión expirada. Por favor, inicia sesión de nuevo.');
       this.router.navigate(['/login']);
       return;
     }
@@ -325,21 +323,15 @@ export class EditarPerfil implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Contraseña actualizada!',
-            text: respuesta.data,
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 2000,
-            timerProgressBar: true
-          });
+          this.mensajeHandlerService.showSuccess(respuesta.data, '¡Contraseña actualizada!')
           this.tokenService.logout();
           this.usuario = null;
           this.seguridadForm.reset();
           this.router.navigate(['/login']).then(r => window.location.reload());
         },
         error: (error) => {
-          this.mostrarError(error?.error?.data || 'Error al cambiar la contraseña');
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -354,7 +346,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
     const usuarioId = this.tokenService.getUserId();
     if (!usuarioId) {
-      this.mostrarError('Sesión expirada.');
+      this.mensajeHandlerService.showError('Sesión expirada.')
       return;
     }
 
@@ -373,22 +365,19 @@ export class EditarPerfil implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Solicitud Enviada!',
-            text: respuesta.data,
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 3000,
-            timerProgressBar: true
-          }).then(() => {
-            this.tokenService.logout();
-            this.usuario = null;
-            this.seguridadForm.reset();
-            this.router.navigate(['/login']).then(r => window.location.reload());
-          });
+          this.mensajeHandlerService.showSuccessWithCallback(
+            respuesta.data, '¡Solicitud Enviada!',
+            () => {
+              this.tokenService.logout();
+              this.usuario = null;
+              this.seguridadForm.reset();
+              this.router.navigate(['/login']).then(r => window.location.reload());
+            }
+          );
         },
         error: (error) => {
-          this.mostrarError(error.error.data);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -400,13 +389,13 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
     // Validar tamaño (máx 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      this.mostrarError('El documento no puede pesar más de 5MB');
+      this.mensajeHandlerService.showError('El documento no puede pesar más de 5MB');
       return;
     }
 
     // Validar tipo (PDF)
     if (file.type !== 'application/pdf') {
-      this.mostrarError('Solo se permiten archivos PDF');
+      this.mensajeHandlerService.showError('Solo se permiten archivos PDF');
       return;
     }
 
@@ -425,13 +414,12 @@ export class EditarPerfil implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          if (!respuesta.error) {
-            this.documentoSubido = respuesta.data.url;
-            this.anfitrionForm.patchValue({ documentoLegal: respuesta.data.url });
-          }
+          this.documentoSubido = respuesta.data.url;
+          this.anfitrionForm.patchValue({ documentoLegal: respuesta.data.url });
         },
         error: (error) => {
-          this.mostrarError(error.error.data);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
           this.nombreDocumentoSubido = ''; // Limpiar en caso de error
         }
       });
@@ -484,30 +472,21 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
     if (!usuarioId) return;
 
-    Swal.fire({
-      title: 'Eliminando cuenta...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
+    this.mensajeHandlerService.showLoading("'Eliminando cuenta...'")
 
     this.usuarioService.eliminar(usuarioId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({
-            title: 'Cuenta eliminada',
-            text: 'Tu cuenta ha sido eliminada correctamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            allowOutsideClick: false
-          }).then(() => {
+          this.mensajeHandlerService.showSuccessWithCallback('Tu cuenta ha sido eliminada correctamente','Cuenta eliminada', ()=> {
             this.tokenService.logout();
             this.router.navigate(['/']);
           });
         },
         error: (error) => {
-          Swal.close();
-          this.mostrarError(error?.error?.data || 'Error al eliminar la cuenta');
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -626,15 +605,6 @@ export class EditarPerfil implements OnInit, OnDestroy {
   private marcarCamposComoTocados(formulario: FormGroup): void {
     Object.keys(formulario.controls).forEach(key => {
       formulario.get(key)?.markAsTouched();
-    });
-  }
-
-  private mostrarError(mensaje: string): void {
-    Swal.fire({
-      title: 'Error',
-      text: mensaje,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
     });
   }
 }

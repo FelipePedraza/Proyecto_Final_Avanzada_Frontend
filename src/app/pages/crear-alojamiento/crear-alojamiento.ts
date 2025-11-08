@@ -3,15 +3,17 @@ import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
-import Swal from 'sweetalert2';
 
-// Importaciones de Servicios y DTOs
+// Servicios
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { ImagenService } from '../../services/imagen-service';
 import { CiudadService } from '../../services/ciudad-service';
 import { ServiciosService } from '../../services/servicios-service';
 import { TokenService } from '../../services/token-service';
 import { MapaService } from '../../services/mapa-service';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
+
+//DTOs
 import { CreacionAlojamientoDTO, EdicionAlojamientoDTO, Direccion } from '../../models/alojamiento-dto';
 import { MarcadorDTO} from '../../models/marcador-dto';
 
@@ -51,6 +53,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
     private ciudadService: CiudadService,
     private serviciosService: ServiciosService,
     private tokenService: TokenService,
+    private mensajeHandlerService: MensajehandlerService,
     private mapaService: MapaService
   ) {}
 
@@ -157,7 +160,8 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.mostrarError('Error al cargar el alojamiento');
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
           this.volver();
         }
       });
@@ -237,7 +241,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
     if (!files || files.length === 0) return;
 
     if (this.imagenesSubidas.length + files.length > 10) {
-      this.mostrarError('Puedes subir máximo 10 imágenes');
+      this.mensajeHandlerService.showError('Puedes subir máximo 10 imágenes');
       return;
     }
 
@@ -252,25 +256,19 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (respuesta) => {
-            if (!respuesta.error) this.imagenesSubidas.push(respuesta.data.url);
+            this.imagenesSubidas.push(respuesta.data.url);
           },
-          error: (error) => this.mostrarError('Error al subir imagen')
+          error: (error) => {
+            const mensaje = this.mensajeHandlerService.handleHttpError(error);
+            this.mensajeHandlerService.showError(mensaje);
+          }
         });
     });
   }
 
   eliminarImagen(index: number): void {
-    Swal.fire({
-      title: '¿Eliminar imagen?',
-      text: 'Esta acción no se puede deshacer',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#2e8b57',
-      cancelButtonColor: '#e74c3c'
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.mensajeHandlerService.confirmDanger('Esta acción no se puede deshacer','Sí, eliminar', '¿Eliminar imagen?').then((result) => {
+      if (result) {
         const imagenAEliminar = this.imagenesSubidas[index];
         if (!imagenAEliminar) return;
 
@@ -293,8 +291,8 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
               this.imagenesSubidas.splice(index, 1);
             },
             error: (error) => {
-              this.mostrarError('Error al eliminar la imagen. Inténtalo de nuevo.');
-              console.error(error.data);
+              const mensaje = this.mensajeHandlerService.handleHttpError(error);
+              this.mensajeHandlerService.showError(mensaje);
             }
           });
       }
@@ -305,7 +303,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
   siguientePaso(): void {
     if (!this.validarPasoActual()) {
       this.marcarCamposComoTocados();
-      this.mostrarError('Por favor completa todos los campos requeridos');
+      this.mensajeHandlerService.showError('Por favor completa todos los campos requeridos');
       return;
     }
 
@@ -374,7 +372,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
   // ==================== ENVÍO DEL FORMULARIO ====================
   guardarAlojamiento(): void {
     if (!this.validarFormularioCompleto()) {
-      this.mostrarError('Por favor completa todos los pasos correctamente');
+      this.mensajeHandlerService.showError('Por favor completa todos los pasos correctamente');
       return;
     }
 
@@ -390,7 +388,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
 
     const idAnfitrion = this.tokenService.getUserId();
     if (!idAnfitrion) {
-      this.mostrarError('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+      this.mensajeHandlerService.showError('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
       this.cargando = false;
       this.router.navigate(['/login']);
       return;
@@ -419,17 +417,14 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Alojamiento creado!',
-            text: 'Tu alojamiento ha sido publicado exitosamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57'
-          }).then(() => {
+          this.mensajeHandlerService.showSuccessWithCallback(respuesta.data, '¡Alojamiento creado!', () => {
             this.router.navigate(['/mis-alojamientos']);
           });
+
         },
         error: (error) => {
-          this.mostrarError(error?.error?.data || 'Error al crear el alojamiento');
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -459,17 +454,13 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Alojamiento actualizado!',
-            text: 'Los cambios han sido guardados exitosamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57'
-          }).then(() => {
+          this.mensajeHandlerService.showSuccessWithCallback('Los cambios han sido guardados exitosamente', '¡Alojamiento actualizado!', () => {
             this.router.navigate(['/mis-alojamientos']);
           });
         },
         error: (error) => {
-          this.mostrarError(error?.error?.data || 'Error al actualizar el alojamiento');
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -536,14 +527,5 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
 
   volver(): void {
     this.location.back();
-  }
-
-  private mostrarError(mensaje: string): void {
-    Swal.fire({
-      title: 'Error',
-      text: mensaje,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
-    });
   }
 }

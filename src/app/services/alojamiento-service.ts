@@ -6,10 +6,6 @@ import { ReservaEstado } from '../models/reserva-dto';
 import { CreacionResenaDTO, CreacionRespuestaDTO } from '../models/resena-dto';
 import { RespuestaDTO } from '../models/respuesta-dto';
 
-/**
- * Servicio para gestionar alojamientos
- * Mapea directamente a los endpoints de AlojamientoControlador.java
- */
 @Injectable({
   providedIn: 'root'
 })

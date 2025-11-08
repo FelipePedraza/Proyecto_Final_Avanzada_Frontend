@@ -1,6 +1,10 @@
 <main class="container chat-container">
+  <div class="chat-header-actions">
+    <button type="button" (click)="volver()" class="btn btn-secondary">
+      <i class="fa-solid fa-arrow-left"></i> Volver
+    </button>
+  </div>
   <div class="chat-layout">
-
     <!-- ==================== LISTA DE CONVERSACIONES ==================== -->
     <aside class="conversations-sidebar" [class.hidden-mobile]="!mostrarListaConversaciones">
 

@@ -29,8 +29,6 @@ export class PanelUsuario {
 
 
   private cargarUsuario(): void {
-    // TODO: Obtener el ID del usuario autenticado desde el token
-    // Por ahora usamos un ID de ejemplo
     const usuarioId = this.tokenService.getUserId();
 
     if (!usuarioId) {

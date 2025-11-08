@@ -2,15 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subject, takeUntil, forkJoin, finalize } from 'rxjs';
+import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
 import Swal from 'sweetalert2';
 
-// Componentes y Servicios
-import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
+// Servicios
+
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
 
-// Modelos
+// DTOs
 import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
 import { ItemResenaDTO } from '../../models/resena-dto';
 import { CreacionRespuestaDTO } from '../../models/resena-dto';
@@ -57,6 +59,7 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
   constructor(
     private alojamientoService: AlojamientoService,
     private usuarioService: UsuarioService,
+    private mensajeHandlerService: MensajehandlerService,
     private tokenService: TokenService
   ) {}
 
@@ -75,7 +78,7 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
   private cargarDatosIniciales(): void {
     const usuarioId = this.tokenService.getUserId();
     if (!usuarioId) {
-      this.mostrarError('No se pudo identificar al usuario');
+      this.mensajeHandlerService.showError('No se pudo identificar al usuario');
       return;
     }
 
@@ -101,7 +104,8 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          this.mostrarError('Error al cargar los alojamientos');
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -220,7 +224,7 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
         <textarea
           id="respuesta-mensaje"
           placeholder="Escribe tu respuesta al huésped..."
-          style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; font-family: var(--font-family); resize: vertical;"
+          style="width: 100%; min-height: 120px; padding: 12px; border: 2px solid var(--border-color); border-radius: 12px; resize: vertical;"
           maxlength="500"></textarea>
         <p style="text-align: right; font-size: 0.85rem; color: #7F8C8D; margin-top: 0.5rem;">
           <span id="char-count">0</span>/500
@@ -265,11 +269,7 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
   }
 
   private procesarRespuesta(idAlojamiento: number, idResena: number, mensaje: string): void {
-    Swal.fire({
-      title: 'Publicando respuesta...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
+    this.mensajeHandlerService.showLoading('Publicando respuesta...')
 
     const dto: CreacionRespuestaDTO = { mensaje };
 
@@ -277,21 +277,15 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({
-            title: '¡Respuesta publicada!',
-            text: 'Tu respuesta ha sido publicada exitosamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 2000,
-            timerProgressBar: true
-          });
+          this.mensajeHandlerService.showSuccess('Tu respuesta ha sido publicada exitosamente', '¡Respuesta publicada!')
 
           // Recargar reseñas
           this.cargarResenasRecientes();
         },
         error: (error) => {
-          Swal.close();
-          this.mostrarError(error?.error?.data || 'Error al publicar la respuesta');
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -311,15 +305,6 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
-    });
-  }
-
-  private mostrarError(mensaje: string): void {
-    Swal.fire({
-      title: 'Error',
-      text: mensaje,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
     });
   }
 }

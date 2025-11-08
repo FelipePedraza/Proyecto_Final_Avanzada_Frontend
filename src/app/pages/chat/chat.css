@@ -4,6 +4,17 @@
   max-width: 1400px;
 }
 
+.chat-header-actions {
+  /* Usa Flexbox para controlar la alineación */
+  display: flex;
+
+  /* Alinea el botón (el item) a la derecha */
+  justify-content: flex-end;
+
+  /* Añade un espacio debajo del botón antes de que empiece el chat */
+  margin-bottom: 1rem;
+}
+
 .chat-layout {
   display: grid;
   grid-template-columns: 380px 1fr;

@@ -3,15 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
-
-// Componentes
 import { AlojamientoItem } from '../../components/alojamiento-item/alojamiento-item';
 import { BarraBusqueda } from '../../components/barra-busqueda/barra-busqueda';
 
 // Servicios
 import { AlojamientoService } from '../../services/alojamiento-service';
 
-// Modelos
+//DTOs
 import { ItemAlojamientoDTO, AlojamientoFiltroDTO } from '../../models/alojamiento-dto';
 
 @Component({

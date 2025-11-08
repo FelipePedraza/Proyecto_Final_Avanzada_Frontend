@@ -1,20 +1,21 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {CommonModule, Location} from '@angular/common';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {finalize, forkJoin, Subject, takeUntil} from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize, forkJoin, Subject, takeUntil } from 'rxjs';
 import Swal from 'sweetalert2';
 
 // IMPORTACIONES DE ANGULAR-CALENDAR
-import {CalendarEvent, CalendarModule, CalendarMonthViewDay} from 'angular-calendar';
-import {addMonths, endOfDay, startOfDay, subMonths} from 'date-fns';
+import { CalendarEvent, CalendarModule, CalendarMonthViewDay } from 'angular-calendar';
+import { addMonths, endOfDay, startOfDay, subMonths } from 'date-fns';
 
 // Servicios
-import {AlojamientoService} from '../../services/alojamiento-service';
-import {ReservaService} from '../../services/reserva-service';
-import {TokenService} from '../../services/token-service';
-import {MapaService} from '../../services/mapa-service';
-import {UsuarioService} from '../../services/usuario-service';
+import { AlojamientoService } from '../../services/alojamiento-service';
+import { ReservaService } from '../../services/reserva-service';
+import { TokenService } from '../../services/token-service';
+import { MapaService } from '../../services/mapa-service';
+import { UsuarioService } from '../../services/usuario-service';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
 
 // DTOs
 import {AlojamientoDTO, MetricasDTO} from '../../models/alojamiento-dto';
@@ -89,6 +90,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     private reservaService: ReservaService,
     public tokenService: TokenService,
     private mapaService: MapaService,
+    private mensajeHandlerService: MensajehandlerService,
     private usuarioService: UsuarioService
   ) {
     this.route.params.subscribe(params => {
@@ -108,7 +110,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.cargarDatosAlojamiento();
           this.confirmarMesActual();
         } else {
-          this.mostrarError('ID de alojamiento no válido', () => {
+          this.mensajeHandlerService.showErrorWithCallback('ID de alojamiento no válido', () => {
             this.router.navigate(['/']).then(r => window.location.reload());
           });
         }
@@ -171,8 +173,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
                   this.anfitiron = respuesta.data;
               },
               error: (error) => {
-                this.mostrarError('Error al cargar los datos del anfitrion');
-                console.error(error);
+                const mensaje = this.mensajeHandlerService.handleHttpError(error);
+                this.mensajeHandlerService.showError(mensaje);
               }
             });
           // Verificar si el usuario es el anfitrión propietario
@@ -193,8 +195,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.errorCarga = true;
-          const mensajeError = error.error.data || 'No se pudo cargar el alojamiento. Intenta de nuevo.';
-          this.mostrarError(mensajeError, () => {
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showErrorWithCallback(mensaje, () => {
             this.router.navigate(['/']).then(r => window.location.reload());
           });
         }
@@ -269,7 +271,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.hayMasResenas = false;
-          this.mostrarError(error.error.data);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
           this.paginaResenas--;
         }
       });
@@ -343,11 +346,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   }
 
   private procesarRespuesta(idResena: number, mensaje: string): void {
-    Swal.fire({
-      title: 'Publicando respuesta...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
+    this.mensajeHandlerService.showLoading('Publicando respuesta...')
 
     const dto: CreacionRespuestaDTO = { mensaje };
 
@@ -355,21 +354,15 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({
-            title: '¡Respuesta publicada!',
-            text: 'Tu respuesta ha sido publicada exitosamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 2000,
-            timerProgressBar: true
-          });
+          this.mensajeHandlerService.showSuccess('Tu respuesta ha sido publicada exitosamente', '¡Respuesta publicada!')
 
           // Recargar reseñas para mostrar la respuesta
           this.recargarResenas();
         },
         error: (error) => {
-          Swal.close();
-          this.mostrarError(error?.error?.data || 'Error al publicar la respuesta');
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -396,7 +389,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     }
 
     if (!this.tokenService.isLogged()) {
-      this.mostrarError('Debes iniciar sesión para poder reservar.', () => {
+      this.mensajeHandlerService.showErrorWithCallback('Debes iniciar sesión para poder reservar.', () => {
         this.router.navigate(['/login']).then(r => window.location.reload());
       });
       return;
@@ -406,7 +399,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     const fechaSalida = new Date(this.reservaForm.value.fechaSalida);
 
     if (fechaEntrada >= fechaSalida) {
-      this.mostrarError('La fecha de salida debe ser posterior a la fecha de entrada.');
+      this.mensajeHandlerService.showError('La fecha de salida debe ser posterior a la fecha de entrada.');
       return;
     }
 
@@ -440,18 +433,11 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
     const idUsuario = this.tokenService.getUserId();
     if (!idUsuario) {
-      this.mostrarError('No se pudo identificar al usuario. Inicia sesión de nuevo.');
+      this.mensajeHandlerService.showError('No se pudo identificar al usuario. Inicia sesión de nuevo.');
       return;
     }
 
-    Swal.fire({
-      title: 'Procesando...',
-      text: 'Estamos procesando tu reserva',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+    this.mensajeHandlerService.showLoading('Estamos procesando tu reserva')
 
     const creacionReservaDTO: CreacionReservaDTO = {
       alojamientoId: this.idAlojamiento,
@@ -465,20 +451,15 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (respuesta) => {
-          Swal.close();
-          Swal.fire({
-            title: '¡Reserva exitosa!',
-            text: respuesta.data,
-            icon: 'success',
-            confirmButtonColor: '#2e8b57'
-          }).then(() => {
+          this.mensajeHandlerService.closeModal();
+          this.mensajeHandlerService.showSuccessWithCallback(respuesta.data, '¡Reserva exitosa!',() => {
             this.router.navigate(['/mis-reservas']).then(r => window.location.reload());
           });
         },
         error: (error) => {
-          Swal.close();
-          const mensajeError = error.error.data || 'No se pudo procesar tu reserva. Intenta de nuevo.';
-          this.mostrarError(mensajeError);
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -704,16 +685,4 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     });
   }
 
-  private mostrarError(mensaje: string, callback?: () => void): void {
-    Swal.fire({
-      title: 'Error',
-      text: mensaje,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
-    }).then(() => {
-      if (callback) {
-        callback();
-      }
-    });
-  }
 }

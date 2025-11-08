@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import {
-  FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControlOptions, AbstractControl, ValidationErrors
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControlOptions, AbstractControl, ValidationErrors } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
-import Swal from 'sweetalert2';
+
+//Servicios
 import { AuthService } from '../../services/auth-service';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
+//DTO
 import { CreacionUsuarioDTO } from '../../models/usuario-dto';
 
 @Component({
@@ -34,6 +35,7 @@ export class Registro implements OnDestroy, OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private mensajeHandlerService: MensajehandlerService,
     private router: Router
   ) {
   }
@@ -124,19 +126,16 @@ export class Registro implements OnDestroy, OnInit {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Registro exitoso!',
-            text: respuesta.data,
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 2000,
-            timerProgressBar: true
-          }).then(() => {
-            this.router.navigate(['/login']);
-          });
+          this.mensajeHandlerService.showSuccessWithCallback(
+            respuesta.data, "",
+            () => {
+              this.router.navigate(['/login']);
+            }
+          );
         },
         error: (error) => {
-          this.mostrarError(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -231,12 +230,4 @@ export class Registro implements OnDestroy, OnInit {
     });
   }
 
-  private mostrarError(error: any): void {
-    Swal.fire({
-      title: 'Error',
-      text: error.error.data,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
-    });
-  }
 }

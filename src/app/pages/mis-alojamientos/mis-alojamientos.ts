@@ -4,11 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
-import { AlojamientoService } from '../../services/alojamiento-service';
+
+//DTO
 import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
-import Swal from 'sweetalert2';
+
+//Servicios
 import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
+import { AlojamientoService } from '../../services/alojamiento-service';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
 
 @Component({
   selector: 'app-mis-alojamientos',
@@ -29,8 +33,9 @@ export class MisAlojamientos implements OnDestroy, OnInit {
 
   // ==================== CONSTRUCTOR ====================
   constructor(
-    public alojamientoService: AlojamientoService, // Cambiado a public para acceder desde el template
+    public alojamientoService: AlojamientoService,
     private usuarioService: UsuarioService,
+    private mensajeHandlerService: MensajehandlerService,
     private tokenService: TokenService
   ) { }
 
@@ -74,17 +79,12 @@ export class MisAlojamientos implements OnDestroy, OnInit {
    * Confirma y elimina un alojamiento
    */
   confirmarEliminar(id: number, titulo: string): void {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: `Se eliminará el alojamiento "${titulo}"`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#2e8b57',
-      cancelButtonColor: '#e74c3c',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.mensajeHandlerService.confirmDanger(
+      `Se eliminará el alojamiento "${titulo}"`,
+      'Sí, eliminar',
+      '¿Estás seguro?'
+    ).then((result) => {
+      if (result) {
         this.eliminarAlojamiento(id);
       }
     });
@@ -114,7 +114,8 @@ export class MisAlojamientos implements OnDestroy, OnInit {
           });
         },
         error: (error) => {
-          this.mostrarError("Error al cargar más alojamientos");
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -144,7 +145,8 @@ export class MisAlojamientos implements OnDestroy, OnInit {
           });
         },
         error: (error) => {
-          this.mostrarError("Error al obtener los alojamientos");
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -173,33 +175,16 @@ export class MisAlojamientos implements OnDestroy, OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Eliminado!',
-            text: 'El alojamiento ha sido eliminado correctamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57'
-          });
-
+          this.mensajeHandlerService.showSuccess(respuesta.data, '¡Eliminado!');
           // Remover de las listas
           this.alojamientos = this.alojamientos.filter(a => a.id !== id);
           this.filtrarAlojamientos();
           this.metricasPorAlojamiento.delete(id);
         },
         error: (error) => {
-          this.mostrarError("Error al eliminar el alojamiento");
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
-  }
-
-  /**
-   * Muestra mensaje de error con SweetAlert2
-   */
-  private mostrarError(mensaje: string): void {
-    Swal.fire({
-      title: 'Error',
-      text: mensaje,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
-    });
   }
 }

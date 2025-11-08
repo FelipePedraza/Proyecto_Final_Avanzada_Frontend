@@ -1,24 +1,24 @@
-import { Component, OnInit, OnDestroy  } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Subject, takeUntil, forkJoin, of, catchError } from 'rxjs';
-import Swal from 'sweetalert2';
-
-// IMPORTACIONES DE ANGULAR-CALENDAR
-import { CalendarModule, CalendarEvent } from 'angular-calendar';
-import { addMonths, subMonths, startOfDay, endOfDay } from 'date-fns';
-
-// COMPONENTES Y SERVICIOS
-import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
-import { AlojamientoService } from '../../services/alojamiento-service';
-import { ReservaService } from '../../services/reserva-service';
-import { TokenService } from '../../services/token-service';
-import { UsuarioService } from '../../services/usuario-service';
-import { ReservaDTO, ReservaEstado } from '../../models/reserva-dto';
-import { AlojamientoDTO } from '../../models/alojamiento-dto';
-import { RespuestaDTO } from '../../models/respuesta-dto';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {catchError, forkJoin, of, Subject, takeUntil} from 'rxjs';
 import {RouterLink} from '@angular/router';
+import {PanelUsuario} from '../../components/panel-usuario/panel-usuario';
+// IMPORTACIONES DE ANGULAR-CALENDAR
+import {CalendarEvent, CalendarModule} from 'angular-calendar';
+import {addMonths, endOfDay, startOfDay, subMonths} from 'date-fns';
 
-// (No es necesario registrar 'localeEs' aquí si ya está en app.config.ts)
+// Servicios
+import {AlojamientoService} from '../../services/alojamiento-service';
+import {ReservaService} from '../../services/reserva-service';
+import {TokenService} from '../../services/token-service';
+import {UsuarioService} from '../../services/usuario-service';
+import {MensajehandlerService} from '../../services/mensajehandler-service';
+
+// DTO
+import {ReservaDTO, ReservaEstado} from '../../models/reserva-dto';
+import {AlojamientoDTO} from '../../models/alojamiento-dto';
+import {RespuestaDTO} from '../../models/respuesta-dto';
+
 
 // Define los colores para los eventos del calendario
 const CALENDAR_COLORS = {
@@ -67,6 +67,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
     public alojamientoService: AlojamientoService,
     private reservaService: ReservaService,
     private tokenService: TokenService,
+    private mensajeHandlerService: MensajehandlerService,
     private usuarioService: UsuarioService
   ) {}
 
@@ -85,7 +86,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
   private cargarDatos(): void {
     const usuarioId = this.tokenService.getUserId();
     if (!usuarioId) {
-      this.mostrarError('No se pudo identificar al usuario');
+      this.mensajeHandlerService.showError('No se pudo identificar al usuario')
       return;
     }
 
@@ -110,7 +111,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
               .pipe(
                 catchError(err => {
                   console.error(`Error cargando reservas para ${alojamiento.id}:`, err);
-                  return of({ error: true, data: null }); // Si una falla, no daña todo
+                  return of({ error: true, data: null }); // Si una falla, no daña
                 })
               )
           );
@@ -136,14 +137,16 @@ export class GestionarReservas implements OnInit, OnDestroy {
 
                 this.cargando = false; // <-- FIN DE LA CARGA
               },
-              error: (err) => {
-                this.mostrarError('Error al cargar las reservas.');
+              error: (error) => {
+                const mensaje = this.mensajeHandlerService.handleHttpError(error);
+                this.mensajeHandlerService.showError(mensaje);
                 this.cargando = false; // <-- FIN DE LA CARGA (con error)
               }
             });
         },
-        error: (err) => {
-          this.mostrarError('Error al cargar los alojamientos del usuario');
+        error: (error) => {
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
           this.cargando = false; // <-- FIN DE LA CARGA (con error)
         }
       });
@@ -183,8 +186,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
   private toLocalDate(fecha: string | Date): Date {
     const date = typeof fecha === 'string' ? new Date(fecha) : fecha;
     // Ajusta la hora eliminando el desplazamiento del huso horario
-    const local = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
-    return local;
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
   }
 
 
@@ -212,77 +214,62 @@ export class GestionarReservas implements OnInit, OnDestroy {
   // (Sin cambios, solo nos aseguramos de llamar a this.cargarDatos())
 
   aprobarReserva(idReserva: number, tituloAlojamiento: string): void {
-    Swal.fire({
-      title: '¿Aprobar reserva?',
-      text: `Confirmarás la reserva para "${tituloAlojamiento}"`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, aprobar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#2e8b57',
-      cancelButtonColor: '#95a5a6'
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.mensajeHandlerService.confirm(
+      `Confirmarás la reserva para "${tituloAlojamiento}"`,
+      'Sí, aprobar',
+      '¿Aprobar reserva?'
+    ).then((result) => {
+      if (result) {
         this.procesarAprobacion(idReserva);
       }
     });
   }
 
   private procesarAprobacion(idReserva: number): void {
-    Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    this.mensajeHandlerService.showLoading('Procesando...');
 
     this.reservaService.aceptar(idReserva)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({
-            title:'¡Reserva aprobada!',
-            text:'',
-            icon:'success',
-            confirmButtonColor: '#2e8b57'});
-          this.cargarDatos(); // <-- Recargamos todo
+          this.mensajeHandlerService.showSuccess("",'¡Reserva aprobada!')
+          this.cargarDatos(); // <-- Recargamos
         },
         error: (error) => {
-          Swal.close();
-          this.mostrarError(error?.error?.data || 'Error al aprobar la reserva');
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
 
   rechazarReserva(idReserva: number, tituloAlojamiento: string): void {
-    Swal.fire({
-      title: '¿Rechazar reserva?',
-      text: `Esta acción no se puede deshacer para "${tituloAlojamiento}"`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, rechazar',
-      cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#e74c3c',
-      cancelButtonColor: '#95a5a6'
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.mensajeHandlerService.confirmDanger(
+      `Esta acción no se puede deshacer para "${tituloAlojamiento}"`,
+      'Sí, rechazar',
+      '¿Rechazar reserva?'
+    ).then((result) => {
+      if (result) {
         this.procesarRechazo(idReserva);
       }
     });
   }
 
   private procesarRechazo(idReserva: number): void {
-    Swal.fire({ title: 'Procesando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    this.mensajeHandlerService.showLoading('Procesando...');
 
     this.reservaService.rechazar(idReserva)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({
-            title:'Reserva rechazada',
-            text:'',
-            icon:'info',
-            confirmButtonColor: '#2e8b57'});
-          this.cargarDatos(); // <-- Recargamos todo
+          this.mensajeHandlerService.showError("",'Reserva rechazada');
+          this.cargarDatos(); // <-- Recargamos
         },
         error: (error) => {
-          Swal.close();
-          this.mostrarError(error?.error?.data || 'Error al rechazar la reserva');
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -313,9 +300,5 @@ export class GestionarReservas implements OnInit, OnDestroy {
     const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
     const fechaAjustada = new Date(f.getTime() + f.getTimezoneOffset() * 60000);
     return fechaAjustada.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
-  }
-
-  private mostrarError(mensaje: string): void {
-    Swal.fire({ title: 'Error', text: mensaje, icon: 'error', confirmButtonColor: '#2e8b57' });
   }
 }

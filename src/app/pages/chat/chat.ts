@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil, filter } from 'rxjs';
@@ -56,6 +56,7 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
     private usuarioService: UsuarioService,
     private webSocketService: WebSocketService,
     private route: ActivatedRoute,
+    private location: Location,
     private router: Router
   ) {}
 
@@ -453,5 +454,9 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
     return chat.usuario1.id === this.usuarioActualId
       ? chat.usuario2
       : chat.usuario1;
+  }
+
+  volver(): void {
+    this.location.back();
   }
 }

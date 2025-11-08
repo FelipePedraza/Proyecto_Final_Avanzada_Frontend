@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { WebSocketService} from './websocket-service';
 
 const TOKEN_KEY = "AuthToken";
 
@@ -19,10 +18,7 @@ export class TokenService {
   }
 
   public isLogged(): boolean {
-    if (this.getToken()) {
-      return true;
-    }
-    return false;
+    return !!this.getToken();
   }
 
   public login(token: string) {

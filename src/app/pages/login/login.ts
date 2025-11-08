@@ -3,7 +3,7 @@ import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
-import Swal from 'sweetalert2';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
 import { AuthService } from '../../services/auth-service';
 import { LoginDTO, OlvidoContrasenaDTO, ReinicioContrasenaDTO } from '../../models/usuario-dto';
 import {TokenService} from '../../services/token-service';
@@ -44,6 +44,7 @@ export class Login implements OnDestroy, OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private tokenService: TokenService,
+    private mensajeHandlerService: MensajehandlerService,
     private router: Router
   ) {
   }
@@ -118,7 +119,8 @@ export class Login implements OnDestroy, OnInit {
           this.router.navigate(['/']).then(() => window.location.reload());
         },
         error: (error) => {
-          this.mostrarError(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -143,10 +145,16 @@ export class Login implements OnDestroy, OnInit {
       )
       .subscribe({
         next: (respuesta) => {
-          this.cambiarVista(VistaLogin.EXITO);
+          this.mensajeHandlerService.showSuccessWithCallback(
+            respuesta.data, "",
+            () => {
+              this.cambiarVista(VistaLogin.EXITO);
+            }
+          );
         },
         error: (error) => {
-          this.mostrarError(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -167,17 +175,11 @@ export class Login implements OnDestroy, OnInit {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: 'Correo reenviado',
-            text: 'Hemos enviado nuevamente el enlace de recuperación',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 3000,
-            timerProgressBar: true
-          });
+          this.mensajeHandlerService.showSuccess(respuesta.data);
         },
         error: (error) => {
-          this.mostrarError(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -205,25 +207,18 @@ export class Login implements OnDestroy, OnInit {
       )
       .subscribe({
         next: (respuesta) => {
-          Swal.fire({
-            title: '¡Contraseña restablecida!',
-            text: 'Tu contraseña ha sido cambiada exitosamente. Ahora puedes iniciar sesión.',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 3000,
-            timerProgressBar: true
-          }).then(() => {
-            this.cambiarVista(VistaLogin.LOGIN);
-          });
+          this.mensajeHandlerService.showSuccessWithCallback(
+            respuesta.data, "",
+            () => {
+              this.cambiarVista(VistaLogin.LOGIN);
+            }
+          );
         },
         error: (error) => {
-          this.mostrarError(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
-  }
-
-  irAFormularioRestablecer(): void {
-    this.cambiarVista(VistaLogin.RESTABLECER);
   }
 
   obtenerErrorCampo(formulario: FormGroup, campo: string): string {
@@ -259,15 +254,6 @@ export class Login implements OnDestroy, OnInit {
     if (primerError) {
       primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }
-
-  private mostrarError(error: any): void {
-    Swal.fire({
-      title: 'Error',
-      text: error.error.data,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
-    });
   }
 
   ngOnDestroy(): void {

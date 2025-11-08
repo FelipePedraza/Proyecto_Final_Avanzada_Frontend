@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink} from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -11,6 +11,7 @@ import { ReservaService } from '../../services/reserva-service';
 import { TokenService } from '../../services/token-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { ItemReservaDTO, ReservaEstado } from '../../models/reserva-dto';
+import { MensajehandlerService } from '../../services/mensajehandler-service';
 
 @Component({
   selector: 'app-mis-reservas',
@@ -35,7 +36,8 @@ export class MisReservas implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private reservaService: ReservaService,
     private tokenService: TokenService,
-    public alojamientoService: AlojamientoService
+    public alojamientoService: AlojamientoService,
+    private mensajeHandlerService: MensajehandlerService,
   ) {}
 
   // ==================== CICLO DE VIDA ====================
@@ -53,7 +55,7 @@ export class MisReservas implements OnInit, OnDestroy {
   private cargarReservas(): void {
     const usuarioId = this.tokenService.getUserId();
     if (!usuarioId) {
-      this.mostrarError('No se pudo identificar al usuario');
+      this.mensajeHandlerService.showError('No se pudo identificar al usuario')
       return;
     }
 
@@ -70,8 +72,8 @@ export class MisReservas implements OnInit, OnDestroy {
           this.clasificarReservas(reservas);
         },
         error: (error) => {
-          this.mostrarError('Error al cargar las reservas');
-          console.error(error);
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -101,44 +103,33 @@ export class MisReservas implements OnInit, OnDestroy {
   // ==================== ACCIONES ====================
 
   cancelarReserva(idReserva: number, tituloAlojamiento: string): void {
-    Swal.fire({
-      title: '¿Cancelar reserva?',
-      text: `¿Estás seguro de cancelar tu reserva en "${tituloAlojamiento}"?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, cancelar',
-      cancelButtonText: 'No, mantener',
-      confirmButtonColor: '#e74c3c',
-      cancelButtonColor: '#95a5a6'
-    }).then((result) => {
-      if (result.isConfirmed) {
+    this.mensajeHandlerService.confirmDanger(
+      `¿Estás seguro de cancelar tu reserva en "${tituloAlojamiento}"?`,
+      'Sí, cancelar',
+      '¿Cancelar reserva?'
+    ).then((result) => {
+      if (result) {
         this.procesarCancelacion(idReserva);
       }
     });
   }
 
   private procesarCancelacion(idReserva: number): void {
-    Swal.fire({
-      title: 'Procesando...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
+
+    this.mensajeHandlerService.showLoading('Procesando...');
+
 
     this.reservaService.cancelar(idReserva)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({
-            title: 'Reserva cancelada',
-            text: 'Tu reserva ha sido cancelada exitosamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57'
-          });
+          this.mensajeHandlerService.showSuccess('Tu reserva ha sido cancelada exitosamente','Reserva cancelada');
           this.cargarReservas(); // Recargar las reservas
         },
         error: (error) => {
-          Swal.close();
-          this.mostrarError(error?.error?.data || 'Error al cancelar la reserva');
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -269,11 +260,8 @@ export class MisReservas implements OnInit, OnDestroy {
   }
 
   private procesarResena(idAlojamiento: number, calificacion: number, comentario: string): void {
-    Swal.fire({
-      title: 'Publicando reseña...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
+
+    this.mensajeHandlerService.showLoading('Procesando...');
 
     const resenaDTO = {
       calificacion,
@@ -284,18 +272,12 @@ export class MisReservas implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          Swal.fire({
-            title: '¡Reseña publicada!',
-            text: 'Tu reseña ha sido publicada exitosamente',
-            icon: 'success',
-            confirmButtonColor: '#2e8b57',
-            timer: 2000,
-            timerProgressBar: true
-          });
+          this.mensajeHandlerService.showSuccess('Tu reseña ha sido publicada exitosamente', '¡Reseña publicada!')
         },
         error: (error) => {
-          Swal.close();
-          this.mostrarError(error?.error?.data || 'Error al publicar la reseña');
+          this.mensajeHandlerService.closeModal();
+          const mensaje = this.mensajeHandlerService.handleHttpError(error);
+          this.mensajeHandlerService.showError(mensaje);
         }
       });
   }
@@ -323,14 +305,5 @@ export class MisReservas implements OnInit, OnDestroy {
     const salida = typeof fechaSalida === 'string' ? new Date(fechaSalida) : fechaSalida;
     const diferencia = salida.getTime() - entrada.getTime();
     return Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-  }
-
-  private mostrarError(mensaje: string): void {
-    Swal.fire({
-      title: 'Error',
-      text: mensaje,
-      icon: 'error',
-      confirmButtonColor: '#2e8b57'
-    });
   }
 }

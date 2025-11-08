@@ -3,10 +3,13 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import { AlojamientoItem } from '../../components/alojamiento-item/alojamiento-item';
 import { BarraBusqueda } from '../../components/barra-busqueda/barra-busqueda';
-import { AlojamientoService } from '../../services/alojamiento-service';
+
+//DTO
 import { ItemAlojamientoDTO } from '../../models/alojamiento-dto';
+
+//Servicios
 import { CiudadService} from '../../services/ciudad-service';
-import {Router} from '@angular/router';
+import { AlojamientoService } from '../../services/alojamiento-service';
 
 @Component({
   selector: 'app-inicio',
