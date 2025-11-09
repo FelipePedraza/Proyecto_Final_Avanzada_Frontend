@@ -44,4 +44,12 @@ export class AuthService {
     return this.http.patch<RespuestaDTO>(`${this.API_URL}/reset-password`, dto);
   }
 
+  /**
+   * POST /api/auth/refresh
+   * Refresca el token de acceso
+   */
+  refrescarToken(dto: { refreshToken: string }): Observable<RespuestaDTO> {
+    return this.http.post<RespuestaDTO>(`${this.API_URL}/refresh`, dto);
+  }
+
 }
