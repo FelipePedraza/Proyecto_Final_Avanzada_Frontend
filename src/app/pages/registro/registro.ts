@@ -101,9 +101,16 @@ export class Registro implements OnDestroy, OnInit {
 
     this.cargando = true;
 
-    const CreacionUsuarioDTO = this.registroForm.value as CreacionUsuarioDTO;
+    const creacionUsuarioDTO: CreacionUsuarioDTO  = {
+      nombre : this.registroForm.value.nombre + " " + this.registroForm.value.apellido,
+      email : this.registroForm.value.email,
+      contrasena : this.registroForm.value.contrasena,
+      telefono : this.registroForm.value.telefono,
+      fechaNacimiento: this.registroForm.value.fechaNacimiento
 
-    this.authService.registro(CreacionUsuarioDTO)
+    };
+
+    this.authService.registro(creacionUsuarioDTO)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.cargando = false)
