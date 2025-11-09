@@ -25,11 +25,11 @@
                   formControlName="email"
                   placeholder="tu@email.com"
                   autocomplete="email"
-                  [class.error]="campoInvalido(loginForm, 'email')">
+                  [class.error]="formUtilsService.campoInvalido(loginForm, 'email')">
 
-                @if (campoInvalido(loginForm, 'email')) {
+                @if (formUtilsService.campoInvalido(loginForm, 'email')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo(loginForm, 'email') }}
+                    {{ formUtilsService.obtenerErrorCampo(loginForm, 'email') }}
                   </div>
                 }
               </div>
@@ -44,7 +44,7 @@
                     formControlName="contrasena"
                     placeholder="Tu contraseña"
                     autocomplete="current-password"
-                    [class.error]="campoInvalido(loginForm, 'contrasena')">
+                    [class.error]="formUtilsService.campoInvalido(loginForm, 'contrasena')">
 
                   <button
                     type="button"
@@ -56,9 +56,9 @@
                   </button>
                 </div>
 
-                @if (campoInvalido(loginForm, 'contrasena')) {
+                @if (formUtilsService.campoInvalido(loginForm, 'contrasena')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo(loginForm, 'contrasena') }}
+                    {{ formUtilsService.obtenerErrorCampo(loginForm, 'contrasena') }}
                   </div>
                 }
               </div>
@@ -131,11 +131,11 @@
                   id="resetEmail"
                   formControlName="email"
                   placeholder="tu@email.com"
-                  [class.error]="campoInvalido(recuperarForm, 'email')">
+                  [class.error]="formUtilsService.campoInvalido(recuperarForm, 'email')">
 
-                @if (campoInvalido(recuperarForm, 'email')) {
+                @if (formUtilsService.campoInvalido(recuperarForm, 'email')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo(recuperarForm, 'email') }}
+                    {{ formUtilsService.obtenerErrorCampo(recuperarForm, 'email') }}
                   </div>
                 }
               </div>
@@ -269,11 +269,11 @@
                   formControlName="codigoVerificacion"
                   placeholder="Ingresa el código de 6 dígitos"
                   autocomplete="one-time-code"
-                  [class.error]="campoInvalido(restablecerForm, 'codigoVerificacion')">
+                  [class.error]="formUtilsService.campoInvalido(restablecerForm, 'codigoVerificacion')">
 
-                @if (campoInvalido(restablecerForm, 'codigoVerificacion')) {
+                @if (formUtilsService.campoInvalido(restablecerForm, 'codigoVerificacion')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo(restablecerForm, 'codigoVerificacion') }}
+                    {{ formUtilsService.obtenerErrorCampo(restablecerForm, 'codigoVerificacion') }}
                   </div>
                 }
               </div>
@@ -287,7 +287,7 @@
                     formControlName="nuevaContrasena"
                     placeholder="Tu nueva contraseña"
                     autocomplete="new-password"
-                    [class.error]="campoInvalido(restablecerForm, 'nuevaContrasena')">
+                    [class.error]="formUtilsService.campoInvalido(restablecerForm, 'nuevaContrasena')">
 
                   <button
                     type="button"
@@ -299,9 +299,9 @@
                   </button>
                 </div>
 
-                @if (campoInvalido(restablecerForm, 'nuevaContrasena')) {
+                @if (formUtilsService.campoInvalido(restablecerForm, 'nuevaContrasena')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo(restablecerForm, 'nuevaContrasena') }}
+                    {{ formUtilsService.obtenerErrorCampo(restablecerForm, 'nuevaContrasena') }}
                   </div>
                 }
               </div>

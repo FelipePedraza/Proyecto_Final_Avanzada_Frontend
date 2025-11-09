@@ -10,8 +10,8 @@ import Swal from 'sweetalert2';
 import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
 import { ImagenService } from '../../services/imagen-service';
-import { MensajehandlerService } from '../../services/mensajehandler-service';
-
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
+import { FormUtilsService } from '../../services/formUtils-service';
 // DTOs
 import { UsuarioDTO, EdicionUsuarioDTO, CambioContrasenaDTO, CreacionAnfitrionDTO, AnfitrionPerfilDTO } from '../../models/usuario-dto';
 
@@ -68,7 +68,8 @@ export class EditarPerfil implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private tokenService: TokenService,
     private imagenService: ImagenService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
+    public formUtilsService: FormUtilsService,
     private router: Router
   ) {}
 
@@ -97,7 +98,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
         Validators.maxLength(10),
         Validators.pattern(/^[0-9]{10}$/)
       ]],
-      fechaNacimiento: ['', [Validators.required, this.edadMinimaValidador(18)]],
+      fechaNacimiento: ['', [Validators.required, this.formUtilsService.edadMinimaValidador(18)]],
       foto: ['']
     });
 
@@ -107,10 +108,10 @@ export class EditarPerfil implements OnInit, OnDestroy {
       contrasenaNueva: ['', [
         Validators.required,
         Validators.minLength(8),
-        this.contrasenaFuerteValidador()
+        this.formUtilsService.contrasenaFuerteValidador()
       ]],
       confirmarContrasena: ['', [Validators.required]]
-    }, { validators: this.contrasenasMatchValidador });
+    }, { validators: this.formUtilsService.contrasenasMatchValidador() });
 
     // Formulario de anfitrion
     this.anfitrionForm = this.formBuilder.group({
@@ -256,7 +257,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
   guardarPerfil(): void {
     if (this.perfilForm.invalid) {
-      this.marcarCamposComoTocados(this.perfilForm);
+      this.formUtilsService.marcarCamposComoTocados(this.perfilForm);
       return;
     }
 
@@ -297,7 +298,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
   cambiarContrasena(): void {
     if (this.seguridadForm.invalid) {
-      this.marcarCamposComoTocados(this.seguridadForm);
+      this.formUtilsService.marcarCamposComoTocados(this.seguridadForm);
       return;
     }
 
@@ -340,7 +341,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
 
   convertirseEnAnfitrion(): void {
     if (this.anfitrionForm.invalid) {
-      this.marcarCamposComoTocados(this.anfitrionForm);
+      this.formUtilsService.marcarCamposComoTocados(this.anfitrionForm);
       return;
     }
 
@@ -491,26 +492,6 @@ export class EditarPerfil implements OnInit, OnDestroy {
       });
   }
 
-  // ==================== VALIDADORES ====================
-
-  private contrasenasMatchValidador(formGroup: AbstractControl): ValidationErrors | null {
-    const nueva = formGroup.get('contrasenaNueva')?.value;
-    const confirmar = formGroup.get('confirmarContrasena')?.value;
-    return nueva === confirmar ? null : { contrasenasNoCoinciden: true };
-  }
-
-  private contrasenaFuerteValidador() {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const value = control.value;
-      if (!value) return null;
-
-      const tieneMayuscula = /[A-Z]/.test(value);
-      const tieneNumero = /\d/.test(value);
-
-      return tieneMayuscula && tieneNumero ? null : { contrasenaDebil: true };
-    };
-  }
-
   // ==================== UTILIDADES ====================
 
   toggleContrasena(campo: 'actual' | 'nueva' | 'confirmar'): void {
@@ -526,85 +507,9 @@ export class EditarPerfil implements OnInit, OnDestroy {
         break;
     }
   }
-
-  campoInvalido(formulario: FormGroup, campo: string): boolean {
-    const control = formulario.get(campo);
-    return !!(control && control.invalid && control.touched);
-  }
-
-  formularioTieneError(formulario: FormGroup, error: string): boolean {
-    return formulario.hasError(error);
-  }
-
-  obtenerErrorCampo(formulario: FormGroup, campo: string): string {
-    const control = formulario.get(campo);
-    if (!control || !control.errors) return '';
-
-    if (control.errors['required']) return 'Este campo es obligatorio';
-    if (control.errors['minlength']) {
-      const minLength = control.errors['minlength'].requiredLength;
-      return `Debe tener al menos ${minLength} caracteres`;
-    }
-    if (control.errors['pattern']) {
-      if (campo === 'telefono') return 'Por favor ingresa un teléfono válido de 10 dígitos';
-      return 'Formato inválido';
-    }
-    if (control.errors['contrasenaDebil']) {
-      return 'La contraseña debe contener al menos una mayúscula y un número';
-    }
-    if (control.errors['edadMinima']) {
-      const edadRequerida = control.errors['edadMinima'].edadRequerida;
-      return `Debes ser mayor de ${edadRequerida} años`;
-    }
-
-    return 'Campo inválido';
-  }
-
-  private edadMinimaValidador(edadMinima: number) {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.value) return null;
-
-      const fechaNacimiento = new Date(control.value);
-      const hoy = new Date();
-      let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-      const mes = hoy.getMonth() - fechaNacimiento.getMonth();
-      const offsetMinutos = fechaNacimiento.getTimezoneOffset();
-      fechaNacimiento.setMinutes(fechaNacimiento.getMinutes() + offsetMinutos);
-
-      if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
-        edad--;
-      }
-
-      return edad >= edadMinima ? null : {
-        edadMinima: { edadRequerida: edadMinima, edadActual: edad }
-      };
-    };
-  }
-
-  obtenerFechaMaxima(): string {
-    const hoy = new Date();
-    hoy.setFullYear(hoy.getFullYear() - 18);
-    // Ajuste para el offset de la zona horaria al generar el string
-    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
-    return hoy.toISOString().split('T')[0];
-  }
-
-  obtenerFechaMinima(): string {
-    const hoy = new Date();
-    hoy.setFullYear(hoy.getFullYear() - 120);
-    // Ajuste para el offset de la zona horaria al generar el string
-    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
-    return hoy.toISOString().split('T')[0];
-  }
-
   obtenerIniciales(): string {
     if (!this.usuario) return 'U';
     return this.usuario.nombre.charAt(0).toUpperCase();
   }
 
-  private marcarCamposComoTocados(formulario: FormGroup): void {
-    Object.keys(formulario.controls).forEach(key => {
-      formulario.get(key)?.markAsTouched();
-    });
-  }
 }

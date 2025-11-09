@@ -21,7 +21,7 @@
       type="date"
       id="checkin"
       [(ngModel)]="fechaEntrada"
-      [min]="obtenerFechaMinima()">
+      [min]="formUtilsService.obtenerFechaHoy()">
   </div>
 
   <!-- Check-out -->

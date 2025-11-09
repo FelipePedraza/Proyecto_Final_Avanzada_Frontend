@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
-import { MensajehandlerService } from '../../services/mensajehandler-service';
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 
 // DTOs
 import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
@@ -59,7 +59,7 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
   constructor(
     private alojamientoService: AlojamientoService,
     private usuarioService: UsuarioService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
     private tokenService: TokenService
   ) {}
 

@@ -6,6 +6,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CiudadService } from '../../services/ciudad-service';
 import { ServiciosService } from '../../services/servicios-service';
 import { AlojamientoFiltroDTO } from '../../models/alojamiento-dto';
+import { FormUtilsService } from '../../services/formUtils-service';
 
 @Component({
   selector: 'app-barra-busqueda',
@@ -35,6 +36,7 @@ export class BarraBusqueda implements OnInit, OnDestroy {
   constructor(
     private ciudadService: CiudadService,
     private serviciosService: ServiciosService,
+    public formUtilsService: FormUtilsService,
     private router: Router
   ) {}
 
@@ -145,15 +147,10 @@ export class BarraBusqueda implements OnInit, OnDestroy {
     return serviciosMap[servicio] || servicio;
   }
 
-  obtenerFechaMinima(): string {
-    return new Date().toISOString().split('T')[0];
-  }
 
   obtenerFechaMinimaSalida(): string {
     if (!this.fechaEntrada) {
-      const manana = new Date();
-      manana.setDate(manana.getDate() + 1);
-      return manana.toISOString().split('T')[0];
+      this.formUtilsService.obtenerFechaManana();
     }
 
     const entrada = new Date(this.fechaEntrada);

@@ -11,7 +11,7 @@ import { ReservaService } from '../../services/reserva-service';
 import { TokenService } from '../../services/token-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { ItemReservaDTO, ReservaEstado } from '../../models/reserva-dto';
-import { MensajehandlerService } from '../../services/mensajehandler-service';
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 
 @Component({
   selector: 'app-mis-reservas',
@@ -37,7 +37,7 @@ export class MisReservas implements OnInit, OnDestroy {
     private reservaService: ReservaService,
     private tokenService: TokenService,
     public alojamientoService: AlojamientoService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
   ) {}
 
   // ==================== CICLO DE VIDA ====================

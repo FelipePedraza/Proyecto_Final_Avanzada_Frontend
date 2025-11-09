@@ -15,8 +15,8 @@ import { ReservaService } from '../../services/reserva-service';
 import { TokenService } from '../../services/token-service';
 import { MapaService } from '../../services/mapa-service';
 import { UsuarioService } from '../../services/usuario-service';
-import { MensajehandlerService } from '../../services/mensajehandler-service';
-
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
+import { FormUtilsService } from '../../services/formUtils-service';
 // DTOs
 import {AlojamientoDTO, MetricasDTO} from '../../models/alojamiento-dto';
 import {CreacionRespuestaDTO, ItemResenaDTO} from '../../models/resena-dto';
@@ -90,7 +90,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     private reservaService: ReservaService,
     public tokenService: TokenService,
     private mapaService: MapaService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
+    public formUtilsService: FormUtilsService,
     private usuarioService: UsuarioService
   ) {
     this.route.params.subscribe(params => {
@@ -384,7 +385,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
   realizarReserva(): void {
     if (this.reservaForm.invalid) {
-      this.marcarCamposComoTocados(this.reservaForm);
+      this.formUtilsService.marcarCamposComoTocados(this.reservaForm);
       return;
     }
 
@@ -412,7 +413,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           <p><strong>Check-out:</strong> ${this.formatearFecha(fechaSalida)}</p>
           <p><strong>Huéspedes:</strong> ${this.reservaForm.value.cantidadHuespedes}</p>
           <hr>
-          <p><strong>Total:</strong> ${this.formatearPrecio(this.precioTotal)}</p>
+          <p><strong>Total:</strong> ${this.alojamientoService.formatearPrecio(this.precioTotal)}</p>
         </div>
       `,
       icon: 'question',
@@ -606,10 +607,6 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     }
   }
 
-  formatearPrecio(precio: number): string {
-    return this.alojamientoService.formatearPrecio(precio);
-  }
-
   private formatDateForInput(d: Date): string {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -636,53 +633,14 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     });
   }
 
-  obtenerFechaMinima(): string {
-    return new Date().toISOString().split('T')[0];
-  }
-
   obtenerFechaMinimaSalida(): string {
     if (!this.reservaForm.value.fechaEntrada) {
-      const manana = new Date();
-      manana.setDate(manana.getDate() + 1);
-      return manana.toISOString().split('T')[0];
+      this.formUtilsService.obtenerFechaManana();
     }
 
     const fechaEntrada = new Date(this.reservaForm.value.fechaEntrada + 'T00:00:00');
     fechaEntrada.setDate(fechaEntrada.getDate() + 1);
     return fechaEntrada.toISOString().split('T')[0];
-  }
-
-  campoInvalido(formulario: FormGroup, campo: string): boolean {
-    const control = formulario.get(campo);
-    return !!(control && control.invalid && control.touched);
-  }
-
-  obtenerErrorCampo(formulario: FormGroup, campo: string): string {
-    const control = formulario.get(campo);
-    if (!control || !control.errors) return '';
-
-    if (control.errors['required']) return 'Este campo es obligatorio';
-    if (control.errors['min']) return `El valor mínimo es ${control.errors['min'].min}`;
-    if (control.errors['max']) {
-      if (campo === 'cantidadHuespedes') {
-        return `Máximo ${control.errors['max'].max} huéspedes`;
-      }
-      return `El valor máximo es ${control.errors['max'].max}`;
-    }
-    if (control.errors['minlength']) {
-      return `Debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
-    }
-    if (control.errors['maxlength']) {
-      return `No puede exceder ${control.errors['maxlength'].requiredLength} caracteres`;
-    }
-
-    return 'Campo inválido';
-  }
-
-  private marcarCamposComoTocados(formulario: FormGroup): void {
-    Object.keys(formulario.controls).forEach(key => {
-      formulario.get(key)?.markAsTouched();
-    });
   }
 
 }

@@ -12,12 +12,12 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // ✅ Si no hay token o es la ruta de refresh, continuar
+  // Si no hay token o es la ruta de refresh, continuar
   if (!tokenService.isLogged() || req.url.includes('/api/auth/refresh')) {
     return next(req);
   }
 
-  // ✅ Agregar token a la request
+  // Agregar token a la request
   const token = tokenService.getToken();
   const authReq = req.clone({
     setHeaders: {
@@ -28,7 +28,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
 
-      // ✅ Si es 401 (Unauthorized), intentar renovar token
+      // Si es 401 (Unauthorized), intentar renovar token
       if (error.status === 401 && !isRefreshing) {
         isRefreshing = true;
 
@@ -41,7 +41,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
           return throwError(() => error);
         }
 
-        // ✅ Intentar renovar el token
+        // Intentar renovar el token
         return authService.refrescarToken({ refreshToken }).pipe(
           switchMap((respuesta) => {
             isRefreshing = false;

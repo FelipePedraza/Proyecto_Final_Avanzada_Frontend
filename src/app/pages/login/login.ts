@@ -1,12 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {ReactiveFormsModule, FormGroup, FormBuilder, Validators, AbstractControlOptions} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
-import { MensajehandlerService } from '../../services/mensajehandler-service';
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 import { AuthService } from '../../services/auth-service';
 import { LoginDTO, OlvidoContrasenaDTO, ReinicioContrasenaDTO } from '../../models/usuario-dto';
 import {TokenService} from '../../services/token-service';
+import { FormUtilsService } from '../../services/formUtils-service';
 
 enum VistaLogin {
   LOGIN = 'login',
@@ -44,7 +45,8 @@ export class Login implements OnDestroy, OnInit {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private tokenService: TokenService,
-    private mensajeHandlerService: MensajehandlerService,
+    public formUtilsService: FormUtilsService,
+    private mensajeHandlerService: MensajeHandlerService,
     private router: Router
   ) {
   }
@@ -68,8 +70,8 @@ export class Login implements OnDestroy, OnInit {
     // Formulario de restablecimiento de contraseña
     this.restablecerForm = this.formBuilder.group({
       codigoVerificacion: ['', [Validators.required, Validators.minLength(6)]],
-      nuevaContrasena: ['', [Validators.required, Validators.minLength(8)]]
-    });
+      nuevaContrasena: ['', [Validators.required, Validators.minLength(8), this.formUtilsService.contrasenaFuerteValidador()]]
+    }, { validators: this.formUtilsService.contrasenasMatchValidador() } as AbstractControlOptions);
   }
 
   toggleContrasena(): void {
@@ -100,7 +102,7 @@ export class Login implements OnDestroy, OnInit {
       Object.keys(this.loginForm.controls).forEach(key => {
         this.loginForm.get(key)?.markAsTouched();
       });
-      this.scrollAlPrimerError();
+      this.formUtilsService.scrollAlPrimerError();
       return;
     }
 
@@ -221,40 +223,6 @@ export class Login implements OnDestroy, OnInit {
       });
   }
 
-  obtenerErrorCampo(formulario: FormGroup, campo: string): string {
-    const control = formulario.get(campo);
-
-    if (!control || !control.errors) {
-      return '';
-    }
-
-    if (control.errors['required']) {
-      return 'Este campo es obligatorio';
-    }
-
-    if (control.errors['email']) {
-      return 'Por favor ingresa un email válido';
-    }
-
-    if (control.errors['minlength']) {
-      const minLength = control.errors['minlength'].requiredLength;
-      return `Debe tener al menos ${minLength} caracteres`;
-    }
-
-    return 'Campo inválido';
-  }
-
-  campoInvalido(formulario: FormGroup, campo: string): boolean {
-    const control = formulario.get(campo);
-    return !!(control && control.invalid && control.touched);
-  }
-
-  private scrollAlPrimerError(): void {
-    const primerError = document.querySelector('.error');
-    if (primerError) {
-      primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
 
   ngOnDestroy(): void {
     this.destroy$.next();

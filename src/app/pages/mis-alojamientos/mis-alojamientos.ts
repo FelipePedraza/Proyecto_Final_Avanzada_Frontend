@@ -12,7 +12,7 @@ import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
 import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
 import { AlojamientoService } from '../../services/alojamiento-service';
-import { MensajehandlerService } from '../../services/mensajehandler-service';
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 
 @Component({
   selector: 'app-mis-alojamientos',
@@ -35,7 +35,7 @@ export class MisAlojamientos implements OnDestroy, OnInit {
   constructor(
     public alojamientoService: AlojamientoService,
     private usuarioService: UsuarioService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
     private tokenService: TokenService
   ) { }
 

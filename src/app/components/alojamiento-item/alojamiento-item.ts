@@ -19,7 +19,4 @@ export class AlojamientoItem {
     return this.alojamientoService.generarEstrellas(this.alojamiento.promedioCalificaciones);
   }
 
-  formatearPrecio(): string {
-    return this.alojamientoService.formatearPrecio(this.alojamiento.precioPorNoche);
-  }
 }

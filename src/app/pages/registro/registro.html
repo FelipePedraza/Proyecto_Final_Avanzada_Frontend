@@ -20,11 +20,11 @@
                 formControlName="nombre"
                 placeholder="Tu nombre"
                 autocomplete="given-name"
-                [class.error]="campoInvalido('nombre')">
+                [class.error]="formUtilsService.campoInvalido(registroForm, 'nombre')">
 
-              @if (campoInvalido('nombre')) {
+              @if (formUtilsService.campoInvalido(registroForm, 'nombre')) {
                 <div class="error-message show">
-                  {{ obtenerErrorCampo('nombre') }}
+                  {{ formUtilsService.obtenerErrorCampo(registroForm, 'nombre') }}
                 </div>
               }
             </div>
@@ -38,11 +38,11 @@
                 formControlName="apellido"
                 placeholder="Tu apellido"
                 autocomplete="family-name"
-                [class.error]="campoInvalido('apellido')">
+                [class.error]="formUtilsService.campoInvalido(registroForm, 'apellido')">
 
-              @if (campoInvalido('apellido')) {
+              @if (formUtilsService.campoInvalido(registroForm, 'apellido')) {
                 <div class="error-message show">
-                  {{ obtenerErrorCampo('apellido') }}
+                  {{ formUtilsService.obtenerErrorCampo(registroForm, 'apellido') }}
                 </div>
               }
             </div>
@@ -56,11 +56,11 @@
                 formControlName="email"
                 placeholder="tu@email.com"
                 autocomplete="email"
-                [class.error]="campoInvalido('email')">
+                [class.error]="formUtilsService.campoInvalido(registroForm, 'email')">
 
-              @if (campoInvalido('email')) {
+              @if (formUtilsService.campoInvalido(registroForm, 'email')) {
                 <div class="error-message show">
-                  {{ obtenerErrorCampo('email') }}
+                  {{ formUtilsService.obtenerErrorCampo(registroForm, 'email') }}
                 </div>
               }
             </div>
@@ -75,7 +75,7 @@
                   formControlName="contrasena"
                   placeholder="Mínimo 8 caracteres"
                   autocomplete="new-password"
-                  [class.error]="campoInvalido('contrasena')">
+                  [class.error]="formUtilsService.campoInvalido(registroForm, 'contrasena')">
 
                 <button
                   type="button"
@@ -112,9 +112,9 @@
                 </ul>
               </div>
 
-              @if (campoInvalido('contrasena')) {
+              @if (formUtilsService.campoInvalido(registroForm, 'contrasena')) {
                 <div class="error-message show">
-                  {{ obtenerErrorCampo('contrasena') }}
+                  {{ formUtilsService.obtenerErrorCampo(registroForm,'contrasena') }}
                 </div>
               }
             </div>
@@ -129,7 +129,7 @@
                   formControlName="confirmarContrasena"
                   placeholder="Repite tu contraseña"
                   autocomplete="new-password"
-                  [class.error]="formularioTieneError('contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched">
+                  [class.error]="formUtilsService.formularioTieneError(registroForm,'contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched">
 
                 <button
                   type="button"
@@ -141,7 +141,7 @@
                 </button>
               </div>
 
-              @if (formularioTieneError('contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched) {
+              @if (formUtilsService.formularioTieneError(registroForm, 'contrasenasNoCoinciden') && registroForm.get('confirmarContrasena')?.touched) {
                 <div class="error-message show">
                   Las contraseñas no coinciden
                 </div>
@@ -157,11 +157,11 @@
                 formControlName="telefono"
                 placeholder="300 123 4567"
                 autocomplete="tel"
-                [class.error]="campoInvalido('telefono')">
+                [class.error]="formUtilsService.campoInvalido(registroForm, 'telefono')">
 
-              @if (campoInvalido('telefono')) {
+              @if (formUtilsService.campoInvalido(registroForm, 'telefono')) {
                 <div class="error-message show">
-                  {{ obtenerErrorCampo('telefono') }}
+                  {{ formUtilsService.obtenerErrorCampo(registroForm,'telefono') }}
                 </div>
               }
             </div>
@@ -174,13 +174,13 @@
                 id="fechaNacimiento"
                 formControlName="fechaNacimiento"
                 autocomplete="bday"
-                [max]="obtenerFechaMaxima()"
-                [min]="obtenerFechaMinima()"
-                [class.error]="campoInvalido('fechaNacimiento')">
+                [max]="formUtilsService.obtenerFechaMaxima()"
+                [min]="formUtilsService.obtenerFechaMinima()"
+                [class.error]="formUtilsService.campoInvalido(registroForm, 'fechaNacimiento')">
 
-              @if (campoInvalido('fechaNacimiento')) {
+              @if (formUtilsService.campoInvalido(registroForm,'fechaNacimiento')) {
                 <div class="error-message show">
-                  {{ obtenerErrorCampo('fechaNacimiento') }}
+                  {{ formUtilsService.obtenerErrorCampo(registroForm,'fechaNacimiento') }}
                 </div>
               }
             </div>
@@ -202,7 +202,7 @@
                 </div>
               </div>
 
-              @if (campoInvalido('terminos')) {
+              @if (formUtilsService.campoInvalido(registroForm, 'terminos')) {
                 <div class="error-message show">
                   Debes aceptar los términos y condiciones
                 </div>

@@ -11,7 +11,7 @@ import { TokenService } from './token-service';
 @Injectable({
   providedIn: 'root'
 })
-export class MensajehandlerService {
+export class MensajeHandlerService {
 
   constructor(
     private router: Router,

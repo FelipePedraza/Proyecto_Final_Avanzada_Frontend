@@ -3,7 +3,7 @@ import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {finalize, Subject, takeUntil} from 'rxjs';
 
-import { MensajehandlerService } from '../../services/mensajehandler-service';
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { UsuarioDTO } from '../../models/usuario-dto';
 import { TokenService} from '../../services/token-service';
@@ -30,7 +30,7 @@ export class Encabezado implements OnInit, OnDestroy {
   constructor(
     private tokenService: TokenService,
     private usuarioService: UsuarioService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
     private router: Router
   ) {
     this.estaAutenticado = this.tokenService.isLogged();

@@ -11,8 +11,8 @@ import { CiudadService } from '../../services/ciudad-service';
 import { ServiciosService } from '../../services/servicios-service';
 import { TokenService } from '../../services/token-service';
 import { MapaService } from '../../services/mapa-service';
-import { MensajehandlerService } from '../../services/mensajehandler-service';
-
+import { MensajeHandlerService } from '../../services/mensajeHandler-service';
+import { FormUtilsService } from '../../services/formUtils-service';
 //DTOs
 import { CreacionAlojamientoDTO, EdicionAlojamientoDTO, Direccion } from '../../models/alojamiento-dto';
 import { MarcadorDTO} from '../../models/marcador-dto';
@@ -53,7 +53,8 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
     private ciudadService: CiudadService,
     private serviciosService: ServiciosService,
     private tokenService: TokenService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
+    public formUtilsService: FormUtilsService,
     private mapaService: MapaService
   ) {}
 
@@ -302,7 +303,7 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
   // ==================== NAVEGACIÓN ENTRE PASOS ====================
   siguientePaso(): void {
     if (!this.validarPasoActual()) {
-      this.marcarCamposComoTocados();
+      this.formUtilsService.marcarCamposComoTocados(this.alojamientoForm);
       this.mensajeHandlerService.showError('Por favor completa todos los campos requeridos');
       return;
     }
@@ -470,38 +471,6 @@ export class CrearAlojamiento implements OnInit, OnDestroy {
     return this.alojamientoForm.valid &&
       this.obtenerServiciosSeleccionados().length > 0 &&
       this.imagenesSubidas.length >= 3;
-  }
-
-  campoInvalido(campo: string): boolean {
-    const control = this.alojamientoForm.get(campo);
-    return !!(control && control.invalid && control.touched);
-  }
-
-  obtenerErrorCampo(campo: string): string {
-    const control = this.alojamientoForm.get(campo);
-    if (!control || !control.errors) return '';
-
-    if (control.errors['required']) return 'Este campo es obligatorio';
-    if (control.errors['minlength']) {
-      return `Debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
-    }
-    if (control.errors['maxlength']) {
-      return `No puede exceder ${control.errors['maxlength'].requiredLength} caracteres`;
-    }
-    if (control.errors['min']) {
-      return `El valor mínimo es ${control.errors['min'].min}`;
-    }
-    if (control.errors['max']) {
-      return `El valor máximo es ${control.errors['max'].max}`;
-    }
-
-    return 'Campo inválido';
-  }
-
-  marcarCamposComoTocados(): void {
-    Object.keys(this.alojamientoForm.controls).forEach(key => {
-      this.alojamientoForm.get(key)?.markAsTouched();
-    });
   }
 
   // ==================== UTILIDADES ====================

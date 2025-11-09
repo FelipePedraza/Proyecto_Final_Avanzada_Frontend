@@ -12,7 +12,7 @@ import {AlojamientoService} from '../../services/alojamiento-service';
 import {ReservaService} from '../../services/reserva-service';
 import {TokenService} from '../../services/token-service';
 import {UsuarioService} from '../../services/usuario-service';
-import {MensajehandlerService} from '../../services/mensajehandler-service';
+import {MensajeHandlerService} from '../../services/mensajeHandler-service';
 
 // DTO
 import {ReservaDTO, ReservaEstado} from '../../models/reserva-dto';
@@ -67,7 +67,7 @@ export class GestionarReservas implements OnInit, OnDestroy {
     public alojamientoService: AlojamientoService,
     private reservaService: ReservaService,
     private tokenService: TokenService,
-    private mensajeHandlerService: MensajehandlerService,
+    private mensajeHandlerService: MensajeHandlerService,
     private usuarioService: UsuarioService
   ) {}
 

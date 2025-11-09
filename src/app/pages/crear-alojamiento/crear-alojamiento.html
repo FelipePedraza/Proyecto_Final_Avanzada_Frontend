@@ -57,11 +57,11 @@
                   id="titulo"
                   formControlName="titulo"
                   placeholder="Ej: Hermoso apartamento en el centro"
-                  [class.error]="campoInvalido('titulo')">
+                  [class.error]="formUtilsService.campoInvalido(alojamientoForm,'titulo')">
 
-                @if (campoInvalido('titulo')) {
+                @if (formUtilsService.campoInvalido(alojamientoForm,'titulo')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo('titulo') }}
+                    {{ formUtilsService.obtenerErrorCampo(alojamientoForm,'titulo') }}
                   </div>
                 }
 
@@ -77,11 +77,11 @@
                   formControlName="descripcion"
                   rows="6"
                   placeholder="Describe tu alojamiento: características, espacios, comodidades..."
-                  [class.error]="campoInvalido('descripcion')"></textarea>
+                  [class.error]="formUtilsService.campoInvalido(alojamientoForm,'descripcion')"></textarea>
 
-                @if (campoInvalido('descripcion')) {
+                @if (formUtilsService.campoInvalido(alojamientoForm,'descripcion')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo('descripcion') }}
+                    {{ formUtilsService.obtenerErrorCampo(alojamientoForm,'descripcion') }}
                   </div>
                 }
 
@@ -98,11 +98,11 @@
                   formControlName="maxHuespedes"
                   min="1"
                   max="20"
-                  [class.error]="campoInvalido('maxHuespedes')">
+                  [class.error]="formUtilsService.campoInvalido(alojamientoForm,'maxHuespedes')">
 
-                @if (campoInvalido('maxHuespedes')) {
+                @if (formUtilsService.campoInvalido(alojamientoForm,'maxHuespedes')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo('maxHuespedes') }}
+                    {{ formUtilsService.obtenerErrorCampo(alojamientoForm,'maxHuespedes') }}
                   </div>
                 }
               </div>
@@ -115,11 +115,11 @@
                   formControlName="precioPorNoche"
                   min="10000"
                   placeholder="50000"
-                  [class.error]="campoInvalido('precioPorNoche')">
+                  [class.error]="formUtilsService.campoInvalido(alojamientoForm,'precioPorNoche')">
 
-                @if (campoInvalido('precioPorNoche')) {
+                @if (formUtilsService.campoInvalido(alojamientoForm,'precioPorNoche')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo('precioPorNoche') }}
+                    {{ formUtilsService.obtenerErrorCampo(alojamientoForm,'precioPorNoche') }}
                   </div>
                 }
               </div>
@@ -141,16 +141,16 @@
                 <select
                   id="ciudad"
                   formControlName="ciudad"
-                  [class.error]="campoInvalido('ciudad')">
+                  [class.error]="formUtilsService.campoInvalido(alojamientoForm,'ciudad')">
                   <option value="">Selecciona una ciudad</option>
                   @for (ciudad of ciudades; track ciudad) {
                     <option [value]="ciudad">{{ ciudad }}</option>
                   }
                 </select>
 
-                @if (campoInvalido('ciudad')) {
+                @if (formUtilsService.campoInvalido(alojamientoForm,'ciudad')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo('ciudad') }}
+                    {{ formUtilsService.obtenerErrorCampo(alojamientoForm,'ciudad') }}
                   </div>
                 }
               </div>
@@ -162,11 +162,11 @@
                   id="direccion"
                   formControlName="direccion"
                   placeholder="Calle 123 #45-67"
-                  [class.error]="campoInvalido('direccion')">
+                  [class.error]="formUtilsService.campoInvalido(alojamientoForm,'direccion')">
 
-                @if (campoInvalido('direccion')) {
+                @if (formUtilsService.campoInvalido(alojamientoForm,'direccion')) {
                   <div class="error-message show">
-                    {{ obtenerErrorCampo('direccion') }}
+                    {{ formUtilsService.obtenerErrorCampo( alojamientoForm, 'direccion') }}
                   </div>
                 }
               </div>
