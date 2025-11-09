@@ -375,7 +375,6 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
       leido: false
     };
 
-    this.mensajes = [...this.mensajes, mensajeTemporal];
     this.nuevoMensaje = '';
     this.shouldScrollToBottom = true;
 
