@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreacionReservaDTO } from '../models/reserva-dto';
 import { RespuestaDTO } from '../models/respuesta-dto';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReservaService {
-  private readonly API_URL = 'http://localhost:8080/api/reservas';
+  private readonly API_URL = `${environment.apiUrl}/reservas`;
 
   constructor(private http: HttpClient) {}
 

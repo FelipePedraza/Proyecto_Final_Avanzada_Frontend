@@ -79,8 +79,6 @@ export class TokenService {
     return "";
   }
 
-  // ==================== TOKEN EXPIRATION ====================
-
   public isTokenExpired(): boolean {
     const token = this.getToken();
     if (!token) return true;

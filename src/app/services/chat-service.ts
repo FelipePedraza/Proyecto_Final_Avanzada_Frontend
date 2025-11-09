@@ -3,12 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { RespuestaDTO } from '../models/respuesta-dto';
 import { MensajeDTO } from '../models/chat-dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private readonly API_URL = 'http://localhost:8080/api/chat';
+  private readonly API_URL = `${environment.apiUrl}/chat`;
 
   private mensajesEnMemoriaSubject = new BehaviorSubject<MensajeDTO[]>([]);
   public mensajesEnMemoria$ = this.mensajesEnMemoriaSubject.asObservable();

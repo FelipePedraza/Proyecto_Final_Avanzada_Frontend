@@ -4,6 +4,7 @@ import SockJS from 'sockjs-client';
 import { BehaviorSubject, Observable, ReplaySubject } from 'rxjs';
 import { TokenService } from './token-service';
 import { MensajeDTO } from '../models/chat-dto';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -28,8 +29,9 @@ export class WebSocketService implements OnDestroy {
   // Control de reconexión
   private reconectando = false;
   private intentosReconexion = 0;
-  private readonly MAX_INTENTOS_RECONEXION = 5;
   private timerReconexion?: any;
+  private readonly MAX_INTENTOS_RECONEXION = environment.wsMaxReconnectAttempts;
+  private readonly RECONNECT_DELAY = environment.wsReconnectDelay;
 
   // ==================== CONSTRUCTOR ====================
   constructor(private tokenService: TokenService) {}
@@ -55,7 +57,7 @@ export class WebSocketService implements OnDestroy {
     console.log('Iniciando conexión WebSocket...');
 
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS(`http://localhost:8080/ws?token=${token}`),
+      webSocketFactory: () => new SockJS(`${environment.wsUrl}?token=${token}`),
       connectHeaders: {
         Authorization: `Bearer ${token}`
       },
@@ -63,7 +65,7 @@ export class WebSocketService implements OnDestroy {
         // Comentar en producción
         console.log('STOMP:', str);
       },
-      reconnectDelay: 5000,
+      reconnectDelay: this.RECONNECT_DELAY,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
@@ -229,14 +231,14 @@ export class WebSocketService implements OnDestroy {
   private procesarMensajesPendientes(): void {
     if (this.mensajesPendientes.length === 0) return;
 
-    console.log(`📤 Enviando ${this.mensajesPendientes.length} mensajes pendientes...`);
+    console.log(`Enviando ${this.mensajesPendientes.length} mensajes pendientes...`);
 
     while (this.mensajesPendientes.length > 0) {
       const mensaje = this.mensajesPendientes.shift();
       this.enviarMensaje(mensaje).subscribe({
         next: () => console.log('Mensaje pendiente enviado'),
         error: (err) => {
-          console.error('❌ Error enviando mensaje pendiente:', err);
+          console.error('Error enviando mensaje pendiente:', err);
           // Volver a agregar a la cola si falla
           this.mensajesPendientes.unshift(mensaje);
         }
@@ -273,7 +275,7 @@ export class WebSocketService implements OnDestroy {
   desconectar(): void {
     if (!this.stompClient) return;
 
-    console.log('🔌 Desconectando WebSocket...');
+    console.log('Desconectando WebSocket...');
 
     // Limpiar timer de reconexión
     if (this.timerReconexion) {

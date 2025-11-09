@@ -2,6 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import mapboxgl, { LngLatLike, Map, Marker, MapMouseEvent } from 'mapbox-gl';
 import { MarcadorDTO } from '../models/marcador-dto';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +12,7 @@ export class MapaService implements OnDestroy {
   private map?: Map;
   private markers: Marker[] = [];
   private currentLocation: LngLatLike = [-75.6727, 4.53252];
-  private readonly MAPBOX_TOKEN = 'pk.eyJ1IjoicGVkcmF6YTgzMCIsImEiOiJjbWg5OTQ0MjMxY2F6MmpxNmVibG5pc2V2In0.VrZ9nEk-zYTfqaUrE2rWwg';
+  private readonly MAPBOX_TOKEN= environment.mapboxToken;
   private destroy$ = new Subject<void>();
   private marcadorElemento = document.createElement('div');
 

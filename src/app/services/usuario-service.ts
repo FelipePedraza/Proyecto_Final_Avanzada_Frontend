@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { EdicionUsuarioDTO, CambioContrasenaDTO, CreacionAnfitrionDTO } from '../models/usuario-dto';
 import { ReservaEstado } from '../models/reserva-dto';
 import { RespuestaDTO } from '../models/respuesta-dto';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
-  private readonly API_URL = 'http://localhost:8080/api/usuarios';
+  private readonly API_URL = `${environment.apiUrl}/usuarios`;
 
   constructor(private http: HttpClient) {}
 

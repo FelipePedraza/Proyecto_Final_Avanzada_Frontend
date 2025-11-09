@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ItemAlojamientoDTO, CreacionAlojamientoDTO, EdicionAlojamientoDTO, AlojamientoFiltroDTO } from '../models/alojamiento-dto';
+import { CreacionAlojamientoDTO, EdicionAlojamientoDTO, AlojamientoFiltroDTO } from '../models/alojamiento-dto';
 import { ReservaEstado } from '../models/reserva-dto';
 import { CreacionResenaDTO, CreacionRespuestaDTO } from '../models/resena-dto';
 import { RespuestaDTO } from '../models/respuesta-dto';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlojamientoService {
-  private readonly API_URL = 'http://localhost:8080/api/alojamientos';
+  private readonly API_URL = `${environment.apiUrl}/alojamientos`;
 
   constructor(private http: HttpClient) {}
 

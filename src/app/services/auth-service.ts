@@ -3,12 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreacionUsuarioDTO, LoginDTO, OlvidoContrasenaDTO, ReinicioContrasenaDTO } from '../models/usuario-dto';
 import { RespuestaDTO } from '../models/respuesta-dto';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/api/auth';
+  private readonly API_URL = `${environment.apiUrl}/auth`;
+
 
   constructor(private http: HttpClient) {}
 
