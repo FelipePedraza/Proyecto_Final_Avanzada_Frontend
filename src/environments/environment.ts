@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
 
-  // URL base del backend
+  // URL base del backend local
   apiUrl: 'http://localhost:8080/api',
 
   // WebSocket
@@ -21,7 +21,5 @@ export const environment = {
   maxImageSize: 5 * 1024 * 1024, // 5MB
   maxImages: 10,
 
-  // Configuración de timeouts (ms)
-  httpTimeout: 30000,
 
 };

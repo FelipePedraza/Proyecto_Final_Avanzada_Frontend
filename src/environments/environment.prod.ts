@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
 
-  // URL base del backend (CAMBIAR por tu dominio de producción)
+  // URL base del backend en produccion
   apiUrl: 'https://proyectofinalavanzadabackend-production.up.railway.app/api',
 
   // WebSocket
@@ -20,8 +20,5 @@ export const environment = {
   // Configuración de imágenes
   maxImageSize: 5 * 1024 * 1024, // 5MB
   maxImages: 10,
-
-  // Configuración de timeouts (ms)
-  httpTimeout: 30000,
 
 };
