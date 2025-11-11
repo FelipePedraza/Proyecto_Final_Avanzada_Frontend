@@ -21,7 +21,4 @@ export const environment = {
   maxImageSize: 5 * 1024 * 1024, // 5MB
   maxImages: 10,
 
-  // Configuración de timeouts (ms)
-  httpTimeout: 30000,
-
 };
