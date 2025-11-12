@@ -13,10 +13,12 @@ import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { MensajeHandlerService } from '../../services/mensajeHandler-service';
+import { CalificacionService } from '../../services/calificacion-service';
+import { PrecioService } from '../../services/precio-service';
 
 @Component({
   selector: 'app-mis-alojamientos',
-  imports: [PanelUsuario, CommonModule, FormsModule, RouterLink],
+  imports: [ PanelUsuario, CommonModule, FormsModule, RouterLink],
   templateUrl: './mis-alojamientos.html',
   styleUrl: './mis-alojamientos.css'
 })
@@ -36,6 +38,8 @@ export class MisAlojamientos implements OnDestroy, OnInit {
     public alojamientoService: AlojamientoService,
     private usuarioService: UsuarioService,
     private mensajeHandlerService: MensajeHandlerService,
+    public calificacionService: CalificacionService,
+    public precioService: PrecioService,
     private tokenService: TokenService
   ) { }
 

@@ -209,12 +209,12 @@
                       [alt]="'Avatar de ' + resena.usuario.nombre">
                     <div>
                       <strong>{{ resena.usuario.nombre }}</strong>
-                      <span>{{ formatearFechaCorta(resena.creadoEn) }}</span>
+                      <span>{{ fechaService.formatearFechaCorta(resena.creadoEn) }}</span>
                     </div>
                   </div>
 
                   <div style="margin: 0.5rem 0;">
-                    @for (star of alojamientoService.generarEstrellas(resena.calificacion); track $index) {
+                    @for (star of calificacionService.generarEstrellas(resena.calificacion); track $index) {
                       <i class="fa-solid fa-star" style="color: #F39C12; font-size: 0.9rem;"></i>
                     }
                   </div>
@@ -230,7 +230,7 @@
                       </div>
                       <p class="host-response-message">{{ resena.respuesta.mensaje }}</p>
                       <p class="host-response-date">
-                        {{ formatearFechaCorta(resena.respuesta.respondidoEn) }}
+                        {{ fechaService.formatearFechaCorta(resena.respuesta.respondidoEn) }}
                       </p>
                     </div>
                   }
@@ -276,7 +276,7 @@
       <!-- Widget de Reserva (Sticky) -->
       <aside class="booking-widget">
         <div class="booking-price">
-          <strong>{{ alojamientoService.formatearPrecio(alojamiento.precioPorNoche) }}</strong> / noche
+          <strong>{{ precioService.formatearPrecio(alojamiento.precioPorNoche) }}</strong> / noche
         </div>
 
         <form [formGroup]="reservaForm" (ngSubmit)="realizarReserva()" class="booking-form">
@@ -287,7 +287,7 @@
               type="date"
               id="fechaEntrada"
               formControlName="fechaEntrada"
-              [min]="formUtilsService.obtenerFechaHoy()"
+              [min]="fechaService.obtenerFechaHoy()"
               [class.error]="formUtilsService.campoInvalido(reservaForm, 'fechaEntrada')">
 
             @if (formUtilsService.campoInvalido(reservaForm, 'fechaEntrada')) {
@@ -303,7 +303,7 @@
               type="date"
               id="fechaSalida"
               formControlName="fechaSalida"
-              [min]="obtenerFechaMinimaSalida()"
+              [min]="fechaService.obtenerFechaMinimaSalida(this.reservaForm.value.fechaEntrada)"
               [class.error]="formUtilsService.campoInvalido(reservaForm, 'fechaSalida')">
 
             @if (formUtilsService.campoInvalido(reservaForm, 'fechaSalida')) {
@@ -352,18 +352,18 @@
           @if (numeroNoches > 0) {
             <ul>
               <li>
-                <span>{{ alojamientoService.formatearPrecio(alojamiento.precioPorNoche) }} x {{ numeroNoches }} noche{{ numeroNoches > 1 ? 's' : '' }}</span>
-                <span>{{ alojamientoService.formatearPrecio(alojamiento.precioPorNoche * numeroNoches) }}</span>
+                <span>{{ precioService.formatearPrecio(alojamiento.precioPorNoche) }} x {{ numeroNoches }} noche{{ numeroNoches > 1 ? 's' : '' }}</span>
+                <span>{{ precioService.formatearPrecio(alojamiento.precioPorNoche * numeroNoches) }}</span>
               </li>
               <li>
                 <span>Tarifa de servicio</span>
-                <span>{{ alojamientoService.formatearPrecio(tarifaServicio) }}</span>
+                <span>{{ precioService.formatearPrecio(tarifaServicio) }}</span>
               </li>
             </ul>
             <hr>
             <p class="total-price">
               <span><strong>Total</strong></span>
-              <span><strong>{{ alojamientoService.formatearPrecio(precioTotal) }}</strong></span>
+              <span><strong>{{ precioService.formatearPrecio(precioTotal) }}</strong></span>
             </p>
           }
         </div>

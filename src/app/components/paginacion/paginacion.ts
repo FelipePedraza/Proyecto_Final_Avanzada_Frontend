@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './paginacion.css'
 })
 export class Paginacion {
-
+  // TODO falta hacer que el los metodos de "cargar mas" usen la paginación para traer mas objetos
 }

@@ -83,7 +83,7 @@
 
                 <!-- Calificación -->
                 <div class="alojamiento-rating">
-                  @for (star of alojamientoService.generarEstrellas(alojamiento.promedioCalificaciones); track $index) {
+                  @for (star of calificacionService.generarEstrellas(alojamiento.promedioCalificaciones); track $index) {
                     <i class="fa-solid fa-star"></i>
                   }
                   <span class="rating-number">
@@ -109,7 +109,7 @@
                 <div class="alojamiento-price">
                   <span class="price-label">Precio por noche</span>
                   <span class="price-amount">
-                    {{ alojamientoService.formatearPrecio(alojamiento.precioPorNoche) }}
+                    {{ precioService.formatearPrecio(alojamiento.precioPorNoche) }}
                   </span>
                 </div>
 

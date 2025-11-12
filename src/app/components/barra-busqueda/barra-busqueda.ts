@@ -7,6 +7,7 @@ import { CiudadService } from '../../services/ciudad-service';
 import { ServiciosService } from '../../services/servicios-service';
 import { AlojamientoFiltroDTO } from '../../models/alojamiento-dto';
 import { FormUtilsService } from '../../services/formUtils-service';
+import { FechaService } from '../../services/fecha-service';
 
 @Component({
   selector: 'app-barra-busqueda',
@@ -37,6 +38,7 @@ export class BarraBusqueda implements OnInit, OnDestroy {
     private ciudadService: CiudadService,
     private serviciosService: ServiciosService,
     public formUtilsService: FormUtilsService,
+    public fechaService: FechaService,
     private router: Router
   ) {}
 
@@ -145,16 +147,5 @@ export class BarraBusqueda implements OnInit, OnDestroy {
       'MASCOTAS': 'Pet Friendly'
     };
     return serviciosMap[servicio] || servicio;
-  }
-
-
-  obtenerFechaMinimaSalida(): string {
-    if (!this.fechaEntrada) {
-      this.formUtilsService.obtenerFechaManana();
-    }
-
-    const entrada = new Date(this.fechaEntrada);
-    entrada.setDate(entrada.getDate() + 1);
-    return entrada.toISOString().split('T')[0];
   }
 }

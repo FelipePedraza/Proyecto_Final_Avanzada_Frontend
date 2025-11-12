@@ -89,14 +89,14 @@
                         <i class="fa-solid fa-comment"></i>
                       </a>
                     </p>
-                    <p><i class="fa-solid fa-calendar"></i> <strong>{{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
+                    <p><i class="fa-solid fa-calendar"></i> <strong>{{ fechaService.formatearFechaCorta(reserva.fechaEntrada) }} - {{ fechaService.formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
                       <i class="fa-solid fa-users"></i>
                       <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
                     </p>
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      <strong>Precio:</strong> {{ alojamientoService.formatearPrecio(reserva.precio) }}
+                      <strong>Precio:</strong> {{ precioService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
                   <div class="reservation-actions-compact">
@@ -137,14 +137,14 @@
                         <i class="fa-solid fa-comment"></i>
                       </a>
                     </p>
-                    <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
+                    <p><i class="fa-solid fa-calendar"></i><strong> {{ fechaService.formatearFechaCorta(reserva.fechaEntrada) }} - {{ fechaService.formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
                       <i class="fa-solid fa-users"></i>
                       <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
                     </p>
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      <strong>Precio:</strong> {{ alojamientoService.formatearPrecio(reserva.precio) }}
+                      <strong>Precio:</strong> {{ precioService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
                   <div class="reservation-actions-compact">
@@ -182,14 +182,14 @@
                         <i class="fa-solid fa-comment"></i>
                       </a>
                     </p>
-                    <p><i class="fa-solid fa-calendar"></i><strong> {{ formatearFechaCorta(reserva.fechaEntrada) }} - {{ formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
+                    <p><i class="fa-solid fa-calendar"></i><strong> {{ fechaService.formatearFechaCorta(reserva.fechaEntrada) }} - {{ fechaService.formatearFechaCorta(reserva.fechaSalida) }}</strong></p>
                     <p>
                       <i class="fa-solid fa-users"></i>
                       <strong>Huéspedes:</strong> {{ reserva.cantidadHuespedes }}
                     </p>
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      <strong>Precio:</strong> {{ alojamientoService.formatearPrecio(reserva.precio) }}
+                      <strong>Precio:</strong> {{ precioService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
                   <div class="reservation-actions-compact">

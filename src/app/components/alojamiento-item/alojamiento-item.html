@@ -17,7 +17,7 @@
 
     <div class="card-footer">
       <div class="rating">
-        @for (star of generarEstrellas(); track $index) {
+        @for (star of this.calificacionService.generarEstrellas(this.alojamiento.promedioCalificaciones); track $index) {
           <i class="fa-solid fa-star"></i>
         }
         <span class="rating-number">
@@ -26,7 +26,7 @@
       </div>
 
       <p class="price">
-        <strong>{{ alojamientoService.formatearPrecio(this.alojamiento.precioPorNoche) }}</strong>
+        <strong>{{ precioService.formatearPrecio(this.alojamiento.precioPorNoche) }}</strong>
         <span class="price-period">/ noche</span>
       </p>
     </div>

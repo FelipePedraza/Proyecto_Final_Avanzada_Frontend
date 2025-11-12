@@ -162,23 +162,4 @@ export class AlojamientoService {
     );
   }
 
-  // ==================== MÉTODOS AUXILIARES (SOLO FRONTEND) ====================
-
-  /**
-   * Formatea precio con formato de moneda colombiana
-   */
-  formatearPrecio(precio: number): string {
-    return precio.toLocaleString('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    });
-  }
-
-  /**
-   * Genera array de estrellas para UI
-   */
-  generarEstrellas(calificacion: number): number[] {
-    return Array(Math.floor(calificacion)).fill(0);
-  }
 }

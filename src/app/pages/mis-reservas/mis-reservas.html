@@ -84,18 +84,18 @@
 
                     <p>
                       <i class="fa-solid fa-calendar"></i>
-                      {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
+                      {{ fechaService.formatearFechaCompleta(reserva.fechaEntrada) }} - {{ fechaService.formatearFechaCompleta(reserva.fechaSalida) }}
                     </p>
 
                     <p>
                       <i class="fa-solid fa-moon"></i>
-                      {{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
-                      noche{{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
+                      {{ fechaService.calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
+                      noche{{ fechaService.calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
                     </p>
 
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      {{ alojamientoService.formatearPrecio(reserva.precio) }}
+                      {{ precioService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
 
@@ -175,18 +175,18 @@
 
                     <p>
                       <i class="fa-solid fa-calendar"></i>
-                      {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
+                      {{ fechaService.formatearFechaCompleta(reserva.fechaEntrada) }} - {{ fechaService.formatearFechaCompleta(reserva.fechaSalida) }}
                     </p>
 
                     <p>
                       <i class="fa-solid fa-moon"></i>
-                      {{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
-                      noche{{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
+                      {{ fechaService.calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
+                      noche{{ fechaService.calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
                     </p>
 
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      {{ alojamientoService.formatearPrecio(reserva.precio) }}
+                      {{ precioService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
 
@@ -255,18 +255,18 @@
                     </p>
                     <p>
                       <i class="fa-solid fa-calendar"></i>
-                      {{ formatearFecha(reserva.fechaEntrada) }} - {{ formatearFecha(reserva.fechaSalida) }}
+                      {{ fechaService.formatearFechaCompleta(reserva.fechaEntrada) }} - {{ fechaService.formatearFechaCompleta(reserva.fechaSalida) }}
                     </p>
 
                     <p>
                       <i class="fa-solid fa-moon"></i>
-                      {{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
-                      noche{{ calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
+                      {{ fechaService.calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) }}
+                      noche{{ fechaService.calcularNoches(reserva.fechaEntrada, reserva.fechaSalida) > 1 ? 's' : '' }}
                     </p>
 
                     <p>
                       <i class="fa-solid fa-dollar-sign"></i>
-                      {{ alojamientoService.formatearPrecio(reserva.precio) }}
+                      {{ precioService.formatearPrecio(reserva.precio) }}
                     </p>
                   </div>
 
