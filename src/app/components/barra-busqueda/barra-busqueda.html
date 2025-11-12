@@ -21,7 +21,7 @@
       type="date"
       id="checkin"
       [(ngModel)]="fechaEntrada"
-      [min]="formUtilsService.obtenerFechaHoy()">
+      [min]="fechaService.obtenerFechaHoy()">
   </div>
 
   <!-- Check-out -->
@@ -31,7 +31,7 @@
       type="date"
       id="checkout"
       [(ngModel)]="fechaSalida"
-      [min]="obtenerFechaMinimaSalida()">
+      [min]="fechaService.obtenerFechaMinimaSalida(this.fechaEntrada)">
   </div>
 
   <!-- Huéspedes -->

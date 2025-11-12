@@ -13,6 +13,8 @@ import {ReservaService} from '../../services/reserva-service';
 import {TokenService} from '../../services/token-service';
 import {UsuarioService} from '../../services/usuario-service';
 import {MensajeHandlerService} from '../../services/mensajeHandler-service';
+import { FechaService } from '../../services/fecha-service';
+import { PrecioService } from '../../services/precio-service';
 
 // DTO
 import {ReservaDTO, ReservaEstado} from '../../models/reserva-dto';
@@ -68,6 +70,8 @@ export class GestionarReservas implements OnInit, OnDestroy {
     private reservaService: ReservaService,
     private tokenService: TokenService,
     private mensajeHandlerService: MensajeHandlerService,
+    public fechaService: FechaService,
+    public precioService: PrecioService,
     private usuarioService: UsuarioService
   ) {}
 
@@ -211,7 +215,6 @@ export class GestionarReservas implements OnInit, OnDestroy {
   }
 
   // ==================== ACCIONES DE RESERVA ====================
-  // (Sin cambios, solo nos aseguramos de llamar a this.cargarDatos())
 
   aprobarReserva(idReserva: number, tituloAlojamiento: string): void {
     this.mensajeHandlerService.confirm(
@@ -292,13 +295,5 @@ export class GestionarReservas implements OnInit, OnDestroy {
 
   cambiarTab(tab: 'pendientes' | 'confirmadas' | 'historial'): void {
     this.tabActiva = tab;
-  }
-
-  // ==================== UTILIDADES ====================
-
-  formatearFechaCorta(fecha: Date | string): string {
-    const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    const fechaAjustada = new Date(f.getTime() + f.getTimezoneOffset() * 60000);
-    return fechaAjustada.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
   }
 }

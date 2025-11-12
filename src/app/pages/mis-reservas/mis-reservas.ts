@@ -3,15 +3,17 @@ import { CommonModule } from '@angular/common';
 import { RouterLink} from '@angular/router';
 import { Subject, takeUntil, finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-
-// COMPONENTES Y SERVICIOS
 import { PanelUsuario } from '../../components/panel-usuario/panel-usuario';
+
+// Servicios
 import { AlojamientoService } from '../../services/alojamiento-service';
 import { ReservaService } from '../../services/reserva-service';
 import { TokenService } from '../../services/token-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { ItemReservaDTO, ReservaEstado } from '../../models/reserva-dto';
 import { MensajeHandlerService } from '../../services/mensajeHandler-service';
+import { FechaService } from '../../services/fecha-service';
+import { PrecioService } from '../../services/precio-service';
 
 @Component({
   selector: 'app-mis-reservas',
@@ -38,6 +40,8 @@ export class MisReservas implements OnInit, OnDestroy {
     private tokenService: TokenService,
     public alojamientoService: AlojamientoService,
     private mensajeHandlerService: MensajeHandlerService,
+    public fechaService: FechaService,
+    public precioService: PrecioService
   ) {}
 
   // ==================== CICLO DE VIDA ====================
@@ -288,22 +292,4 @@ export class MisReservas implements OnInit, OnDestroy {
     this.tabActiva = tab;
   }
 
-  // ==================== UTILIDADES ====================
-
-  formatearFecha(fecha: Date | string): string {
-    const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    const fechaAjustada = new Date(f.getTime() + f.getTimezoneOffset() * 60000);
-    return fechaAjustada.toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  }
-
-  calcularNoches(fechaEntrada: Date | string, fechaSalida: Date | string): number {
-    const entrada = typeof fechaEntrada === 'string' ? new Date(fechaEntrada) : fechaEntrada;
-    const salida = typeof fechaSalida === 'string' ? new Date(fechaSalida) : fechaSalida;
-    const diferencia = salida.getTime() - entrada.getTime();
-    return Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-  }
 }

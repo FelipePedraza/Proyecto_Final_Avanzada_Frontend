@@ -2,7 +2,8 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ItemAlojamientoDTO } from '../../models/alojamiento-dto';
-import { AlojamientoService } from '../../services/alojamiento-service';
+import { CalificacionService } from '../../services/calificacion-service';
+import { PrecioService } from '../../services/precio-service';
 
 @Component({
   selector: 'app-alojamiento-item',
@@ -13,10 +14,9 @@ import { AlojamientoService } from '../../services/alojamiento-service';
 export class AlojamientoItem {
   @Input() alojamiento!: ItemAlojamientoDTO;
 
-  constructor(public alojamientoService: AlojamientoService) {}
-
-  generarEstrellas(): number[] {
-    return this.alojamientoService.generarEstrellas(this.alojamiento.promedioCalificaciones);
-  }
+  constructor(
+    public calificacionService: CalificacionService,
+    public precioService: PrecioService
+  ) {}
 
 }

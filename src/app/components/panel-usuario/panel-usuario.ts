@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { UsuarioService } from '../../services/usuario-service';
 import { UsuarioDTO } from '../../models/usuario-dto';
 import { TokenService} from '../../services/token-service';
+import { FechaService } from '../../services/fecha-service';
 
 @Component({
   selector: 'app-panel-usuario',
@@ -22,6 +23,7 @@ export class PanelUsuario {
   constructor(
     private usuarioService: UsuarioService,
     private tokenService: TokenService,
+    public fechaService: FechaService,
     private router: Router
   ) {
     this.cargarUsuario()
@@ -76,10 +78,5 @@ export class PanelUsuario {
   obtenerIniciales(): string {
     if (!this.usuario) return 'U';
     return this.usuario.nombre.charAt(0).toUpperCase();
-  }
-
-  obtenerAnioRegistro(): number {
-    if (!this.usuario) return new Date().getFullYear();
-    return new Date().getFullYear();
   }
 }

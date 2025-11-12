@@ -150,8 +150,8 @@
                     id="fechaNacimiento"
                     formControlName="fechaNacimiento"
                     autocomplete="bday"
-                    [max]="formUtilsService.obtenerFechaMaxima()"
-                    [min]="formUtilsService.obtenerFechaMinima()"
+                    [max]="fechaService.obtenerFechaMaxima()"
+                    [min]="fechaService.obtenerFechaMinima()"
                     [class.error]="formUtilsService.campoInvalido(perfilForm,'fechaNacimiento')">
 
                   @if (formUtilsService.campoInvalido(perfilForm, 'fechaNacimiento')) {
