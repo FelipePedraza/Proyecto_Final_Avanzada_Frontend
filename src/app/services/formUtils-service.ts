@@ -166,45 +166,6 @@ export class FormUtilsService {
       return contrasena === confirmar ? null : { contrasenasNoCoinciden: true };
     };
   }
-
-  // ==================== UTILIDADES DE FECHAS ====================
-
-  /**
-   * Obtiene la fecha máxima para un selector de fecha (edad mínima)
-   */
-  obtenerFechaMaxima(edadMinima: number = 18): string {
-    const hoy = new Date();
-    hoy.setFullYear(hoy.getFullYear() - edadMinima);
-    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
-    return hoy.toISOString().split('T')[0];
-  }
-
-  /**
-   * Obtiene la fecha mínima para un selector de fecha
-   */
-  obtenerFechaMinima(edadMaxima: number = 120): string {
-    const hoy = new Date();
-    hoy.setFullYear(hoy.getFullYear() - edadMaxima);
-    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
-    return hoy.toISOString().split('T')[0];
-  }
-
-  /**
-   * Obtiene la fecha de hoy en formato YYYY-MM-DD
-   */
-  obtenerFechaHoy(): string {
-    return new Date().toISOString().split('T')[0];
-  }
-
-  /**
-   * Obtiene la fecha de mañana en formato YYYY-MM-DD
-   */
-  obtenerFechaManana(): string {
-    const manana = new Date();
-    manana.setDate(manana.getDate() + 1);
-    return manana.toISOString().split('T')[0];
-  }
-
   // ==================== SCROLL Y UX ====================
 
   /**

@@ -8,9 +8,9 @@ import { Subject, takeUntil, finalize } from 'rxjs';
 import { AuthService } from '../../services/auth-service';
 import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 import { FormUtilsService } from '../../services/formUtils-service';
+import { FechaService } from '../../services/fecha-service';
 //DTO
 import { CreacionUsuarioDTO } from '../../models/usuario-dto';
-import {CreacionAlojamientoDTO} from '../../models/alojamiento-dto';
 
 @Component({
   selector: 'app-registro',
@@ -39,6 +39,7 @@ export class Registro implements OnDestroy, OnInit {
     private authService: AuthService,
     private mensajeHandlerService: MensajeHandlerService,
     public formUtilsService: FormUtilsService,
+    public fechaService: FechaService,
     private router: Router
   ) {
   }

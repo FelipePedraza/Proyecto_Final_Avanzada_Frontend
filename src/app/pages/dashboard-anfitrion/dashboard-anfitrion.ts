@@ -11,6 +11,7 @@ import { AlojamientoService } from '../../services/alojamiento-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { TokenService } from '../../services/token-service';
 import { MensajeHandlerService } from '../../services/mensajeHandler-service';
+import { FechaService } from '../../services/fecha-service';
 
 // DTOs
 import { ItemAlojamientoDTO, MetricasDTO } from '../../models/alojamiento-dto';
@@ -60,6 +61,7 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
     private alojamientoService: AlojamientoService,
     private usuarioService: UsuarioService,
     private mensajeHandlerService: MensajeHandlerService,
+    public fechaService: FechaService,
     private tokenService: TokenService
   ) {}
 
@@ -296,15 +298,4 @@ export class DashboardAnfitrion implements OnInit, OnDestroy {
     this.tabActiva = tab;
   }
 
-  // ==================== UTILIDADES ====================
-
-  formatearFecha(fecha: Date | string): string {
-    const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    const fechaAjustada = new Date(f.getTime() + f.getTimezoneOffset() * 60000);
-    return fechaAjustada.toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  }
 }

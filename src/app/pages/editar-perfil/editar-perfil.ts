@@ -12,6 +12,7 @@ import { TokenService } from '../../services/token-service';
 import { ImagenService } from '../../services/imagen-service';
 import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 import { FormUtilsService } from '../../services/formUtils-service';
+import { FechaService } from '../../services/fecha-service';
 // DTOs
 import { UsuarioDTO, EdicionUsuarioDTO, CambioContrasenaDTO, CreacionAnfitrionDTO, AnfitrionPerfilDTO } from '../../models/usuario-dto';
 
@@ -70,6 +71,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
     private imagenService: ImagenService,
     private mensajeHandlerService: MensajeHandlerService,
     public formUtilsService: FormUtilsService,
+    public fechaService: FechaService,
     private router: Router
   ) {}
 
@@ -170,7 +172,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (respuesta) => {
-            this.anfitrionInfo = respuesta.data;
+          this.anfitrionInfo = respuesta.data;
         },
         error: (error) => {
           const mensaje = this.mensajeHandlerService.handleHttpError(error);
@@ -507,6 +509,7 @@ export class EditarPerfil implements OnInit, OnDestroy {
         break;
     }
   }
+
   obtenerIniciales(): string {
     if (!this.usuario) return 'U';
     return this.usuario.nombre.charAt(0).toUpperCase();

@@ -53,7 +53,7 @@
                   <strong>{{ obtenerOtroUsuario(conversacion).nombre }}</strong>
                   @if (conversacion.ultimoMensaje) {
                     <span class="conversation-time">
-                      {{ formatearHora(conversacion.ultimoMensaje.fechaEnvio) }}
+                      {{ fechaService.formatearHora(conversacion.ultimoMensaje.fechaEnvio) }}
                     </span>
                   }
                 </div>
@@ -138,7 +138,7 @@
 
                 <div class="message-bubble">
                   <p class="message-content">{{ mensaje.contenido }}</p>
-                  <span class="message-time">{{ formatearHora(mensaje.fechaEnvio) }}</span>
+                  <span class="message-time">{{ fechaService.formatearHora(mensaje.fechaEnvio) }}</span>
                 </div>
               </div>
             }

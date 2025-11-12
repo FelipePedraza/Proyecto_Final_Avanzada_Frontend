@@ -9,6 +9,7 @@ import { ChatService } from '../../services/chat-service';
 import { TokenService } from '../../services/token-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { WebSocketService } from '../../services/websocket-service';
+import { FechaService } from '../../services/fecha-service';
 
 // Modelos
 import { ChatDTO, MensajeDTO } from '../../models/chat-dto';
@@ -57,6 +58,7 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
     private webSocketService: WebSocketService,
     private route: ActivatedRoute,
     private location: Location,
+    public fechaService: FechaService,
     private router: Router
   ) {}
 
@@ -411,14 +413,6 @@ export class Chat implements OnInit, OnDestroy, AfterViewChecked {
 
   esMensajePropio(mensaje: MensajeDTO): boolean {
     return mensaje.remitenteId === this.usuarioActualId;
-  }
-
-  formatearHora(fecha: Date | string): string {
-    const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    return f.toLocaleTimeString('es-CO', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   }
 
   obtenerIniciales(nombre: string): string {

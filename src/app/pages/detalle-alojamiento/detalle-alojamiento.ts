@@ -17,6 +17,9 @@ import { MapaService } from '../../services/mapa-service';
 import { UsuarioService } from '../../services/usuario-service';
 import { MensajeHandlerService } from '../../services/mensajeHandler-service';
 import { FormUtilsService } from '../../services/formUtils-service';
+import { FechaService } from '../../services/fecha-service';
+import { PrecioService } from '../../services/precio-service';
+import { CalificacionService } from '../../services/calificacion-service';
 // DTOs
 import {AlojamientoDTO, MetricasDTO} from '../../models/alojamiento-dto';
 import {CreacionRespuestaDTO, ItemResenaDTO} from '../../models/resena-dto';
@@ -92,6 +95,9 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     private mapaService: MapaService,
     private mensajeHandlerService: MensajeHandlerService,
     public formUtilsService: FormUtilsService,
+    public fechaService: FechaService,
+    public precioService: PrecioService,
+    public calificacionService: CalificacionService,
     private usuarioService: UsuarioService
   ) {
     this.route.params.subscribe(params => {
@@ -170,14 +176,14 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
           this.usuarioService.obtener(respuesta.alojamiento.data.anfitrionId).pipe(
             takeUntil(this.destroy$),
             finalize(() => this.cargando = false)).subscribe({
-              next: (respuesta) => {
-                  this.anfitiron = respuesta.data;
-              },
-              error: (error) => {
-                const mensaje = this.mensajeHandlerService.handleHttpError(error);
-                this.mensajeHandlerService.showError(mensaje);
-              }
-            });
+            next: (respuesta) => {
+              this.anfitiron = respuesta.data;
+            },
+            error: (error) => {
+              const mensaje = this.mensajeHandlerService.handleHttpError(error);
+              this.mensajeHandlerService.showError(mensaje);
+            }
+          });
           // Verificar si el usuario es el anfitrión propietario
           this.verificarPropietario();
 
@@ -409,11 +415,11 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       html: `
         <div style="text-align: left;">
           <p><strong>Alojamiento:</strong> ${this.alojamiento!.titulo}</p>
-          <p><strong>Check-in:</strong> ${this.formatearFecha(fechaEntrada)}</p>
-          <p><strong>Check-out:</strong> ${this.formatearFecha(fechaSalida)}</p>
+          <p><strong>Check-in:</strong> ${this.fechaService.formatearFechaCompleta(fechaEntrada)}</p>
+          <p><strong>Check-out:</strong> ${this.fechaService.formatearFechaCompleta(fechaSalida)}</p>
           <p><strong>Huéspedes:</strong> ${this.reservaForm.value.cantidadHuespedes}</p>
           <hr>
-          <p><strong>Total:</strong> ${this.alojamientoService.formatearPrecio(this.precioTotal)}</p>
+          <p><strong>Total:</strong> ${this.precioService.formatearPrecio(this.precioTotal)}</p>
         </div>
       `,
       icon: 'question',
@@ -513,7 +519,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
 
     // Si el usuario nunca seleccionó manualmente (bandera true), fijamos entrada
     if (this.seleccionandoEntrada || !entradaVal) {
-      const nuevaEntradaStr = this.formatDateForInput(clicked);
+      const nuevaEntradaStr = this.fechaService.formatearParaInput(clicked);
       // Si la nueva entrada es igual o posterior a la salida actual, la dejamos (o reseteamos la salida)
       if (salidaVal) {
         const salidaDate = new Date(salidaVal + 'T00:00:00');
@@ -531,7 +537,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       this.seleccionandoEntrada = false;
     } else {
       // estamos seleccionando salida
-      const nuevaSalidaStr = this.formatDateForInput(clicked);
+      const nuevaSalidaStr = this.fechaService.formatearParaInput(clicked);
 
       // Asegurarnos que la salida sea posterior a la entrada
       const entradaDate = new Date((this.reservaForm.get('fechaEntrada')?.value || '') + 'T00:00:00');
@@ -605,42 +611,6 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
     if (index !== -1) {
       this.imagenesGaleria[index] = imagenAnterior;
     }
-  }
-
-  private formatDateForInput(d: Date): string {
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  }
-
-  formatearFecha(fecha: Date): string {
-    const fechaAjustada = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
-    return fechaAjustada.toLocaleDateString('es-CO', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-
-  formatearFechaCorta(fecha: string | Date): string {
-    const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    const fechaAjustada = new Date(f.getTime() + f.getTimezoneOffset() * 60000);
-    return fechaAjustada.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'short'
-    });
-  }
-
-  obtenerFechaMinimaSalida(): string {
-    if (!this.reservaForm.value.fechaEntrada) {
-      this.formUtilsService.obtenerFechaManana();
-    }
-
-    const fechaEntrada = new Date(this.reservaForm.value.fechaEntrada + 'T00:00:00');
-    fechaEntrada.setDate(fechaEntrada.getDate() + 1);
-    return fechaEntrada.toISOString().split('T')[0];
   }
 
 }
