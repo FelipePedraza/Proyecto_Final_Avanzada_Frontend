@@ -42,7 +42,7 @@ const CALENDAR_COLORS = {
 })
 export class DetalleAlojamiento implements OnInit, OnDestroy {
   // ==================== PROPIEDADES ====================
-  anfitiron: UsuarioDTO | undefined;
+  anfitrion: UsuarioDTO | undefined;
   alojamiento: AlojamientoDTO | undefined;
   metricas: MetricasDTO | undefined;
   resenas: ItemResenaDTO[] = [];
@@ -177,7 +177,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
             takeUntil(this.destroy$),
             finalize(() => this.cargando = false)).subscribe({
               next: (respuesta) => {
-                  this.anfitiron = respuesta.data;
+                  this.anfitrion = respuesta.data;
               },
               error: (error) => {
                 const mensaje = this.mensajeHandlerService.handleHttpError(error);
@@ -216,7 +216,7 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
       this.esAnfitrionPropietario = false;
       return;
     }
-    if(this.anfitiron?.id === this.tokenService.getUserId()) {
+    if(this.anfitrion!.id === this.tokenService.getUserId()) {
       this.esAnfitrionPropietario = true;
       return;
     }
@@ -599,8 +599,8 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
   // ==================== UTILIDADES ====================
 
   obtenerIniciales(): string {
-    if (!this.anfitiron) return 'U';
-    return this.anfitiron.nombre.charAt(0).toUpperCase();
+    if (!this.anfitrion) return 'U';
+    return this.anfitrion.nombre.charAt(0).toUpperCase();
   }
 
   cambiarImagenPrincipal(imagen: string): void {
