@@ -178,14 +178,14 @@ export class DetalleAlojamiento implements OnInit, OnDestroy {
             finalize(() => this.cargando = false)).subscribe({
               next: (respuesta) => {
                   this.anfitrion = respuesta.data;
+                  // Verificar si el usuario es el anfitrión propietario
+                  this.verificarPropietario();
               },
               error: (error) => {
                 const mensaje = this.mensajeHandlerService.handleHttpError(error);
                 this.mensajeHandlerService.showError(mensaje);
               }
             });
-          // Verificar si el usuario es el anfitrión propietario
-          this.verificarPropietario();
 
           // Validar capacidad máxima en el formulario
           this.reservaForm.get('cantidadHuespedes')?.setValidators([
