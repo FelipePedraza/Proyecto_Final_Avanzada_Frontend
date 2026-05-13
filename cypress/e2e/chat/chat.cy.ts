@@ -11,6 +11,6 @@ describe('Chat - C1255', () => {
   it('debe redirigir a home si no autenticado', () => {
     cy.logout();
     cy.visit('/chat');
-    cy.url().should('eq', 'http://localhost:4200/');
+    cy.location('pathname').should('eq', '/');
   });
 });

@@ -2,7 +2,7 @@ Cypress.Commands.add('login', (email: string, password: string) => {
   cy.request({
     method: 'POST',
     url: `${Cypress.env('apiUrl')}/auth/login`,
-    body: { email, password },
+    body: { email, contrasena: password },
   }).then((response) => {
     sessionStorage.setItem('AuthToken', response.body.data.token);
     sessionStorage.setItem('RefreshToken', response.body.data.refreshToken);

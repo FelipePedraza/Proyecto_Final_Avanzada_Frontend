@@ -11,6 +11,6 @@ describe('Dashboard Anfitrión - C1259', () => {
   it('debe redirigir a home si no es anfitrión', () => {
     cy.logout();
     cy.visit('/dashboard-anfitrion');
-    cy.url().should('eq', 'http://localhost:4200/');
+    cy.location('pathname').should('eq', '/');
   });
 });

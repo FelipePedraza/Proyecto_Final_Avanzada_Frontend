@@ -26,7 +26,7 @@ describe('Login - C1234', () => {
   it('debe redirigir a home si ya está autenticado', () => {
     cy.loginAsHuesped();
     cy.visit('/login');
-    cy.url().should('eq', 'http://localhost:4200/');
+    cy.location('pathname').should('eq', '/');
   });
 
   it('debe mostrar enlace para recuperar contraseña', () => {

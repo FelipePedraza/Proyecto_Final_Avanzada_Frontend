@@ -10,9 +10,9 @@ describe('Navegación y Accesibilidad', () => {
 
   it('debe redirigir a home si no autenticado en rutas protegidas', () => {
     cy.visit('/mis-reservas');
-    cy.url().should('eq', 'http://localhost:4200/');
+    cy.location('pathname').should('eq', '/');
     cy.visit('/chat');
-    cy.url().should('eq', 'http://localhost:4200/');
+    cy.location('pathname').should('eq', '/');
   });
 
   it('debe tener navegación principal visible', () => {

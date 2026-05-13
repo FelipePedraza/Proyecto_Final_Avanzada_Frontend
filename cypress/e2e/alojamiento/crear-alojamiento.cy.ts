@@ -13,6 +13,6 @@ describe('Crear Alojamiento - C1245', () => {
   it('debe redirigir a home si no es anfitrión', () => {
     cy.logout();
     cy.visit('/crear-alojamiento');
-    cy.url().should('eq', 'http://localhost:4200/');
+    cy.location('pathname').should('eq', '/');
   });
 });
