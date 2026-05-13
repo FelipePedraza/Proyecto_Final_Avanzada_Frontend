@@ -8,7 +8,11 @@
     "prebuild": "node scripts/generate-env-config.mjs",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:headless": "cypress run --headless --browser chrome",
+    "e2e": "start-server-and-test start http://localhost:4200 cypress:run"
   },
   "prettier": {
     "printWidth": 100,
@@ -20,6 +24,11 @@
           "parser": "angular"
         }
       }
+    ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "cypress"
     ]
   },
   "private": true,
@@ -48,14 +57,18 @@
     "@angular/build": "^20.2.0",
     "@angular/cli": "^20.2.0",
     "@angular/compiler-cli": "^20.2.0",
+    "@cypress/code-coverage": "^4.0.3",
     "@types/jasmine": "~5.1.0",
     "@types/sockjs-client": "^1.5.4",
+    "cypress": "^15.15.0",
+    "cypress-testrail-reporter": "^1.3.4",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "start-server-and-test": "^2.0.0",
     "typescript": "~5.9.2"
   }
 }

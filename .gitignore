@@ -37,6 +37,15 @@ yarn-error.log
 testem.log
 /typings
 
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
+/cypress/downloads/
+
+# pnpm
+pnpm-workspace.yaml
+
 # System files
 .DS_Store
 Thumbs.db
+nul

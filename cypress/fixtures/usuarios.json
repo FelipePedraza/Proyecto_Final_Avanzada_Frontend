@@ -1,0 +1,17 @@
+{
+  "huesped": {
+    "email": "huesped@test.com",
+    "password": "Test1234",
+    "nombre": "Huesped Test"
+  },
+  "anfitrion": {
+    "email": "anfitrion@test.com",
+    "password": "Test1234",
+    "nombre": "Anfitrion Test"
+  },
+  "nuevo": {
+    "email": "nuevo@test.com",
+    "password": "Test1234",
+    "nombre": "Nuevo Test"
+  }
+}

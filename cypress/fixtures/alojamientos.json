@@ -1,0 +1,10 @@
+{
+  "alojamientoEjemplo": {
+    "nombre": "Casa de prueba Cypress",
+    "ciudad": "Armenia",
+    "descripcion": "Alojamiento creado por pruebas E2E",
+    "precioPorNoche": 150000,
+    "capacidad": 4,
+    "servicios": ["WIFI", "PISCINA"]
+  }
+}
