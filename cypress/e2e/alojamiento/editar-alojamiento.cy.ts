@@ -1,15 +1,23 @@
 describe('Editar Alojamiento - C1247', () => {
   beforeEach(() => {
     cy.loginAsAnfitrion();
+    cy.intercept('GET', '**/api/ciudades', {
+      statusCode: 200,
+      body: { data: ['Armenia', 'Bogotá', 'Medellín'] },
+    }).as('getCiudades');
+    cy.intercept('GET', '**/api/servicios', {
+      statusCode: 200,
+      body: { data: ['WIFI', 'PISCINA', 'PARQUEADERO'] },
+    }).as('getServicios');
+    cy.intercept('GET', '**/api/alojamientos/**', {
+      statusCode: 200,
+      body: { data: { titulo: 'Test', descripcion: 'Test edit', maxHuespedes: 2, precioPorNoche: 100000 } },
+    }).as('getAlojamiento');
   });
 
   it('C1248 Editar alojamiento - formulario visible', () => {
-    cy.intercept('GET', '**/api/alojamientos/**', {
-      statusCode: 200,
-      body: { data: { titulo: 'Test', descripcion: 'Test', maxHuespedes: 2, precioPorNoche: 100000 } },
-    }).as('getAlojamiento');
     cy.visit('/editar-alojamiento/1');
-    cy.wait('@getAlojamiento');
+    cy.wait('@getCiudades');
     cy.get('form').should('be.visible');
   });
 
