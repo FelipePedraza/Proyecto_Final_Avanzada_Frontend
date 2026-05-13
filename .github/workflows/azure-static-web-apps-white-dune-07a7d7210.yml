@@ -36,12 +36,19 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Angular app
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          WS_URL: ${{ secrets.WS_URL }}
+          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+          STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
         run: pnpm build
 
       - name: Serve built app and run Cypress
         run: |
-          npx serve dist/ViviGo_Frontend/browser -l 4200 --no-clipboard &
+          npx serve dist/ViviGo_Frontend/browser -l 4200 --no-clipboard --single &
           sleep 5
+          curl -s -o /dev/null -w "%{http_code}" http://localhost:4200/login
+          echo ""
           npx cypress run --headless --browser chrome --config baseUrl=http://localhost:4200
 
       - name: Upload Cypress screenshots (on failure)
