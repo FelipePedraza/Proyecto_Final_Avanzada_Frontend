@@ -1,7 +1,7 @@
 describe('Gestionar Reservas (Anfitrión) - C1253', () => {
   beforeEach(() => {
     cy.loginAsAnfitrion();
-    cy.intercept('GET', '**/api/usuarios/*/alojamientos*', {
+    cy.intercept('GET', '**/usuarios/*/alojamientos*', {
       statusCode: 200,
       body: {
         data: {
@@ -10,7 +10,7 @@ describe('Gestionar Reservas (Anfitrión) - C1253', () => {
         },
       },
     }).as('getAlojamientos');
-    cy.intercept('GET', '**/api/alojamientos/*/reservas*', {
+    cy.intercept('GET', '**/alojamientos/*/reservas*', {
       statusCode: 200,
       body: { data: { content: [], pagination: { page: 0, size: 5, totalElements: 0, totalPages: 0 } } },
     }).as('getReservas');

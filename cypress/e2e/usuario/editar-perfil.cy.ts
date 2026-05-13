@@ -1,7 +1,7 @@
 describe('Editar Perfil - C1257', () => {
   beforeEach(() => {
     cy.loginAsHuesped();
-    cy.intercept('GET', '**/api/usuarios/*', {
+    cy.intercept('GET', '**/usuarios/*', {
       statusCode: 200,
       body: {
         data: {
