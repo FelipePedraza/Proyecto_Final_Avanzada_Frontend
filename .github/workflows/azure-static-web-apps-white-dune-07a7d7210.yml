@@ -14,67 +14,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-    runs-on: ubuntu-latest
-    name: Run Cypress E2E Tests
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build Angular app
-        env:
-          API_URL: ${{ secrets.API_URL }}
-          WS_URL: ${{ secrets.WS_URL }}
-          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
-          STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
-        run: pnpm build
-
-      - name: Serve built app and run Cypress
-        run: |
-          npx serve dist/ViviGo_Frontend/browser -l 4200 --no-clipboard --single &
-          for i in $(seq 1 15); do
-            if curl -s -o /dev/null http://localhost:4200; then
-              echo "Server ready after ${i}s"
-              break
-            fi
-            echo "Waiting... ${i}s"
-            sleep 1
-          done
-          npx cypress run --headless --browser chrome --config baseUrl=http://localhost:4200
-
-      - name: Upload Cypress screenshots (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots/
-
-      - name: Upload Cypress videos (on failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-videos
-          path: cypress/videos/
-
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
-    needs: test
+    outputs:
+      static_web_app_url: ${{ steps.builddeploy.outputs.static_web_app_url }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -95,6 +40,48 @@ jobs:
           app_location: "/"
           api_location: ""
           output_location: "dist/ViviGo_Frontend/browser"
+
+  test:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    runs-on: ubuntu-latest
+    name: Run Cypress E2E Tests
+    needs: build_and_deploy_job
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Cypress against deployed app
+        run: |
+          npx cypress run --headless --browser chrome \
+            --config baseUrl=${{ needs.build_and_deploy_job.outputs.static_web_app_url }} \
+            --env apiUrl=${{ secrets.API_URL }}
+
+      - name: Upload Cypress screenshots (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots/
+
+      - name: Upload Cypress videos (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos
+          path: cypress/videos/
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
