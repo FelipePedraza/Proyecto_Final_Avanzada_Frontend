@@ -1,10 +1,12 @@
-import { defineConfig } from 'cypress';
+const { defineConfig } = require('cypress');
 
-const testrailHost = 'https://vivigo830.testrail.io';
-const testrailUser = 'felipedraza830@gmail.com';
-const testrailPassword = 'ObhUeyEaGYGFjYFBFipL-bEVgle.Usj7ritJffNTX';
+const testrailHost = process.env.CYPRESS_TESTRAIL_HOST || 'https://vivigo830.testrail.io';
+const testrailUser = process.env.CYPRESS_TESTRAIL_USERNAME || 'felipedraza830@gmail.com';
+const testrailPass = process.env.CYPRESS_TESTRAIL_PASSWORD || 'ObhUeyEaGYGFjYFBFipL-bEVgle.Usj7ritJffNTX';
+const testrailProjectId = parseInt(process.env.CYPRESS_TESTRAIL_PROJECT_ID || '1');
+const testrailSuiteId = parseInt(process.env.CYPRESS_TESTRAIL_SUITE_ID || '1');
 
-export default defineConfig({
+module.exports = defineConfig({
   e2e: {
     allowCypressEnv: true,
     baseUrl: 'http://localhost:4200',
@@ -23,9 +25,9 @@ export default defineConfig({
   reporterOptions: {
     host: testrailHost,
     username: testrailUser,
-    password: testrailPassword,
-    projectId: 1,
-    suiteId: 1,
+    password: testrailPass,
+    projectId: testrailProjectId,
+    suiteId: testrailSuiteId,
     includeAll: false,
   },
   component: {
