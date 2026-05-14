@@ -1,4 +1,4 @@
-describe('Navegación y Accesibilidad', () => {
+describe('Navegación y Accesibilidad - C1261', () => {
   it('debe navegar a todas las rutas públicas', () => {
     cy.visit('/');
     cy.get('app-encabezado').should('be.visible');

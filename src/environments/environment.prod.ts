@@ -36,4 +36,4 @@ export const environment = {
   // Configuración de imágenes
   maxImageSize: 5 * 1024 * 1024, // 5MB
   maxImages: 10,
-};
+}

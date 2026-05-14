@@ -75,10 +75,17 @@ jobs:
         run: npx cypress install --force
 
       - name: Run Cypress against deployed app
+        env:
+          CYPRESS_BASE_URL: ${{ needs.build_and_deploy_job.outputs.static_web_app_url }}
+          CYPRESS_apiUrl: ${{ secrets.API_URL }}
+          CYPRESS_TESTRAIL_HOST: ${{ secrets.TESTRAIL_HOST }}
+          CYPRESS_TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
+          CYPRESS_TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
+          CYPRESS_TESTRAIL_PROJECT_ID: ${{ secrets.TESTRAIL_PROJECT_ID }}
+          CYPRESS_TESTRAIL_SUITE_ID: ${{ secrets.TESTRAIL_SUITE_ID }}
         run: |
           npx cypress run --headless --browser chrome \
-            --config baseUrl=${{ needs.build_and_deploy_job.outputs.static_web_app_url }} \
-            --env apiUrl=${{ secrets.API_URL }},TESTRAIL_HOST=${{ secrets.TESTRAIL_HOST }},TESTRAIL_USER=${{ secrets.TESTRAIL_USER }},TESTRAIL_API_KEY=${{ secrets.TESTRAIL_API_KEY }},TESTRAIL_PROJECT_ID=${{ secrets.TESTRAIL_PROJECT_ID }},TESTRAIL_SUITE_ID=${{ secrets.TESTRAIL_SUITE_ID }}
+            --config baseUrl=${{ needs.build_and_deploy_job.outputs.static_web_app_url }}
 
       - name: Upload Cypress screenshots (on failure)
         if: failure()

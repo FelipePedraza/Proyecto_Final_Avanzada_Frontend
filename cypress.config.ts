@@ -1,5 +1,9 @@
 import { defineConfig } from 'cypress';
 
+const testrailHost = 'https://vivigo830.testrail.io';
+const testrailUser = 'felipedraza830@gmail.com';
+const testrailPassword = 'ObhUeyEaGYGFjYFBFipL-bEVgle.Usj7ritJffNTX';
+
 export default defineConfig({
   e2e: {
     allowCypressEnv: true,
@@ -11,18 +15,15 @@ export default defineConfig({
     defaultCommandTimeout: 10000,
     env: {
       apiUrl: 'http://localhost/api',
-      TESTRAIL_HOST: 'https://vivigo.testrail.io',
-      TESTRAIL_PROJECT_ID: 1,
-      TESTRAIL_SUITE_ID: 1,
     },
     specPattern: 'cypress/e2e/**/*.cy.ts',
     supportFile: 'cypress/support/e2e.ts',
   },
   reporter: 'cypress-testrail-reporter',
   reporterOptions: {
-    host: 'https://vivigo830.testrail.io',
-    user: 'felipedraza830@gmail.com',
-    apiKey: 'ObhUeyEaGYGFjYFBFipL-bEVgle.Usj7ritJffNTX',
+    host: testrailHost,
+    username: testrailUser,
+    password: testrailPassword,
     projectId: 1,
     suiteId: 1,
     includeAll: false,
