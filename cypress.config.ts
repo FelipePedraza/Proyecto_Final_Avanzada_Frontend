@@ -18,6 +18,15 @@ export default defineConfig({
     specPattern: 'cypress/e2e/**/*.cy.ts',
     supportFile: 'cypress/support/e2e.ts',
   },
+  reporter: 'cypress-testrail-reporter',
+  reporterOptions: {
+    host: 'https://vivigo830.testrail.io',
+    user: 'felipedraza830@gmail.com',
+    apiKey: 'ObhUeyEaGYGFjYFBFipL-bEVgle.Usj7ritJffNTX',
+    projectId: 1,
+    suiteId: 1,
+    includeAll: false,
+  },
   component: {
     devServer: {
       framework: 'angular',
