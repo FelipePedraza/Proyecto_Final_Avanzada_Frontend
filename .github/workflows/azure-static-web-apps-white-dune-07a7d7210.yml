@@ -80,7 +80,7 @@ jobs:
           CYPRESS_apiUrl: ${{ secrets.API_URL }}
           CYPRESS_TESTRAIL_HOST: ${{ secrets.TESTRAIL_HOST }}
           CYPRESS_TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USER }}
-          CYPRESS_TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_API_KEY }}
+          CYPRESS_TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}
           CYPRESS_TESTRAIL_PROJECT_ID: ${{ secrets.TESTRAIL_PROJECT_ID }}
           CYPRESS_TESTRAIL_SUITE_ID: ${{ secrets.TESTRAIL_SUITE_ID }}
         run: |

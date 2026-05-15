@@ -1,6 +1,1 @@
-window.__env = {
-  apiUrl: '',
-  wsUrl: '',
-  mapboxToken: '',
-  stripePublicKey: '',
-};
+window.__env = {};

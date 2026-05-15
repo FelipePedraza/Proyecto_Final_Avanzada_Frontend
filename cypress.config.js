@@ -4,7 +4,7 @@ const apiUrl = process.env.CYPRESS_apiUrl;
 const baseUrl = process.env.CYPRESS_BASE_URL;
 const testrailHost = process.env.CYPRESS_TESTRAIL_HOST;
 const testrailUser = process.env.CYPRESS_TESTRAIL_USERNAME;
-const testrailPass = process.env.CYPRESS_TESTRAIL_PASSWORD;
+const testrailPass = process.env.CYPRESS_TESTRAIL_API_KEY;
 const testrailProjectId = parseInt(process.env.CYPRESS_TESTRAIL_PROJECT_ID);
 const testrailSuiteId = parseInt(process.env.CYPRESS_TESTRAIL_SUITE_ID);
 
