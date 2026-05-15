@@ -10,13 +10,16 @@ const testrailSuiteId = parseInt(process.env.CYPRESS_TESTRAIL_SUITE_ID);
 
 module.exports = defineConfig({
   e2e: {
-    allowCypressEnv: true,
     baseUrl: baseUrl,
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
     screenshotOnRunFailure: true,
     defaultCommandTimeout: 10000,
+    retries: {
+      runMode: 2,
+      openMode: 0,
+    },
     env: {
       apiUrl: apiUrl,
     },
