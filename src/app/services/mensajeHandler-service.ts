@@ -54,6 +54,10 @@ export class MensajeHandlerService {
         // Conflict - Por ejemplo, email duplicado
         return this.extractBackendMessage(error) || 'Conflicto con los datos existentes.';
 
+      case 429:
+        // Too Many Requests - Account locked due to failed login attempts
+        return this.extractBackendMessage(error) || 'Demasiados intentos fallidos. Intente de nuevo más tarde.';
+
       case 500:
         // Internal Server Error
         return this.extractBackendMessage(error) || 'Error interno del servidor. Intenta más tarde.';
