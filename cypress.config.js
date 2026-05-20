@@ -8,6 +8,15 @@ const testrailPass = process.env.CYPRESS_TESTRAIL_API_KEY;
 const testrailProjectId = parseInt(process.env.CYPRESS_TESTRAIL_PROJECT_ID);
 const testrailSuiteId = parseInt(process.env.CYPRESS_TESTRAIL_SUITE_ID);
 
+const testrailEnabled =
+  !!testrailHost &&
+  !!testrailUser &&
+  !!testrailPass &&
+  !isNaN(testrailProjectId) &&
+  !isNaN(testrailSuiteId);
+
+console.log('[Cypress Config] TestRail reporter enabled:', testrailEnabled);
+
 module.exports = defineConfig({
   e2e: {
     baseUrl: baseUrl,
@@ -25,15 +34,17 @@ module.exports = defineConfig({
     },
     specPattern: 'cypress/e2e/**/*.cy.ts',
     supportFile: 'cypress/support/e2e.ts',
-    reporter: 'cypress-testrail-reporter',
-    reporterOptions: {
-      host: testrailHost,
-      username: testrailUser,
-      password: testrailPass,
-      projectId: testrailProjectId,
-      suiteId: testrailSuiteId,
-      includeAll: false,
-    },
+    reporter: testrailEnabled ? 'cypress-testrail-reporter' : 'spec',
+    reporterOptions: testrailEnabled
+      ? {
+          host: testrailHost,
+          username: testrailUser,
+          password: testrailPass,
+          projectId: testrailProjectId,
+          suiteId: testrailSuiteId,
+          includeAll: false,
+        }
+      : {},
   },
   component: {
     devServer: {

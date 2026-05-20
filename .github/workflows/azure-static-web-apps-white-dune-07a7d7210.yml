@@ -91,6 +91,22 @@ jobs:
           echo "App did not become ready in time"
           exit 1
 
+      - name: Verify TestRail credentials presence
+        run: |
+          echo "TESTRAIL_HOST present: $( [ -n '${{ secrets.TESTRAIL_HOST }}' ] && echo 'YES' || echo 'NO' )"
+          echo "TESTRAIL_USER present: $( [ -n '${{ secrets.TESTRAIL_USER }}' ] && echo 'YES' || echo 'NO' )"
+          echo "TESTRAIL_API_KEY present: $( [ -n '${{ secrets.TESTRAIL_API_KEY }}' ] && echo 'YES' || echo 'NO' )"
+          echo "TESTRAIL_PROJECT_ID present: $( [ -n '${{ secrets.TESTRAIL_PROJECT_ID }}' ] && echo 'YES' || echo 'NO' )"
+          echo "TESTRAIL_SUITE_ID present: $( [ -n '${{ secrets.TESTRAIL_SUITE_ID }}' ] && echo 'YES' || echo 'NO' )"
+
+      - name: Test TestRail API connectivity
+        continue-on-error: true
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            -u "${{ secrets.TESTRAIL_USER }}:${{ secrets.TESTRAIL_API_KEY }}" \
+            "${{ secrets.TESTRAIL_HOST }}/index.php?/api/v2/get_projects" \
+            || echo "TestRail connection failed"
+
       - name: Run Cypress against deployed app
         env:
           CYPRESS_BASE_URL: ${{ needs.build_and_deploy_job.outputs.static_web_app_url }}
@@ -100,7 +116,6 @@ jobs:
           CYPRESS_TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}
           CYPRESS_TESTRAIL_PROJECT_ID: ${{ secrets.TESTRAIL_PROJECT_ID }}
           CYPRESS_TESTRAIL_SUITE_ID: ${{ secrets.TESTRAIL_SUITE_ID }}
-          DEBUG: cypress-testrail-reporter
         run: |
           npx cypress run --headless --browser electron
 
