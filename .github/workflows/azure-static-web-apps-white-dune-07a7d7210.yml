@@ -46,6 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Cypress E2E Tests
     needs: build_and_deploy_job
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v3
 
@@ -74,6 +75,22 @@ jobs:
       - name: Install Cypress binary
         run: npx cypress install --force
 
+      - name: Wait for deployed app to be ready
+        run: |
+          URL="${{ needs.build_and_deploy_job.outputs.static_web_app_url }}"
+          echo "Checking URL: $URL"
+          for i in {1..30}; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo "000")
+            echo "Attempt $i: HTTP $HTTP_CODE"
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "App is ready!"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "App did not become ready in time"
+          exit 1
+
       - name: Run Cypress against deployed app
         env:
           CYPRESS_BASE_URL: ${{ needs.build_and_deploy_job.outputs.static_web_app_url }}
@@ -83,6 +100,7 @@ jobs:
           CYPRESS_TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}
           CYPRESS_TESTRAIL_PROJECT_ID: ${{ secrets.TESTRAIL_PROJECT_ID }}
           CYPRESS_TESTRAIL_SUITE_ID: ${{ secrets.TESTRAIL_SUITE_ID }}
+          DEBUG: cypress-testrail-reporter
         run: |
           npx cypress run --headless --browser electron
 
