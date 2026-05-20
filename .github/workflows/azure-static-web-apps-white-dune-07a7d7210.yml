@@ -100,23 +100,32 @@ jobs:
           echo "TESTRAIL_SUITE_ID present: $( [ -n '${{ secrets.TESTRAIL_SUITE_ID }}' ] && echo 'YES' || echo 'NO' )"
 
       - name: Test TestRail API connectivity
+        id: testrail_check
         continue-on-error: true
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -u "${{ secrets.TESTRAIL_USER }}:${{ secrets.TESTRAIL_API_KEY }}" \
             "${{ secrets.TESTRAIL_HOST }}/index.php?/api/v2/get_projects" \
-            || echo "TestRail connection failed"
+            || echo "000")
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "TestRail API status: $STATUS"
 
       - name: Run Cypress against deployed app
-        env:
-          CYPRESS_BASE_URL: ${{ needs.build_and_deploy_job.outputs.static_web_app_url }}
-          CYPRESS_apiUrl: ${{ secrets.API_URL }}
-          CYPRESS_TESTRAIL_HOST: ${{ secrets.TESTRAIL_HOST }}
-          CYPRESS_TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USER }}
-          CYPRESS_TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}
-          CYPRESS_TESTRAIL_PROJECT_ID: ${{ secrets.TESTRAIL_PROJECT_ID }}
-          CYPRESS_TESTRAIL_SUITE_ID: ${{ secrets.TESTRAIL_SUITE_ID }}
         run: |
+          export CYPRESS_BASE_URL="${{ needs.build_and_deploy_job.outputs.static_web_app_url }}"
+          export CYPRESS_apiUrl="${{ secrets.API_URL }}"
+
+          if [ "${{ steps.testrail_check.outputs.status }}" = "200" ]; then
+            export CYPRESS_TESTRAIL_HOST="${{ secrets.TESTRAIL_HOST }}"
+            export CYPRESS_TESTRAIL_USERNAME="${{ secrets.TESTRAIL_USER }}"
+            export CYPRESS_TESTRAIL_API_KEY="${{ secrets.TESTRAIL_API_KEY }}"
+            export CYPRESS_TESTRAIL_PROJECT_ID="${{ secrets.TESTRAIL_PROJECT_ID }}"
+            export CYPRESS_TESTRAIL_SUITE_ID="${{ secrets.TESTRAIL_SUITE_ID }}"
+            echo "TestRail reporter ENABLED"
+          else
+            echo "TestRail reporter DISABLED (API status: ${{ steps.testrail_check.outputs.status }})"
+          fi
+
           npx cypress run --headless --browser electron
 
       - name: Upload Cypress screenshots (on failure)
