@@ -25,15 +25,15 @@ module.exports = defineConfig({
     },
     specPattern: 'cypress/e2e/**/*.cy.ts',
     supportFile: 'cypress/support/e2e.ts',
-  },
-  reporter: 'cypress-testrail-reporter',
-  reporterOptions: {
-    host: testrailHost,
-    username: testrailUser,
-    password: testrailPass,
-    projectId: testrailProjectId,
-    suiteId: testrailSuiteId,
-    includeAll: false,
+    reporter: 'cypress-testrail-reporter',
+    reporterOptions: {
+      host: testrailHost,
+      username: testrailUser,
+      password: testrailPass,
+      projectId: testrailProjectId,
+      suiteId: testrailSuiteId,
+      includeAll: false,
+    },
   },
   component: {
     devServer: {
